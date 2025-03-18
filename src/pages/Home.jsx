@@ -6,9 +6,9 @@ import CompanyCards from '../components/home/CompanyCards'
 import Pagination from '../components/home/Pagination'
 import Footer from '../components/home/Footer'
 
-const Home = () => {
+const  Home = () => {
   return (
-    <div className="flex flex-col w-full max-w-screen-xl mx-auto bg-[#f9f4e7]">
+    <div className="flex flex-col w-full   bg-[#f9f4e7]">
       <Header />
       <HeroSection />
       <FilterBar />

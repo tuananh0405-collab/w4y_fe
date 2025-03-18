@@ -1,12 +1,8 @@
-import React from 'react'
-import { Outlet } from 'react-router-dom'
+import React from "react";
+import { Outlet } from "react-router-dom";
 
 const AdminRoute = () => {
-  return (
-    <div>
-      <Outlet/>
-    </div>
-  )
-}
+  return <Outlet />;
+};
 
-export default AdminRoute
+export default AdminRoute;

@@ -1,28 +1,29 @@
 import React from 'react';
+import { fsoftImage } from '../../assets';
 
 const defaultCompanies = [
   {
     id: 1,
     name: 'FPT Software',
-    logo: 'https://dashboard.codeparrot.ai/api/image/Z9fvHSppvFKitUQv/image-6.png',
+    logo: fsoftImage,
     skills: ['C++', 'English', 'Java', 'Android', '.Net']
   },
   {
     id: 2,
     name: 'ELCA',
-    logo: 'https://dashboard.codeparrot.ai/api/image/Z9fvHSppvFKitUQv/image-7.png',
+    logo: fsoftImage,
     skills: ['C++', 'JavaScript', 'Java', 'SharePoint', '.Net']
   },
   {
     id: 3,
     name: 'MB Bank',
-    logo: 'https://dashboard.codeparrot.ai/api/image/Z9fvHSppvFKitUQv/image-36.png', 
+    logo: fsoftImage, 
     skills: ['Python', 'Oracle', 'Java', 'ReactJS', 'AngularJS']
   },
   {
     id: 4,
     name: 'VTC',
-    logo: 'https://dashboard.codeparrot.ai/api/image/Z9fvHSppvFKitUQv/image-37.png',
+    logo: fsoftImage,
     skills: ['Design', 'Photoshop', 'AI', 'After Effect', 'InDesign']
   }
 ];

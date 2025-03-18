@@ -2,7 +2,7 @@ import React from 'react';
 
 const Header = () => {
   return (
-    <header className="flex justify-between items-center h-32 px-8 bg-transparent">
+    <header className="flex justify-between items-center h-32 px-8 bg-[#F2D49B]">
       <div className="text-4xl font-normal">LOGO</div>
       <nav className="flex gap-10">
         <a href="#" className="text-xl font-bold text-gray-800">Việc làm</a>

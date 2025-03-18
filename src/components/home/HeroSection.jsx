@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-
+import { heroImage } from '../../assets';
+import { Search } from '@mui/icons-material'; 
 const HeroSection = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -10,23 +11,25 @@ const HeroSection = () => {
 
   return (
     <div className="relative w-full h-[619px] overflow-hidden bg-transparent">
-      <img src="https://dashboard.codeparrot.ai/api/image/Z9fvHSppvFKitUQv/1440-x-691.png" alt="Hero background" className="w-full h-full object-cover" />
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <h1 className="text-white text-4xl font-bold text-center mb-10">TÌM VIỆC NHANH HƠN<br />TẠI W4U</h1>
-        <form className="flex items-center w-full max-w-lg relative" onSubmit={handleSearch}>
-          <input
-            type="text"
-            placeholder="Tìm Kiếm"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-12 rounded-full bg-white pr-12 pl-4"
-          />
-          <button type="submit" className="absolute right-0 w-12 h-12 flex items-center justify-center">
-            <img src="https://dashboard.codeparrot.ai/api/image/Z9fvHSppvFKitUQv/vector.png" alt="Search" />
-          </button>
-        </form>
-      </div>
+    <img src={heroImage} alt="Hero background" className="w-full h-full object-cover" />
+    
+    <div className="absolute inset-0 flex flex-col justify-center pt-30 pl-20">
+      
+      
+      <form className="flex items-center w-md relative" onSubmit={handleSearch}>
+        <input
+          type="text"
+          placeholder="Tìm Kiếm"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full h-12 rounded-full bg-white pl-4 pr-12 focus:outline-none"
+        />
+        <button type="submit" className="absolute right-0 w-12 h-12 flex items-center justify-center">
+          <Search className="text-orange-500" /> {/* Material-UI search icon */}
+        </button>
+      </form>
     </div>
+  </div>
   );
 };
 

@@ -1,0 +1,36 @@
+// src/assets/index.js
+
+// Icons
+export { default as accountBoxIcon } from './icons/account_box.svg';
+export { default as cityIcon } from './icons/city.svg';
+export { default as codexFileIcon } from './icons/codex_file.svg';
+export { default as companyIcon } from './icons/company.svg';
+export { default as controlFilledIcon } from './icons/control_filled.svg';
+export { default as cvLookUpIcon } from './icons/cv_look_up.svg';
+export { default as deviconGoogleIcon } from './icons/devicon_google.svg';
+export { default as emailIcon } from './icons/email.svg';
+export { default as facebookIcon } from './icons/facebook.svg';
+export { default as fileIcon } from './icons/file.svg';
+export { default as googleBlackIcon } from './icons/google_black.svg';
+// export { default as cityOutlineIcon } from './icons/icon-park-outline-city-1.svg';
+export { default as instagramIcon } from './icons/instagram.svg';
+export { default as keyPasswordIcon } from './icons/key_password.svg';
+export { default as lightBulbIcon } from './icons/light_bulb.svg';
+export { default as lightPostIcon } from './icons/light_post.svg';
+export { default as packageIcon } from './icons/package.svg';
+export { default as passwordCheckIcon } from './icons/password_check.svg';
+export { default as peopleFillIcon } from './icons/people-fill.svg';
+export { default as phoneIcon } from './icons/phone.svg';
+export { default as pinterestIcon } from './icons/pinterest.svg';
+export { default as postAddIcon } from './icons/post_add.svg';
+export { default as searchFilledIcon } from './icons/search_filled.svg';
+export { default as settingIcon } from './icons/setting.svg';
+export { default as userIcon } from './icons/user.svg';
+
+// Images
+export { default as bgImage } from './images/bg.png';
+export { default as cskhImage } from './images/cskh.png';
+export { default as employeeImage } from './images/employee.png';
+export { default as employerImage } from './images/employer.png';
+export { default as heroImage } from './images/hero.png';
+export { default as fsoftImage } from './images/fsoft.png';

@@ -5,7 +5,7 @@ import { Outlet } from "react-router-dom";
 function App() {
   return (
     <>
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center  min-h-screen ">
         <Outlet />
       </div>
     </>
