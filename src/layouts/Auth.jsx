@@ -1,17 +1,32 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux"; // Import dispatch từ Redux
+import { useSignInMutation } from "../redux/api/authApiSlice"; // Import hook từ apiSlice
+import { setCredentials } from "../redux/features/authSlice"; // Import action setCredentials
 import { cskhImage, emailIcon, googleBlackIcon, keyPasswordIcon } from "../assets";
-// import emailIcon from '../assets/icons/email.svg'
-// import keyPassword from '../assets/icons/key_password.svg'
-// import googleBlack from '../assets/icons/google_black.svg'
-// import cskh from '../assets/images/cskh.png'
+import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [signIn, { isLoading, error }] = useSignInMutation(); // Hook để gọi mutation signIn
+  const dispatch = useDispatch(); // Khởi tạo dispatch từ Redux
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
+    try {
+      // Gọi API đăng nhập
+      const userData = await signIn({ email, password }).unwrap(); // Gọi mutation và trả về kết quả
+
+      // Nếu đăng nhập thành công, dispatch setCredentials để lưu vào Redux state và localStorage
+      dispatch(setCredentials(userData)); // Lưu thông tin người dùng vào Redux
+      navigate('/home')
+
+      console.log(userData); // Xử lý thành công (có thể chuyển hướng hoặc cập nhật trạng thái người dùng)
+      // Bạn có thể sử dụng navigate() từ react-router-dom để chuyển hướng sang trang khác
+    } catch (err) {
+      console.error("Login failed: ", err); // Xử lý lỗi nếu có
+    }
   };
 
   return (
@@ -80,10 +95,15 @@ const Auth = () => {
 
           <button
             type="submit"
-            className="bg-orange-500 text-white rounded-lg py-3 font-bold transition-all duration-300 hover:bg-orange-600"
+            className={`bg-orange-500 text-white rounded-lg py-3 font-bold transition-all duration-300 hover:bg-orange-600 ${
+              isLoading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={isLoading}
           >
-            Đăng nhập
+            {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
           </button>
+
+          {error && <div className="text-red-500 mt-2 text-center">Đăng nhập thất bại. Vui lòng thử lại!</div>}
 
           <button className="flex items-center justify-center gap-2 border rounded-lg py-3 transition-all duration-300 hover:bg-gray-100">
             <img src={googleBlackIcon} alt="Google" className="w-8 h-8" />
@@ -102,7 +122,7 @@ const Auth = () => {
           />
         </div>
         <div className="absolute top-0 left-0 w-[30%] h-full bg-orange-100 opacity-70"></div>
-        <div className="absolute top-[30%] left-[20%] text-white p-6">
+        {/* <div className="absolute top-[30%] left-[20%] text-white p-6">
           <h3 className="font-bold text-2xl mb-3">Môi trường làm việc năng động</h3>
           <ul className="list-disc text-lg ml-6">
             <li>Không ngừng phát triển 6 tháng liên tục</li>
@@ -111,7 +131,7 @@ const Auth = () => {
           <button className="mt-4 bg-white text-orange-600 font-bold py-2 px-4 rounded-full">
             APPLY NOW
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

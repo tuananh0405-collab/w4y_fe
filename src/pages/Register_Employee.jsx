@@ -1,11 +1,8 @@
 import React, { use, useState } from 'react';
 import { bgImage, deviconGoogleIcon, emailIcon, keyPasswordIcon, passwordCheckIcon, userIcon } from '../assets';
-// import bg from '../assets/images/bg.png'
-// import googleWhite from '../assets/icons/devicon_google.svg'
-// import userIcon from '../assets/icons/user.svg'
-// import emailIcon from '../assets/icons/email.svg'
-// import passwordKeyIcon from '../assets/icons/key_password.svg'
-// import passwordCheckIcon from '../assets/icons/password_check.svg'
+import { useSignUpMutation, useVerifyEmailMutation } from '../redux/api/authApiSlice';
+import { useNavigate } from 'react-router-dom';
+import { Modal, Input, Button } from "antd";
 
 const Register_Employee = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +13,12 @@ const Register_Employee = () => {
     agreeToTerms: false
   });
 
+  const [signUp, { isLoading: isSigningUp }] = useSignUpMutation();
+    const [verifyEmail, { isLoading: isVerifying }] = useVerifyEmailMutation();
+    const [isModalVisible, setIsModalVisible] = useState(false); // State for Modal visibility
+    const [verificationCode, setVerificationCode] = useState("");
+    const navigate = useNavigate();
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -24,15 +27,61 @@ const Register_Employee = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+
+    if (!formData.agreeToTerms) {
+      return alert("You must agree to the terms before registering!"); // Kiểm tra xem có đồng ý điều khoản chưa
+    }
+
+    // Thêm trường `accountType` với giá trị "Nhà Tuyển Dụng"
+    const updatedFormData = {
+      ...formData,
+      accountType: "Ứng Viên", // Thêm accountType mặc định
+      agreeToTerms: undefined, // Không gửi trường agreeToTerms
+    };
+
+    try {
+      // Gửi request đăng ký
+      const response = await signUp(updatedFormData).unwrap();
+      console.log("Registration successful", response);
+
+      // Hiển thị Modal yêu cầu nhập verification code
+      setIsModalVisible(true);
+    } catch (error) {
+      console.error("Registration failed:", error);
+    }
+  };
+  const handleVerifyEmail = async () => {
+    if (verificationCode.trim() === "") {
+      alert("Please enter the verification code.");
+      return;
+    }
+
+    try {
+      // Gửi yêu cầu xác minh email khi người dùng nhập mã xác minh
+      const response = await verifyEmail({
+        email: formData.email,
+        verificationCode: verificationCode,
+        password: formData.password,
+      }).unwrap();
+      console.log("Email verified successfully", response);
+
+      // Sau khi xác minh thành công, điều hướng về trang đăng nhập
+      navigate("/auth");
+    } catch (error) {
+      console.error("Verification failed:", error);
+    }
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false); // Đóng Modal
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-screen bg-orange-100 relative">
+    <div className="flex flex-col items-center justify-center w-full h-full bg-orange-100 relative">
       <img src={bgImage} alt="Background" className="absolute top-0 left-0 w-full h-full object-cover z-0" />
-      <div className="flex flex-col items-center justify-center w-full max-w-3xl bg-white rounded-3xl shadow-lg p-10 z-10">
+      <div className="flex flex-col items-center justify-center w-full max-w-3xl bg-white rounded-3xl shadow-lg p-10 z-10 my-10">
         <div className="flex flex-col items-center w-full max-w-lg p-5">
           <h1 className="font-margarine text-4xl text-gray-900 mb-8">Hi!</h1>
           
@@ -121,13 +170,40 @@ const Register_Employee = () => {
               </label>
             </div>
 
-            <button type="submit" className="w-full h-16 bg-orange-600 rounded-lg text-white text-xl font-bold mb-5 hover:bg-orange-700 transition-all duration-300">
-              Hoàn tất
+            <button type="submit" disabled={isSigningUp} className="w-full h-16 bg-orange-600 rounded-lg text-white text-xl font-bold mb-5 hover:bg-orange-700 transition-all duration-300">
+            {isSigningUp ? "Đang đăng ký..." : "Hoàn tất"}
             </button>
+
+<Modal
+        title="Xác minh email"
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <div>
+          <label className="block text-lg font-medium text-gray-900 mb-2">Mã xác minh</label>
+          <Input
+            type="text"
+            value={verificationCode}
+            onChange={(e) => setVerificationCode(e.target.value)}
+            placeholder="Nhập mã xác minh"
+            className="w-full py-3 border border-gray-300 rounded-lg"
+          />
+          <div className="mt-4 flex justify-end">
+            <Button
+              type="primary"
+              onClick={handleVerifyEmail}
+              disabled={isVerifying || verificationCode.length === 0}
+            >
+              Xác minh
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
             <div className="text-center text-xl">
               <span className="text-gray-700 font-medium">Đã có tài khoản?</span>
-              <a href="#" className="text-gray-900 font-bold ml-2">Đăng nhập ngay</a>
+              <a href="/auth" className="text-gray-900 font-bold ml-2">Đăng nhập ngay</a>
             </div>
           </form>
         </div>

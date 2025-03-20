@@ -71,6 +71,7 @@ const UpJob = () => {
           </nav>
         </aside>
         {/* <JobPostingForm /> */}
+        
         <div className="bg-white rounded-lg p-5 w-full">
           <h2 className="text-xl font-bold text-orange-500 mb-6">
             Thông tin cơ bản

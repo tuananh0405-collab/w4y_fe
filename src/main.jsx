@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import App from './layouts/App.jsx'
+import App from "./layouts/App.jsx";
 import {
   Route,
   RouterProvider,
@@ -19,13 +19,15 @@ import Home from "./pages/Home.jsx";
 import UpCV from "./pages/UpCV.jsx";
 import UpJob from "./pages/UpJob.jsx";
 import Apply from "./pages/Apply.jsx";
-
+import { Provider } from "react-redux";
+import store from "./redux/store.js";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
       {/* AUTH  */}
-      <Route path="/" element={<Auth />} />
+      <Route path="/" element={<Welcome />} />
+      <Route path="/auth" element={<Auth />} />
       {/* PRIVATE  */}
       <Route path="/admin" element={<App />}>
         <Route path="" element={<AdminRoute />}>
@@ -35,7 +37,6 @@ const router = createBrowserRouter(
       {/* PUBLIC  */}
       <Route path="/" element={<App />}>
         <Route path="" element={<UserRoute />}>
-          <Route path="/welcome" element={<Welcome />} />
           <Route path="/register-employer" element={<Register_Employer />} />
           <Route path="/register-employee" element={<Register_Employee />} />
           <Route path="/home" element={<Home />} />
@@ -51,8 +52,7 @@ const router = createBrowserRouter(
 );
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    {/* <App /> */}
+  <Provider store={store}>
     <RouterProvider router={router} />
-  </StrictMode>
+  </Provider>
 );

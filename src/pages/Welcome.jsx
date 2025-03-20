@@ -1,9 +1,10 @@
 import React from 'react'
 import { employeeImage, employerImage } from '../assets'
-// import employeeImg from '../assets/images/employee.png'
-// import employerImg from '../assets/images/employer.png'
+import { useNavigate } from 'react-router-dom';
 
 const Welcome = () => {
+    const navigate = useNavigate();
+  
   return (
     <div className="max-w-[1440px] mx-auto p-5 font-sans">
       <div className="text-center mb-10">
@@ -32,7 +33,7 @@ const Welcome = () => {
           <button 
             className="w-[310px] h-[61px] bg-[#f2762e] rounded-[30.5px] text-white text-2xl font-medium 
                        hover:bg-[#d65f1f] active:scale-[0.98] transition-all duration-300"
-            onClick={() => console.log('Recruiter selected')}
+            onClick={() => navigate('/register-employer')}
           >
             Tôi là nhà tuyển dụng
           </button>
@@ -50,8 +51,8 @@ const Welcome = () => {
           <button 
             className="w-[310px] h-[61px] bg-[#f2762e] rounded-[30.5px] text-white text-2xl font-medium 
                        hover:bg-[#d65f1f] active:scale-[0.98] transition-all duration-300"
-            onClick={() => console.log('Job seeker selected')}
-          >
+                       onClick={() => navigate('/register-employee')}
+                       >
             Tôi là ứng viên tìm việc
           </button>
         </div>
