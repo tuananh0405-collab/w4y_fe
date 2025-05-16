@@ -21,6 +21,8 @@ import UpJob from "./pages/UpJob.jsx";
 import Apply from "./pages/Apply.jsx";
 import { Provider } from "react-redux";
 import store from "./redux/store.js";
+import JobDetail from "./pages/JobDetail.jsx";
+import Profile from "./pages/Profile.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -43,6 +45,8 @@ const router = createBrowserRouter(
           <Route path="/up-cv" element={<UpCV />} />
           <Route path="/up-job" element={<UpJob />} />
           <Route path="/apply" element={<Apply />} />
+          <Route path="/job-detail/:jobId" element={<JobDetail />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
       </Route>
       {/* Route 404 cho tất cả các route khác */}

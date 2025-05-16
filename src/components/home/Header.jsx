@@ -26,8 +26,8 @@ const Header = () => {
 
   const menu = (
     <Menu>
-      <Menu.Item key="1">
-        <span className="font-inter text-[14px]">{user?.user?.name}</span>
+      <Menu.Item key="1" onClick={()=>navigate('/profile')}>
+        <span className="font-inter text-[14px]">Hồ sơ cá nhân</span>
       </Menu.Item>
       <Menu.Item key="2">
         <span className="font-inter text-[14px]">Type: {user?.user?.accountType}</span>
