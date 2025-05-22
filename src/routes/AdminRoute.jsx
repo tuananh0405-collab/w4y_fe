@@ -2,7 +2,11 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 
 const AdminRoute = () => {
-  return <Outlet />;
+  return (
+    <>
+      <Outlet />
+    </>
+  );
 };
 
 export default AdminRoute;
