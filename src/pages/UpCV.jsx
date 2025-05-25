@@ -7,16 +7,17 @@ import CreateNewCVSection from "../components/cv/CreateNewCVSection";
 import CVTemplateSelection from "../components/cv/CVTemplateSection";
 import PreviewSection from "../components/cv/PreviewSection";
 import { cvLookUpIcon } from "../assets";
+import theme from "../utils/theme";
 
 const UpCV = () => {
   return (
-    <div className="flex flex-col min-h-screen w-full bg-gray-200">
+    <div className="flex flex-col min-h-screen w-full bg-white">
       <Header />
       <div className="flex flex-row justify-start items-center mx-20">
-        <h1 className="text-4xl font-bold text-orange-500 mb-8">
+        <h1 className="text-4xl font-bold  mb-8" style={{color: theme.colors.darkTeal}}>
           Tải lên CV của bạn
         </h1>
-        <img src={cvLookUpIcon} alt="cv lookup icon" />
+        {/* <img src={cvLookUpIcon} alt="cv lookup icon" /> */}
       </div>
       <div className="flex flex-col mx-20 bg-white my-5 rounded-lg">
         <StepperNavigation currentStep={1} />

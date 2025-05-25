@@ -3,6 +3,7 @@ import { bgImage, cityIcon, companyIcon, deviconGoogleIcon, emailIcon, keyPasswo
 import { useNavigate } from "react-router-dom";
 import { useSignUpMutation, useVerifyEmailMutation } from "../redux/api/authApiSlice";
 import { Modal, Input, Button } from "antd";
+import theme from "../utils/theme";
 
 
 const Register_Employer = () => {
@@ -85,13 +86,18 @@ const Register_Employer = () => {
   };
 
   return (
-    <div className="flex justify-center items-center w-full h-full bg-orange-100 relative">
+       <div
+      className="flex justify-center items-center w-full h-full relative"
+      style={{ backgroundColor: theme.colors.mintGreen }} // đổi màu nền từ cam nhạt sang mint green
+    >
       <img
         src={bgImage}
         alt="Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
       />
-      <div className="relative w-full max-w-5xl bg-white rounded-3xl shadow-lg p-10 my-10">
+      <div
+        className="relative w-full max-w-5xl bg-white rounded-3xl shadow-lg p-10 my-10"
+      >
         <div className="relative z-10">
           <form
             className="flex flex-col items-center w-full max-w-lg mx-auto p-5"
@@ -99,7 +105,10 @@ const Register_Employer = () => {
           >
             <h1 className="font-margarine text-4xl text-gray-900 mb-8">Hi!</h1>
 
-            <button className="flex items-center justify-center w-full h-16 bg-orange-500 text-white text-xl font-medium rounded-lg mb-5 hover:bg-orange-600 transition-all duration-300">
+            <button
+              className="flex items-center justify-center w-full h-16 text-white text-xl font-medium rounded-lg mb-5 hover:brightness-90 active:scale-[0.98] transition-all duration-300"
+              style={{ backgroundColor: theme.colors.darkTeal }} // đổi màu nút google đăng ký
+            >
               <img
                 src={deviconGoogleIcon}
                 alt="Google"
@@ -343,39 +352,44 @@ const Register_Employer = () => {
 
             <button
               type="submit"
-              className="w-full h-16 bg-orange-600 text-white text-xl font-bold rounded-lg mb-5 hover:bg-orange-700 transition-all duration-300"
+              className="w-full h-16 text-white text-xl font-bold rounded-lg mb-5 hover:brightness-90 active:scale-[0.98] transition-all duration-300"
+              style={{ backgroundColor: theme.colors.darkTeal }}
               disabled={isSigningUp}
             >
              {isSigningUp ? "Đang đăng ký..." : "Hoàn tất"}
             </button>
 
-             {/* Modal xác minh email */}
-      <Modal
-        title="Xác minh email"
-        visible={isModalVisible}
-        onCancel={handleCancel}
-        footer={null}
-      >
-        <div>
-          <label className="block text-lg font-medium text-gray-900 mb-2">Mã xác minh</label>
-          <Input
-            type="text"
-            value={verificationCode}
-            onChange={(e) => setVerificationCode(e.target.value)}
-            placeholder="Nhập mã xác minh"
-            className="w-full py-3 border border-gray-300 rounded-lg"
-          />
-          <div className="mt-4 flex justify-end">
-            <Button
-              type="primary"
-              onClick={handleVerifyEmail}
-              disabled={isVerifying || verificationCode.length === 0}
+            {/* Modal xác minh email */}
+            <Modal
+              title="Xác minh email"
+              visible={isModalVisible}
+              onCancel={handleCancel}
+              footer={null}
             >
-              Xác minh
-            </Button>
-          </div>
-        </div>
-      </Modal>
+              <div>
+                <label className="block text-lg font-medium text-gray-900 mb-2">Mã xác minh</label>
+                <Input
+                  type="text"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value)}
+                  placeholder="Nhập mã xác minh"
+                  className="w-full py-3 border border-gray-300 rounded-lg"
+                  style={{ borderColor: theme.colors.tealGreen }}
+                  onFocus={e => (e.target.style.borderColor = theme.colors.darkTeal)}
+                  onBlur={e => (e.target.style.borderColor = theme.colors.tealGreen)}
+                />
+                <div className="mt-4 flex justify-end">
+                  <Button
+                    type="primary"
+                    onClick={handleVerifyEmail}
+                    disabled={isVerifying || verificationCode.length === 0}
+                    style={{ backgroundColor: theme.colors.darkTeal, borderColor: theme.colors.darkTeal }}
+                  >
+                    Xác minh
+                  </Button>
+                </div>
+              </div>
+            </Modal>
 
             <div className="flex gap-2 text-lg">
               <span className="text-gray-700">Đã có tài khoản?</span>

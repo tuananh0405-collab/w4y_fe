@@ -27,10 +27,27 @@ export { default as searchFilledIcon } from './icons/search_filled.svg';
 export { default as settingIcon } from './icons/setting.svg';
 export { default as userIcon } from './icons/user.svg';
 
+export { default as bagIcon } from './icons/bag.svg';
+export { default as buildingIcon } from './icons/building.svg';
+export { default as companyLogoIcon } from './icons/company-logo.svg';
+export { default as customerServiceIcon } from './icons/customer-service.svg';
+export { default as homeIcon } from './icons/home.svg';
+export { default as LGIcon } from './icons/LG.svg';
+export { default as moneyCalculator24Icon } from './icons/money-calculator-24.svg';
+export { default as nanoTechnologyIcon } from './icons/nano-technology.svg';
+export { default as skypeIcon } from './icons/skype.svg';
+export { default as speakerIcon } from './icons/speaker.svg';
+export { default as funnelIcon } from './icons/famicons-funnel.svg';
+export { default as editIcon } from './icons/edit.png';
+export { default as editNoteIcon } from './icons/edit-note.svg';
+export { default as checkedIcon } from './icons/checked.png';
+
+
+
 // Images
 export { default as bgImage } from './images/bg.png';
 export { default as cskhImage } from './images/cskh.png';
 export { default as employeeImage } from './images/employee.png';
 export { default as employerImage } from './images/employer.png';
-export { default as heroImage } from './images/hero.png';
+export { default as heroImage } from './images/hero.svg';
 export { default as fsoftImage } from './images/fsoft.png';

@@ -10,7 +10,7 @@ export const applicationApiSlice = apiSlice.injectEndpoints({
         method: "POST",
         body: formData, // gửi formData chứa file CV
         headers: {
-        //   "Content-Type": "multipart/form-data", // Đảm bảo gửi file qua multipart/form-data
+          //   "Content-Type": "multipart/form-data", // Đảm bảo gửi file qua multipart/form-data
         },
         credentials: "include", // Nếu cần gửi cookie/Authorization header
       }),
@@ -24,10 +24,15 @@ export const applicationApiSlice = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
+
+    getApplicationsWithInfo: builder.query({
+      query: ({ employerId }) => ({
+        url: `${APPLICATION_URL}/applications/${employerId}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const {
-  useApplyJobMutation,
-  useViewApplicationStatusQuery,
-} = applicationApiSlice;
+export const { useApplyJobMutation, useViewApplicationStatusQuery,useGetApplicationsWithInfoQuery } =
+  applicationApiSlice;

@@ -23,6 +23,7 @@ import { Provider } from "react-redux";
 import store from "./redux/store.js";
 import JobDetail from "./pages/JobDetail.jsx";
 import Profile from "./pages/Profile.jsx";
+import TopJobs from "./pages/TopJobs.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -46,6 +47,7 @@ const router = createBrowserRouter(
           <Route path="/up-job" element={<UpJob />} />
           <Route path="/apply" element={<Apply />} />
           <Route path="/job-detail/:jobId" element={<JobDetail />} />
+          <Route path="/top-jobs" element={<TopJobs />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
       </Route>

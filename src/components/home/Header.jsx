@@ -7,6 +7,7 @@ import { logout } from "../../redux/features/authSlice"; // Import logout action
 import {useNavigate} from "react-router-dom"
 import { Dropdown, Menu } from "antd"; // Import Dropdown và Menu của Ant Design
 import { useSignOutMutation } from "../../redux/api/authApiSlice";
+import theme from "../../utils/theme";
 
 const Header = () => {
   const user = useSelector((state) => state.auth.userState); // Lấy thông tin người dùng từ Redux state
@@ -30,7 +31,7 @@ const Header = () => {
         <span className="font-inter text-[14px]">Hồ sơ cá nhân</span>
       </Menu.Item>
       <Menu.Item key="2">
-        <span className="font-inter text-[14px]">Type: {user?.user?.accountType}</span>
+        <span className="font-inter text-[14px]">{user?.user?.accountType}</span>
       </Menu.Item>
       <Menu.Divider />
       <Menu.Item key="3" onClick={handleLogout}>
@@ -40,13 +41,13 @@ const Header = () => {
   );
 
   return (
-    <header className="flex justify-between items-center h-32 px-8 bg-[#F2D49B]">
+    <header className="flex justify-between items-center h-32 px-8 bg-white">
       <div className="text-4xl font-normal">LOGO</div>
       <nav className="flex gap-10">
         <a href="/home" className="text-xl font-bold text-gray-800">
           Việc làm
         </a>
-        <a href="up-cv" className="text-xl font-bold text-gray-800">
+        <a href="/up-cv" className="text-xl font-bold text-gray-800">
           Hồ sơ & CV
         </a>
         <a href="#" className="text-xl font-bold text-gray-800">
@@ -83,7 +84,7 @@ const Header = () => {
             </span>
             <div className="flex p-2">
               <span className="font-inter text-[12px] font-normal text-[#151515]">
-                Type: {user.user.accountType}
+                {user.user.accountType}
               </span>
             </div>
           </div>
@@ -98,7 +99,7 @@ const Header = () => {
           <button className="text-xl font-medium text-gray-800" onClick={()=>navigate('/auth')}>
             Đăng nhập
           </button>
-          <button className="text-xl font-medium text-gray-800 bg-orange-500 rounded-md px-5 py-2" onClick={()=>navigate('/')}>
+          <button className="text-xl font-medium text-gray-800 rounded-md px-5 py-2" onClick={()=>navigate('/')} style={{background: theme.colors.mintGreen}}>
             Đăng ký
           </button>
         </div>

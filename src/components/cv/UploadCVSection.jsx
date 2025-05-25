@@ -90,7 +90,7 @@ const UploadCVSection = () => {
 
       <Button
         variant="contained"
-        color="warning"
+        color="success"
         className="mt-5"
         component="label"
       >

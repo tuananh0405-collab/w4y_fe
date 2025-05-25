@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, Col, Row, Typography } from 'antd';
 import { DollarOutlined, ScheduleOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import JobCard from './JobCard';
 
 // Sử dụng tailwindcss cho các kiểu dáng
 const { Title, Text } = Typography;
@@ -14,9 +15,13 @@ const JobDisplay = ({ job }) => {
     navigate(`/job-detail/${jobId}`);
   };
 
+  console.log('====================================');
+  console.log(job);
+  console.log('====================================');
+
   return (
     <Col span={8} className="p-4">
-      <Card
+      {/* <Card
         hoverable
         onClick={() => handleJobClick(job.id)}
         className="border border-gray-200 rounded-lg shadow-md"
@@ -40,7 +45,10 @@ const JobDisplay = ({ job }) => {
             </div>
           </div>
         </div>
-      </Card>
+      </Card> */}
+        <div onClick={()=>handleJobClick(job.id)}>
+        <JobCard {...job} />
+      </div>
     </Col>
   );
 };

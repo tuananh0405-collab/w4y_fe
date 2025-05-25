@@ -1,5 +1,5 @@
 import { apiSlice } from "./apiSlice";
-import { APPLICANT_URL } from "../constants"; // Đảm bảo bạn có URL API cho ứng viên
+import { APPLICANT_URL, USER_URL } from "../constants"; // Đảm bảo bạn có URL API cho ứng viên
 
 export const applicantApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -20,7 +20,15 @@ export const applicantApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+
+     getApplicantProfile: builder.query({
+      query: () => ({
+        url: `${USER_URL}/profile`,
+        method: 'GET',
+        credentials:'include'
+      }),
+    }),
   }),
 });
 
-export const { useUploadCVMutation, useGetProfileQuery } = applicantApiSlice;
+export const { useUploadCVMutation, useGetProfileQuery,useGetApplicantProfileQuery  } = applicantApiSlice;

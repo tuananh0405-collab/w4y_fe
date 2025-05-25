@@ -12,6 +12,27 @@ import {
   packageIcon,
   settingIcon,
 } from "../assets";
+import theme from "../utils/theme";
+import DashboardTab from "../components/up-job/DashboardTab";
+import CreateJobTab from "../components/up-job/CreateJobTab";
+import PostedJobsTab from "../components/up-job/PostedJobsTab";
+import ApplicantsTab from "../components/up-job/ApplicantsTab";
+import SearchApplicantsTab from "../components/up-job/SearchApplicantsTab";
+import CompanyProfileTab from "../components/up-job/CompanyProfileTab";
+import ServicePackageTab from "../components/up-job/ServicePackageTab";
+import SettingsTab from "../components/up-job/SettingsTab";
+import Sidebar from "../components/up-job/Sidebar";
+
+const tabsComponents = [
+  DashboardTab,
+  CreateJobTab,
+  PostedJobsTab,
+  ApplicantsTab,
+  SearchApplicantsTab,
+  CompanyProfileTab,
+  ServicePackageTab,
+  SettingsTab,
+];
 
 const UpJob = () => {
   const menuItems = [
@@ -73,246 +94,29 @@ const UpJob = () => {
     }
   };
 
-  const handleBack = () => {};
 
+
+ const [activeIndex, setActiveIndex] = useState(1);
+
+  const ActiveTab = tabsComponents[activeIndex];
+
+  const handleSubmitJob = (jobData) => {
+    console.log("Submit job:", jobData);
+    // Gọi API hoặc xử lý ở đây...
+  };
   return (
-    <div className="flex flex-col min-h-screen w-full">
+       <div className="flex flex-col min-h-screen w-full">
       <Header />
       <div className="flex flex-grow px-20 bg-gray-200 py-10">
-        {/* Sidebar */}
-        <aside className="bg-white rounded-lg p-4 min-w-[325px] flex flex-col gap-6 mr-5">
-          <h2 className="text-xl font-bold text-orange-500">
-            Quản lý tuyển dụng
-          </h2>
-          <nav className="flex flex-col gap-7">
-            {menuItems.map((item, index) => (
-              <button
-                key={index}
-                className="flex items-center gap-3 p-2 hover:bg-orange-100 rounded"
-              >
-                <img src={item.icon} alt="" className="w-6 h-6" />
-                <span className="text-lg font-medium">{item.text}</span>
-              </button>
-            ))}
-          </nav>
-        </aside>
-
-        {/* Job Posting Form */}
-        <div className="bg-white rounded-lg p-5 w-full">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold text-orange-500 mb-6">
-              Thông tin cơ bản
-            </h2>
-            <button
-              className="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 mb-6"
-              onClick={() => {}} // Bạn có thể thêm hàm xử lý khi nhấn nút nếu cần
-            >
-              Xem bản nháp đã lưu
-            </button>
-          </div>
-
-          {/* Mẹo đăng tin hiệu quả */}
-          <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-            <h3 className="text-lg font-semibold text-orange-600">
-              Mẹo đăng tin hiệu quả 💡
-            </h3>
-            <ul className="list-disc pl-5 text-sm text-gray-700">
-              <li>Tiêu đề việc làm rõ ràng, có chứa tên vị trí và cấp bậc</li>
-              <li>
-                Mô tả công việc và yêu cầu chi tiết, tập trung vào kỹ năng cần
-                thiết
-              </li>
-              <li>
-                Thông tin về lương và phúc lợi cụ thể để thu hút ứng viên mới
-              </li>
-              <li>Sử dụng từ khóa ngành nghề để tối ưu khả năng tìm kiếm</li>
-            </ul>
-          </div>
-
-          {/* Form Inputs */}
-          <div className="flex flex-col gap-5">
-            <div className="flex flex-col">
-              <label className="text-lg font-medium text-gray-700">
-                Tiêu đề tin tuyển dụng
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleInputChange}
-                placeholder="Senior Java Developer - Lương đến 4000$"
-                className="border p-2 rounded"
-              />
-            </div>
-
-            {/* Quantity and Work Type */}
-            <div className="flex gap-5">
-              <div className="flex flex-col w-full">
-                <label className="text-lg font-medium text-gray-700">
-                  Số lượng tuyển dụng
-                </label>
-                <input
-                  type="text"
-                  name="quantity"
-                  value={formData.quantity}
-                  onChange={handleInputChange}
-                  placeholder="3"
-                  className="border p-2 rounded"
-                />
-              </div>
-              <div className="flex flex-col w-full">
-                <label className="text-lg font-medium text-gray-700">
-                  Thời gian làm việc
-                </label>
-                <input
-                  type="text"
-                  name="deliveryTime"
-                  value={formData.deliveryTime}
-                  onChange={handleInputChange}
-                  placeholder="Toàn thời gian"
-                  className="border p-2 rounded"
-                />
-              </div>
-            </div>
-
-            {/* Level and Industry */}
-            <div className="flex gap-5">
-              <div className="flex flex-col w-full">
-                <label className="text-lg font-medium text-gray-700">
-                  Cấp bậc
-                </label>
-                <input
-                  type="text"
-                  name="level"
-                  value={formData.level}
-                  onChange={handleInputChange}
-                  placeholder="Chuyên viên"
-                  className="border p-2 rounded"
-                />
-              </div>
-              <div className="flex flex-col w-full">
-                <label className="text-lg font-medium text-gray-700">
-                  Ngành nghề
-                </label>
-                <input
-                  type="text"
-                  name="industry"
-                  value={formData.industry}
-                  onChange={handleInputChange}
-                  placeholder="CNTT"
-                  className="border p-2 rounded"
-                />
-              </div>
-            </div>
-
-            {/* Position and Location */}
-            <div className="flex gap-5">
-              <div className="flex flex-col w-full">
-                <label className="text-lg font-medium text-gray-700">
-                  Chức danh
-                </label>
-                <input
-                  type="text"
-                  name="position"
-                  value={formData.position}
-                  onChange={handleInputChange}
-                  placeholder="Lập trình viên"
-                  className="border p-2 rounded"
-                />
-              </div>
-              <div className="flex flex-col w-full">
-                <label className="text-lg font-medium text-gray-700">
-                  Địa điểm làm việc
-                </label>
-                <input
-                  type="text"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleInputChange}
-                  placeholder="Hà Nội"
-                  className="border p-2 rounded"
-                />
-              </div>
-            </div>
-
-            {/* Experience and Benefits */}
-            <div className="flex gap-5">
-              <div className="flex flex-col w-full">
-                <label className="text-lg font-medium text-gray-700">
-                  Kinh nghiệm
-                </label>
-                <input
-                  type="text"
-                  name="experience"
-                  value={formData.experience}
-                  onChange={handleInputChange}
-                  placeholder="3-5 năm"
-                  className="border p-2 rounded"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col">
-              <label className="text-lg font-medium text-gray-700">
-                Mô tả công việc
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                placeholder="Mô tả công việc"
-                className="border p-2 rounded"
-                rows="4"
-              />
-            </div>
-
-            <div className="flex flex-col">
-              <label className="text-lg font-medium text-gray-700">
-                Yêu cầu công việc
-              </label>
-              <textarea
-                name="requirements"
-                value={formData.requirements}
-                onChange={handleInputChange}
-                placeholder="Yêu cầu công việc"
-                className="border p-2 rounded"
-                rows="4"
-              />
-            </div>
-
-            <div className="flex flex-col">
-              <label className="text-lg font-medium text-gray-700">
-                Lương và phúc lợi
-              </label>
-              <input
-                type="text"
-                name="salary"
-                value={formData.salary}
-                onChange={handleInputChange}
-                placeholder="Lương"
-                className="border p-2 rounded"
-              />
-            </div>
-
-            {/* Buttons */}
-            <div className="flex justify-between mt-5">
-              <button
-                onClick={handleBack}
-                className="bg-gray-300 text-black px-4 py-2 rounded"
-              >
-                Quay lại
-              </button>
-              <button
-                onClick={handleSubmit}
-                className="bg-orange-500 text-white px-4 py-2 rounded"
-              >
-                Đăng việc
-              </button>
-            </div>
-          </div>
-        </div>
+        <Sidebar
+          menuItems={menuItems}
+          activeIndex={activeIndex}
+          onSelect={setActiveIndex}
+        />
+        <main className="bg-white rounded-lg p-5 w-full">
+          <ActiveTab onBack={() => setActiveIndex(0)} onSubmit={handleSubmitJob} />
+        </main>
       </div>
-
       <Footer />
     </div>
   );

@@ -1,5 +1,6 @@
 import React from 'react';
 import Card from '@mui/material/Card';
+import theme from '../../utils/theme';
 
 const CVTemplateSelection = () => {
     const templates = [
@@ -25,12 +26,12 @@ const CVTemplateSelection = () => {
 
     return (
         <div className="w-full min-w-[1000px] p-5 bg-inherit">
-            <h1 className="font-inter font-bold text-4xl text-orange-500 mb-8 text-center">Chọn mẫu CV</h1>
+            <h1 className="font-inter font-bold text-4xl text-orange-500 mb-8 text-center" style={{color: theme.colors.darkTeal}}>Chọn mẫu CV</h1>
             
             <div className="flex gap-5 justify-center flex-wrap">
                 {templates.map((template) => (
                     <Card key={template.id} className="w-[311px] cursor-pointer transition-transform transform hover:-translate-y-1">
-                        <div className="h-[296px] bg-orange-500 rounded-t-lg flex items-center justify-center">
+                        <div className="h-[296px] bg-orange-500 rounded-t-lg flex items-center justify-center" style={{background: theme.colors.darkTeal}}>
                             <h2 className="font-inter font-medium text-4xl text-white text-center">{template.title}</h2>
                         </div>
                         <div className={`bg-white p-5 h-[173px] rounded-b-lg ${template.id === 3 ? 'bg-[#fffaf1]' : ''}`}>

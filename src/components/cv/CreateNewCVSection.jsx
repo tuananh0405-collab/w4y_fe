@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
+import theme from '../../utils/theme';
 
 const CreateNewCVSection = () => {
     const [skills, setSkills] = useState(['Java', 'Design', 'MySQL']);
@@ -19,7 +20,7 @@ const CreateNewCVSection = () => {
 
     return (
         <div className="w-full max-w-[1240px] mx-auto p-5 font-inter">
-            <h1 className="text-4xl font-bold text-orange-500 mb-8">Hoặc tạo CV mới</h1>
+            <h1 className="text-4xl font-bold text-orange-500 mb-8" style={{color: theme.colors.darkTeal}}>Hoặc tạo CV mới</h1>
             
             <div className="flex flex-col gap-5">
                 <TextField 
@@ -76,7 +77,7 @@ const CreateNewCVSection = () => {
                                 key={index} 
                                 label={skill} 
                                 onDelete={() => handleRemoveSkill(skill)}
-                                color="primary"
+                                color="success"
                             />
                         ))}
                     </div>
