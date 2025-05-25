@@ -1,7 +1,7 @@
 import React from "react";
 import Avatar from "@mui/material/Avatar";
 import Chip from "@mui/material/Chip";
-import { userIcon } from "../../assets";
+import { userIcon, logoIcon } from "../../assets";
 import { useSelector, useDispatch } from "react-redux"; // Import useSelector để lấy dữ liệu từ Redux
 import { logout } from "../../redux/features/authSlice"; // Import logout action
 import {useNavigate} from "react-router-dom"
@@ -42,7 +42,9 @@ const Header = () => {
 
   return (
     <header className="flex justify-between items-center h-32 px-8 bg-white">
-      <div className="text-4xl font-normal">LOGO</div>
+        <div className="text-4xl font-normal">
+        <img src={logoIcon} alt="Logo" className="h-20 w-auto" />
+      </div>
       <nav className="flex gap-10">
         <a href="/home" className="text-xl font-bold text-gray-800">
           Việc làm
