@@ -1,10 +1,20 @@
-import React, { useState } from "react";
-import { bgImage, cityIcon, companyIcon, deviconGoogleIcon, emailIcon, keyPasswordIcon, passwordCheckIcon, phoneIcon, userIcon } from "../assets";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import {
+  bgImage,
+  cityIcon,
+  companyIcon,
+  deviconGoogleIcon,
+  emailIcon,
+  keyPasswordIcon,
+  passwordCheckIcon,
+  phoneIcon,
+  userIcon,
+} from "../assets";
 import { useNavigate } from "react-router-dom";
 import { useSignUpMutation, useVerifyEmailMutation } from "../redux/api/authApiSlice";
 import { Modal, Input, Button } from "antd";
 import theme from "../utils/theme";
-
 
 const Register_Employer = () => {
   const [formData, setFormData] = useState({
@@ -20,11 +30,42 @@ const Register_Employer = () => {
     agreeToTerms: false,
   });
 
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+
   const [signUp, { isLoading: isSigningUp }] = useSignUpMutation();
   const [verifyEmail, { isLoading: isVerifying }] = useVerifyEmailMutation();
-  const [isModalVisible, setIsModalVisible] = useState(false); // State for Modal visibility
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const navigate = useNavigate();
+
+  // Lấy danh sách tỉnh/thành phố khi component mount
+  useEffect(() => {
+    axios
+      .get("https://provinces.open-api.vn/api/p/")
+      .then((res) => setProvinces(res.data))
+      .catch((err) => console.error("Failed to load provinces", err));
+  }, []);
+
+  // Khi chọn tỉnh/thành phố, lấy danh sách huyện tương ứng
+  useEffect(() => {
+    if (formData.city) {
+      axios
+        .get(`https://provinces.open-api.vn/api/p/${formData.city}?depth=2`)
+        .then((res) => {
+          setDistricts(res.data.districts || []);
+          setFormData((prev) => ({ ...prev, district: "" })); // reset huyện khi đổi tỉnh
+        })
+        .catch((err) => {
+          console.error("Failed to load districts", err);
+          setDistricts([]);
+          setFormData((prev) => ({ ...prev, district: "" }));
+        });
+    } else {
+      setDistricts([]);
+      setFormData((prev) => ({ ...prev, district: "" }));
+    }
+  }, [formData.city]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -38,27 +79,25 @@ const Register_Employer = () => {
     e.preventDefault();
 
     if (!formData.agreeToTerms) {
-      return alert("You must agree to the terms before registering!"); // Kiểm tra xem có đồng ý điều khoản chưa
+      return alert("You must agree to the terms before registering!");
     }
 
-    // Thêm trường `accountType` với giá trị "Nhà Tuyển Dụng"
+    // Thêm accountType, loại bỏ agreeToTerms khỏi data gửi lên server
     const updatedFormData = {
       ...formData,
-      accountType: "Nhà Tuyển Dụng", // Thêm accountType mặc định
-      agreeToTerms: undefined, // Không gửi trường agreeToTerms
+      accountType: "Nhà Tuyển Dụng",
+      agreeToTerms: undefined,
     };
 
     try {
-      // Gửi request đăng ký
       const response = await signUp(updatedFormData).unwrap();
       console.log("Registration successful", response);
-
-      // Hiển thị Modal yêu cầu nhập verification code
       setIsModalVisible(true);
     } catch (error) {
       console.error("Registration failed:", error);
     }
   };
+
   const handleVerifyEmail = async () => {
     if (verificationCode.trim() === "") {
       alert("Please enter the verification code.");
@@ -66,15 +105,12 @@ const Register_Employer = () => {
     }
 
     try {
-      // Gửi yêu cầu xác minh email khi người dùng nhập mã xác minh
       const response = await verifyEmail({
         email: formData.email,
-        verificationCode: verificationCode,
+        verificationCode,
         password: formData.password,
       }).unwrap();
       console.log("Email verified successfully", response);
-
-      // Sau khi xác minh thành công, điều hướng về trang đăng nhập
       navigate("/auth");
     } catch (error) {
       console.error("Verification failed:", error);
@@ -82,22 +118,20 @@ const Register_Employer = () => {
   };
 
   const handleCancel = () => {
-    setIsModalVisible(false); // Đóng Modal
+    setIsModalVisible(false);
   };
 
   return (
-       <div
+    <div
       className="flex justify-center items-center w-full h-full relative"
-      style={{ backgroundColor: theme.colors.mintGreen }} // đổi màu nền từ cam nhạt sang mint green
+      style={{ backgroundColor: theme.colors.mintGreen }}
     >
       <img
         src={bgImage}
         alt="Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
       />
-      <div
-        className="relative w-full max-w-5xl bg-white rounded-3xl shadow-lg p-10 my-10"
-      >
+      <div className="relative w-full max-w-5xl bg-white rounded-3xl shadow-lg p-10 my-10">
         <div className="relative z-10">
           <form
             className="flex flex-col items-center w-full max-w-lg mx-auto p-5"
@@ -107,13 +141,10 @@ const Register_Employer = () => {
 
             <button
               className="flex items-center justify-center w-full h-16 text-white text-xl font-medium rounded-lg mb-5 hover:brightness-90 active:scale-[0.98] transition-all duration-300"
-              style={{ backgroundColor: theme.colors.darkTeal }} // đổi màu nút google đăng ký
+              style={{ backgroundColor: theme.colors.darkTeal }}
+              type="button"
             >
-              <img
-                src={deviconGoogleIcon}
-                alt="Google"
-                className="w-9 h-9 mr-2"
-              />
+              <img src={deviconGoogleIcon} alt="Google" className="w-9 h-9 mr-2" />
               Đăng ký bằng Google
             </button>
 
@@ -125,15 +156,9 @@ const Register_Employer = () => {
 
             {/* Email */}
             <div className="w-full mb-5">
-              <label className="block text-lg font-medium text-gray-900 mb-2">
-                Email đăng nhập*
-              </label>
+              <label className="block text-lg font-medium text-gray-900 mb-2">Email đăng nhập*</label>
               <div className="relative">
-                <img
-                  src={emailIcon}
-                  alt="Email"
-                  className="absolute left-3 top-3 w-6 h-6"
-                />
+                <img src={emailIcon} alt="Email" className="absolute left-3 top-3 w-6 h-6" />
                 <input
                   type="email"
                   name="email"
@@ -147,15 +172,9 @@ const Register_Employer = () => {
 
             {/* Mật khẩu */}
             <div className="w-full mb-5">
-              <label className="block text-lg font-medium text-gray-900 mb-2">
-                Mật khẩu*
-              </label>
+              <label className="block text-lg font-medium text-gray-900 mb-2">Mật khẩu*</label>
               <div className="relative">
-                <img
-                  src={keyPasswordIcon}
-                  alt="Password"
-                  className="absolute left-3 top-3 w-6 h-6"
-                />
+                <img src={keyPasswordIcon} alt="Password" className="absolute left-3 top-3 w-6 h-6" />
                 <input
                   type="password"
                   name="password"
@@ -169,9 +188,7 @@ const Register_Employer = () => {
 
             {/* Nhập lại mật khẩu */}
             <div className="w-full mb-5">
-              <label className="block text-lg font-medium text-gray-900 mb-2">
-                Nhập lại mật khẩu*
-              </label>
+              <label className="block text-lg font-medium text-gray-900 mb-2">Nhập lại mật khẩu*</label>
               <div className="relative">
                 <img
                   src={passwordCheckIcon}
@@ -190,21 +207,13 @@ const Register_Employer = () => {
             </div>
 
             {/* Thông tin nhà tuyển dụng */}
-            <h2 className="w-full text-xl font-bold text-gray-900 mb-5">
-              Thông tin nhà tuyển dụng
-            </h2>
+            <h2 className="w-full text-xl font-bold text-gray-900 mb-5">Thông tin nhà tuyển dụng</h2>
 
             {/* Họ và tên */}
             <div className="w-full mb-5">
-              <label className="block text-lg font-medium text-gray-900 mb-2">
-                Họ và tên*
-              </label>
+              <label className="block text-lg font-medium text-gray-900 mb-2">Họ và tên*</label>
               <div className="relative">
-                <img
-                  src={userIcon}
-                  alt="Name"
-                  className="absolute left-3 top-3 w-6 h-6"
-                />
+                <img src={userIcon} alt="Name" className="absolute left-3 top-3 w-6 h-6" />
                 <input
                   type="text"
                   name="name"
@@ -218,9 +227,7 @@ const Register_Employer = () => {
 
             {/* Giới tính */}
             <div className="w-full mb-5">
-              <label className="block text-lg font-medium text-gray-900 mb-2">
-                Giới tính*
-              </label>
+              <label className="block text-lg font-medium text-gray-900 mb-2">Giới tính*</label>
               <div className="flex items-center gap-5">
                 <label className="flex items-center">
                   <input
@@ -249,15 +256,9 @@ const Register_Employer = () => {
 
             {/* Số điện thoại */}
             <div className="w-full mb-5">
-              <label className="block text-lg font-medium text-gray-900 mb-2">
-                Số điện thoại cá nhân*
-              </label>
+              <label className="block text-lg font-medium text-gray-900 mb-2">Số điện thoại cá nhân*</label>
               <div className="relative">
-                <img
-                  src={phoneIcon}
-                  alt="Phone"
-                  className="absolute left-3 top-3 w-6 h-6"
-                />
+                <img src={phoneIcon} alt="Phone" className="absolute left-3 top-3 w-6 h-6" />
                 <input
                   type="tel"
                   name="phone"
@@ -271,15 +272,9 @@ const Register_Employer = () => {
 
             {/* Công ty */}
             <div className="w-full mb-5">
-              <label className="block text-lg font-medium text-gray-900 mb-2">
-                Công ty*
-              </label>
+              <label className="block text-lg font-medium text-gray-900 mb-2">Công ty*</label>
               <div className="relative">
-                <img
-                  src={companyIcon}
-                  alt="Company"
-                  className="absolute left-3 top-3 w-6 h-6"
-                />
+                <img src={companyIcon} alt="Company" className="absolute left-3 top-3 w-6 h-6" />
                 <input
                   type="text"
                   name="company"
@@ -291,47 +286,46 @@ const Register_Employer = () => {
               </div>
             </div>
 
-            {/* Địa điểm làm việc */}
-            <div className="flex flex-col md:flex-row w-full gap-5 mb-5">
-              <div className="flex-grow">
-                <label className="block text-lg font-medium text-gray-900 mb-2">
-                  Tỉnh/ Thành phố
-                </label>
-                <div className="relative">
-                  <img
-                    src={cityIcon}
-                    alt="City"
-                    className="absolute left-3 top-3 w-6 h-6"
-                  />
-                  <input
-                    type="text"
-                    name="city"
-                    placeholder="Tỉnh/ Thành phố"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  />
-                </div>
+            {/* Tỉnh/Thành phố */}
+            <div className="w-full mb-5">
+              <label className="block text-lg font-medium text-gray-900 mb-2">Tỉnh/Thành phố*</label>
+              <div className="relative">
+                <img src={cityIcon} alt="City" className="absolute left-3 top-3 w-6 h-6" />
+                <select
+                  name="city"
+                  value={formData.city}
+                  onChange={handleInputChange}
+                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                >
+                  <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                  {provinces.map((province) => (
+                    <option key={province.code} value={province.code}>
+                      {province.name}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <div className="flex-grow">
-                <label className="block text-lg font-medium text-gray-900 mb-2">
-                  Quận/ Huyện
-                </label>
-                <div className="relative">
-                  <img
-                    src={cityIcon}
-                    alt="District"
-                    className="absolute left-3 top-3 w-6 h-6"
-                  />
-                  <input
-                    type="text"
-                    name="district"
-                    placeholder="Quận/ Huyện"
-                    value={formData.district}
-                    onChange={handleInputChange}
-                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  />
-                </div>
+            </div>
+
+            {/* Quận/Huyện */}
+            <div className="w-full mb-5">
+              <label className="block text-lg font-medium text-gray-900 mb-2">Quận/Huyện*</label>
+              <div className="relative">
+                <img src={cityIcon} alt="District" className="absolute left-3 top-3 w-6 h-6" />
+                <select
+                  name="district"
+                  value={formData.district}
+                  onChange={handleInputChange}
+                  disabled={!formData.city}
+                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                >
+                  <option value="">-- Chọn Quận/Huyện --</option>
+                  {districts.map((district) => (
+                    <option key={district.code} value={district.name}>
+                      {district.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -345,8 +339,7 @@ const Register_Employer = () => {
                 className="w-5 h-5"
               />
               <label className="text-sm text-gray-900">
-                Tôi đã đọc và đồng ý với Điều khoản dịch vụ và Chính sách bảo
-                mật của W4U.
+                Tôi đã đọc và đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của W4U.
               </label>
             </div>
 
@@ -356,7 +349,7 @@ const Register_Employer = () => {
               style={{ backgroundColor: theme.colors.darkTeal }}
               disabled={isSigningUp}
             >
-             {isSigningUp ? "Đang đăng ký..." : "Hoàn tất"}
+              {isSigningUp ? "Đang đăng ký..." : "Hoàn tất"}
             </button>
 
             {/* Modal xác minh email */}
@@ -375,8 +368,8 @@ const Register_Employer = () => {
                   placeholder="Nhập mã xác minh"
                   className="w-full py-3 border border-gray-300 rounded-lg"
                   style={{ borderColor: theme.colors.tealGreen }}
-                  onFocus={e => (e.target.style.borderColor = theme.colors.darkTeal)}
-                  onBlur={e => (e.target.style.borderColor = theme.colors.tealGreen)}
+                  onFocus={(e) => (e.target.style.borderColor = theme.colors.darkTeal)}
+                  onBlur={(e) => (e.target.style.borderColor = theme.colors.tealGreen)}
                 />
                 <div className="mt-4 flex justify-end">
                   <Button
