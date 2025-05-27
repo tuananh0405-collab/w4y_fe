@@ -29,7 +29,7 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <>
       {/* AUTH  */}
-      <Route path="/" element={<Welcome />} />
+      <Route path="/welcome" element={<Welcome />} />
       <Route path="/auth" element={<Auth />} />
       {/* PRIVATE  */}
       <Route path="/admin" element={<App />}>
@@ -42,7 +42,7 @@ const router = createBrowserRouter(
         <Route path="" element={<UserRoute />}>
           <Route path="/register-employer" element={<Register_Employer />} />
           <Route path="/register-employee" element={<Register_Employee />} />
-          <Route path="/home" element={<Home />} />
+          <Route path="/" element={<Home />} />
           <Route path="/up-cv" element={<UpCV />} />
           <Route path="/up-job" element={<UpJob />} />
           <Route path="/apply" element={<Apply />} />

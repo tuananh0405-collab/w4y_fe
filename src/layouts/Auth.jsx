@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux"; 
 import { useSignInMutation } from "../redux/api/authApiSlice"; 
 import { setCredentials } from "../redux/features/authSlice"; 
-import { cskhImage, emailIcon, googleBlackIcon, keyPasswordIcon } from "../assets";
+import { cskhImage, emailIcon, googleBlackIcon, keyPasswordIcon, logoIcon } from "../assets";
 import { useNavigate } from "react-router-dom";
 import theme from "../utils/theme";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"; // thư viện react-icons
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -12,41 +13,49 @@ const Auth = () => {
   const [signIn, { isLoading, error }] = useSignInMutation(); 
   const dispatch = useDispatch(); 
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const userData = await signIn({ email, password }).unwrap(); 
       dispatch(setCredentials(userData)); 
-      navigate('/home');
+      navigate('/');
       console.log(userData);
     } catch (err) {
       console.error("Login failed: ", err); 
     }
   };
-
+ const menuItems = [
+    { label: "Việc làm", path: "/" },
+    { label: "Hồ sơ & CV", path: "/up-cv" },
+    { label: "Công cụ", path: "/" },
+    { label: "W4UVIP", path: "/" },
+  ];
   return (
     <div className="flex flex-row w-full min-h-screen">
       {/* Left Section */}
       <div 
-        className="flex-grow flex flex-col items-center p-10 bg-white"
+        className="flex-grow flex flex-col items-center p-5 bg-white"
         // style={{ backgroundColor: theme.colors.mintGreen }} // đổi nền trắng sang mintGreen
       >
         {/* Header */}
         <header className="flex justify-between items-center w-full mb-10">
-          <h1 className="text-4xl font-bold" style={{ color: theme.colors.veryDarkGreen }}>LOGO</h1>
-          <nav className="flex gap-10 items-center">
-            {["Việc làm", "Hồ sơ & CV", "Công cụ", "W4UVIP"].map(text => (
-              <a 
-                href="#" 
-                key={text} 
-                className="text-xl font-semibold hover:text-opacity-75"
-                style={{ color: theme.colors.veryDarkGreen }}
-              >
-                {text}
-              </a>
-            ))}
-          </nav>
+         <div className="cursor-pointer" onClick={() => navigate("/")}>
+          <img src={logoIcon} alt="Logo" className="h-28 w-auto" />
+        </div>
+         <nav className="flex gap-10 items-center">
+      {menuItems.map(({ label, path }) => (
+        <button
+          key={label}
+          onClick={() => navigate(path)}
+          className="text-xl font-semibold hover:text-opacity-75"
+          style={{ color: theme.colors.veryDarkGreen }}
+        >
+          {label}
+        </button>
+      ))}
+    </nav>
         </header>
 
         {/* Welcome back text */}
@@ -103,7 +112,7 @@ const Auth = () => {
             >
               <img src={keyPasswordIcon} alt="password" className="w-6 h-6 mx-3" />
               <input
-                type="password"
+              type={showPassword ? "text" : "password"}
                 placeholder="Mật khẩu (từ 6 - 25 ký tự)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -111,6 +120,18 @@ const Auth = () => {
                 className="flex-grow p-3 outline-none"
                 style={{ color: theme.colors.veryDarkGreen }}
               />
+               <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="mr-3 text-gray-500 hover:text-gray-700 focus:outline-none"
+            tabIndex={-1} // tránh nút này nhận focus tab
+          >
+            {showPassword ? (
+              <AiOutlineEyeInvisible size={24} />
+            ) : (
+              <AiOutlineEye size={24} />
+            )}
+          </button>
             </div>
           </div>
 
@@ -128,7 +149,7 @@ const Auth = () => {
           {/* Submit button */}
           <button
             type="submit"
-            className={`rounded-lg py-3 font-bold transition-all duration-300 ${
+            className={`rounded-lg py-3 font-bold transition-all duration-300 cursor-pointer ${
               isLoading ? "opacity-50 cursor-not-allowed" : ""
             }`}
             disabled={isLoading}

@@ -107,13 +107,13 @@ const UpJob = () => {
   return (
        <div className="flex flex-col min-h-screen w-full">
       <Header />
-      <div className="flex flex-grow px-20 bg-gray-200 py-10">
+      <div className="flex flex-grow px-20 py-10" style={{backgroundColor: theme.colors.bgColor}}>
         <Sidebar
           menuItems={menuItems}
           activeIndex={activeIndex}
           onSelect={setActiveIndex}
         />
-        <main className="bg-white rounded-lg p-5 w-full">
+        <main className="bg-white rounded-lg p-5 w-full shadow-2xl">
           <ActiveTab onBack={() => setActiveIndex(0)} onSubmit={handleSubmitJob} />
         </main>
       </div>

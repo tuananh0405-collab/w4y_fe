@@ -9,9 +9,9 @@ export const applicantApiSlice = apiSlice.injectEndpoints({
         method: "POST",
         body: formData, // formData là dữ liệu bạn gửi, bao gồm file CV
         headers: {
-        //   "Content-Type": "multipart/form-data", // Đảm bảo Content-Type đúng cho việc upload file
+          //   "Content-Type": "multipart/form-data", // Đảm bảo Content-Type đúng cho việc upload file
         },
-        credentials:'include'
+        credentials: "include",
       }),
     }),
     getProfile: builder.query({
@@ -21,14 +21,33 @@ export const applicantApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
-     getApplicantProfile: builder.query({
+    getApplicantProfile: builder.query({
       query: () => ({
         url: `${USER_URL}/profile`,
-        method: 'GET',
-        credentials:'include'
+        method: "GET",
+        credentials: "include",
       }),
+    }),
+
+    // Thêm mutation cập nhật profile
+    updateUserProfile: builder.mutation({
+      query: (profileData) => ({
+        url: `${USER_URL}/profile`,
+        method: "PATCH",
+        body: profileData,
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      // Tự động refetch getApplicantProfile để cập nhật cache sau khi update
+      invalidatesTags: [{ type: "ApplicantProfile", id: "LIST" }],
     }),
   }),
 });
 
-export const { useUploadCVMutation, useGetProfileQuery,useGetApplicantProfileQuery  } = applicantApiSlice;
+export const {
+  useUploadCVMutation,
+  useGetProfileQuery,
+  useGetApplicantProfileQuery,useUpdateUserProfileMutation
+} = applicantApiSlice;

@@ -41,7 +41,7 @@ export { default as funnelIcon } from './icons/famicons-funnel.svg';
 export { default as editIcon } from './icons/edit.png';
 export { default as editNoteIcon } from './icons/edit-note.svg';
 export { default as checkedIcon } from './icons/checked.png';
-export { default as logoIcon } from './icons/logo.svg';
+export { default as logoIcon } from './icons/logo.png';
 
 
 

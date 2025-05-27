@@ -1,4 +1,5 @@
 import React from 'react';
+import { logoIcon } from '../../assets';
 
 const Footer = () => {
   return (
@@ -33,7 +34,10 @@ const Footer = () => {
           </ul>
         </div>
 
-        <div className="text-6xl font-normal">LOGO</div>
+         <div className="cursor-pointer" onClick={() => navigate("/")}>
+  <img src={logoIcon} alt="Logo" className="h-36 w-auto" />
+</div>
+
 
         <div className="max-w-xs">
           <p className="text-sm font-light mb-5">Sign up for emails and receive $15 off your order of $75 or more. Exclusions apply</p>

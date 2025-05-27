@@ -2,7 +2,7 @@ import React from "react";
 
 const CompanyProfileTab = () => {
   return (
-    <div className="bg-[#d8fff799] rounded-xl p-6 w-[988px] relative h-[710px] fixed top-0 left-0">
+    <div className=" rounded-xl p-6 w-[988px] relative h-[710px] fixed top-0 left-0">
       <h2 className="font-bold text-black text-xl mb-1">Hồ sơ công ty</h2>
       <p className="text-black text-lg mb-6">Thông tin cơ bản</p>
 
