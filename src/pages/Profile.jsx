@@ -6,6 +6,7 @@ import Rating from "@mui/material/Rating";
 import TestimonialCard from "../components/profile/TestimonialCard";
 import { useSelector } from "react-redux";
 import {
+  useCountApplicationsQuery,
   useGetApplicantProfileQuery,
   useUpdateUserProfileMutation,
 } from "../redux/api/applicantApiSlice";
@@ -33,7 +34,11 @@ const Profile = () => {
   // Mutation cập nhật profile
   const [updateUserProfile, { isLoading: isUpdating }] =
     useUpdateUserProfileMutation();
-
+// Lấy số dự án đã ứng tuyển
+  const { data: countData, isLoading: isCountLoading } = useCountApplicationsQuery(
+    undefined,
+    { skip: !userId }
+  );
   // Local state chỉnh sửa
   const [editMode, setEditMode] = useState(false);
   const [jobTitle, setJobTitle] = useState("");
@@ -108,6 +113,11 @@ const Profile = () => {
   };
 
   const profile = data?.data || [];
+  const resumeFiles = profile.resumeFiles || [];
+  console.log('====================================');
+  console.log(countData);
+  console.log('====================================');
+  const applicationCount = countData?.data?.totalApplications || 0;
 
   const defaultProjects = [
     {
@@ -307,12 +317,11 @@ const Profile = () => {
           {/* Job Statistics Section */}
           <div className="bg-white rounded-xl p-6 shadow-md mb-8">
             <h2 className="text-2xl font-bold mb-6">Quản lý dự án tiêu biểu</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
               {[
-                { value: 8, label: "Tổng số dự án" },
-                { value: 4, label: "Dự án đang hiển thị" },
-                { value: 312, label: "Lượt xem dự án" },
-                { value: 21, label: "Nhà tuyển dụng đã xem" },
+                { value: resumeFiles.length, label: "Danh sách CV của bạn" },
+                { value: applicationCount, label: "Dự án đã ứng tuyển" },
+                { value: 312, label: "Lượt xem hồ sơ" },
               ].map(({ value, label }, idx) => (
                 <div
                   key={idx}

@@ -32,11 +32,12 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
     quantity: "",
     deliveryTime: "",
     deliveryTimeOther: "", // text tùy chỉnh nếu chọn "Khác"
-    level: "",
+    // level: "",
     industry: "",
     position: "",
     locationType: "",
     locationAddress: "",
+     applicationDeadline: "",
     experience: "",
     description: "",
     requirementsTechnical: [],
@@ -65,7 +66,8 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
     if (!formData.locationType) newErrors.locationType = "Địa điểm làm việc là bắt buộc";
     else if (formData.locationType === "Offline" && !formData.locationAddress.trim())
       newErrors.locationAddress = "Vui lòng nhập địa chỉ làm việc";
-
+   if (!formData.applicationDeadline)
+      newErrors.applicationDeadline = "Thời hạn ứng tuyển là bắt buộc";
     if (!formData.description.trim()) newErrors.description = "Mô tả công việc là bắt buộc";
 
     if (!formData.salary.trim()) newErrors.salary = "Lương và phúc lợi là bắt buộc";
@@ -126,7 +128,8 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
           formData.deliveryTime === "Khác" ? formData.deliveryTimeOther : formData.deliveryTime,
         priorityLevel: "Thông thường",
         quantity: Number(formData.quantity),
-        level: formData.level,
+        // level: formData.level,
+         deadline: formData.applicationDeadline,
         industry: formData.industry,
         position: formData.position,
         location:
@@ -243,12 +246,22 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
 
         {/* Cấp bậc & Ngành nghề */}
         <div className="flex gap-5">
-          <InputField
-            label="Cấp bậc"
-            name="level"
-            value={formData.level}
+          <div className="flex flex-col w-full">
+          <label className="text-lg font-medium text-gray-700">
+            Thời hạn ứng tuyển <span className="text-red-600">*</span>
+          </label>
+          <input
+            type="date"
+            name="applicationDeadline"
+            value={formData.applicationDeadline}
             onChange={handleInputChange}
+            className="border p-2 rounded"
+            min={new Date().toISOString().split("T")[0]} // không cho chọn ngày quá khứ
           />
+          {errors.applicationDeadline && (
+            <p className="text-red-600 mt-1">{errors.applicationDeadline}</p>
+          )}
+        </div>
           <InputField
             label="Ngành nghề"
             name="industry"

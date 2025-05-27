@@ -1,4 +1,8 @@
 import React from "react";
+import { useSelector } from "react-redux";
+import { useGetApplicationsWithInfoQuery } from "../../redux/api/applicationApiSlice";
+import { useGetJobsByEmployerQuery } from "../../redux/api/jobApiSlice";
+import { format, differenceInDays, parseISO } from "date-fns";
 
 const JobCard = ({ title, date, views, cvs }) => (
   <article className="bg-teal-800 rounded-md p-3 text-white">
@@ -18,7 +22,37 @@ const ExpiringJobCard = ({ title, daysLeft }) => (
   </article>
 );
 
-const DashboardTab = () => {
+const DashboardTab = ({ onSelectTab }) => {
+  const user = useSelector((state) => state.auth.userState);
+    const employerId = user?.user?.id;
+   // Lấy danh sách job của employer
+  const { data: jobsData, isLoading: isLoadingJobs, error: jobsError } = useGetJobsByEmployerQuery(employerId);
+
+  // Lấy danh sách ứng tuyển cho các job
+  const { data: applicationsData, isLoading: isLoadingApplications, error: applicationsError } = useGetApplicationsWithInfoQuery({ employerId });
+
+  if (isLoadingJobs || isLoadingApplications) return <div>Loading...</div>;
+  if (jobsError || applicationsError) return <div>Error loading data</div>;
+
+  const jobs = jobsData?.data || [];
+  const applications = applicationsData?.data || [];
+
+  
+  // Lọc ra các job đăng trong 7 ngày gần nhất
+  const recentJobs = jobs.filter(job => {
+    if (!job.createdAt) return false;
+    const createdDate = parseISO(job.createdAt);
+    const daysDiff = differenceInDays(new Date(), createdDate);
+    return daysDiff <= 7;
+  });
+
+  // Giả sử job có deadline lưu trong trường 'deadline' kiểu ISO string, lọc job còn dưới 7 ngày
+  const expiringJobs = jobs.filter(job => {
+    if (!job.deadline) return false;
+    const deadlineDate = parseISO(job.deadline);
+    const daysLeft = differenceInDays(deadlineDate, new Date());
+    return daysLeft >= 0 && daysLeft <= 7;
+  });
   return (
     <section className="max-w-4xl mx-auto p-4 bg-white rounded-xl font-inter">
       <header className="mb-6">
@@ -27,17 +61,17 @@ const DashboardTab = () => {
 
       {/* Stats */}
       <section className="flex justify-between gap-4 mb-8">
-        <div className="flex-1 border-2 border-gray-400 rounded-md p-4 text-center">
+        <div className="flex-1 border-2 border-gray-400 rounded-md p-4 text-center cursor-pointer"   onClick={() => onSelectTab(2)}>
           <p className="text-base font-normal mb-2">Tin tuyển dụng hiện tại</p>
-          <p className="text-4xl font-bold">10</p>
+          <p className="text-4xl font-bold">{jobs.length}</p>
         </div>
         <div className="flex-1 border-2 border-gray-400 rounded-md p-4 text-center">
           <p className="text-base font-normal mb-2">Lượt xem tin tuyển dụng</p>
           <p className="text-4xl font-bold">125</p>
         </div>
-        <div className="flex-1 border-2 border-gray-400 rounded-md p-4 text-center">
+        <div className="flex-1 border-2 border-gray-400 rounded-md p-4 text-center cursor-pointer"   onClick={() => onSelectTab(3)}>
           <p className="text-base font-normal mb-2">Ứng viên ứng tuyển</p>
-          <p className="text-4xl font-bold">36</p>
+          <p className="text-4xl font-bold">{applications.length}</p>
         </div>
       </section>
 
@@ -47,9 +81,15 @@ const DashboardTab = () => {
         <section className="flex-1">
           <h2 className="text-xl font-bold mb-3">Tin tuyển dụng gần đây</h2>
           <div className="border-2 border-gray-400 rounded-md p-3 flex flex-col gap-3">
-            <JobCard title="Junior Design UX/UI" date="02/05/2025" views={36} cvs={36} />
-            <JobCard title="Junior Design UX/UI" date="02/05/2025" views={36} cvs={36} />
-            <JobCard title="Junior Design UX/UI" date="02/05/2025" views={36} cvs={36} />
+            {recentJobs.map(job => (
+              <JobCard
+                key={job._id}
+                title={job.title}
+                date={format(parseISO(job.createdAt), "dd/MM/yyyy")}
+                views={job.views || 0}  // giả định có trường views
+                cvs={job.applicationsCount || 0} // giả định có trường ứng viên đếm được
+              />
+            ))}
           </div>
         </section>
 
@@ -57,8 +97,12 @@ const DashboardTab = () => {
         <section className="flex-1">
           <h2 className="text-xl font-bold mb-3">Sắp hết hạn</h2>
           <div className="border-2 border-gray-400 rounded-md p-3 flex flex-col gap-4">
-            <ExpiringJobCard title="Frontend Developer" daysLeft={3} />
-            <ExpiringJobCard title="Design Web" daysLeft={2} />
+           {expiringJobs.map(job => {
+              const daysLeft = differenceInDays(parseISO(job.deadline), new Date());
+              return (
+                <ExpiringJobCard key={job._id} title={job.title} daysLeft={daysLeft} />
+              );
+            })}
           </div>
         </section>
       </main>

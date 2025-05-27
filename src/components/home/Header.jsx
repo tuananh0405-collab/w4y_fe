@@ -19,7 +19,7 @@ const Header = () => {
     try {
       await signOut().unwrap();
       dispatch(logout()); // Gọi action logout khi người dùng click vào nút Đăng xuất
-      navigate('/')
+      navigate('/');
     } catch (error) {
       console.error("Login failed: ", err); // Xử lý lỗi nếu có
     }

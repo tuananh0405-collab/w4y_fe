@@ -5,7 +5,7 @@ const Error500 = () => (
     status="500"
     title="500"
     subTitle="Sorry, something went wrong."
-    extra={<Link to={'/dashboard'}><Button type="primary">Back Home</Button></Link>}
+    extra={<Link to={'/'}><Button type="primary">Back Home</Button></Link>}
   />
 );
 export default Error500;

@@ -6,7 +6,7 @@ const SettingsTab = () => {
   const [theme, setTheme] = useState("light");
 
   return (
-    <div className="p-8 space-y-8 bg-[#d9f9f7] rounded-lg max-w-4xl mx-auto">
+    <div className="p-8 space-y-8  rounded-lg max-w-4xl mx-auto">
       {/* Thông tin tài khoản */}
       <section className="bg-[#e6f9f8] rounded-lg p-6 space-y-4">
         <h1 className="font-bold text-xl">Cài đặt tài khoản</h1>

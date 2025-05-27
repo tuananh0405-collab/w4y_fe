@@ -97,7 +97,10 @@ const UpJob = () => {
 
 
  const [activeIndex, setActiveIndex] = useState(1);
-
+// Hàm xử lý chung chuyển tab
+  const handleSelectTab = (index) => {
+    setActiveIndex(index);
+  };
   const ActiveTab = tabsComponents[activeIndex];
 
   const handleSubmitJob = (jobData) => {
@@ -107,14 +110,14 @@ const UpJob = () => {
   return (
        <div className="flex flex-col min-h-screen w-full">
       <Header />
-      <div className="flex flex-grow px-20 py-10" style={{backgroundColor: theme.colors.bgColor}}>
+      <div className="flex flex-grow px-20 py-10 shadow-2xl" style={{backgroundColor: theme.colors.bgColor}}>
         <Sidebar
           menuItems={menuItems}
           activeIndex={activeIndex}
           onSelect={setActiveIndex}
         />
         <main className="bg-white rounded-lg p-5 w-full shadow-2xl">
-          <ActiveTab onBack={() => setActiveIndex(0)} onSubmit={handleSubmitJob} />
+          <ActiveTab onBack={() => setActiveIndex(0)} onSubmit={handleSubmitJob}  onSelectTab={handleSelectTab} />
         </main>
       </div>
       <Footer />

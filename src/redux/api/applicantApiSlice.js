@@ -1,5 +1,5 @@
 import { apiSlice } from "./apiSlice";
-import { APPLICANT_URL, USER_URL } from "../constants"; // Đảm bảo bạn có URL API cho ứng viên
+import { APPLICANT_URL, APPLICATION_URL, USER_URL } from "../constants"; // Đảm bảo bạn có URL API cho ứng viên
 
 export const applicantApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -43,11 +43,21 @@ export const applicantApiSlice = apiSlice.injectEndpoints({
       // Tự động refetch getApplicantProfile để cập nhật cache sau khi update
       invalidatesTags: [{ type: "ApplicantProfile", id: "LIST" }],
     }),
+
+    countApplications: builder.query({
+      query: () => ({
+        url: `${APPLICANT_URL}/count`,
+        method: "GET",
+        credentials: "include", // nếu cần gửi cookie/token
+      }),
+    }),
   }),
 });
 
 export const {
   useUploadCVMutation,
   useGetProfileQuery,
-  useGetApplicantProfileQuery,useUpdateUserProfileMutation
+  useGetApplicantProfileQuery,
+  useUpdateUserProfileMutation,
+  useCountApplicationsQuery,
 } = applicantApiSlice;
