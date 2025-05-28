@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { useGetApplicationsWithInfoQuery } from "../../redux/api/applicationApiSlice";
+import { useGetApplicationsWithInfoQuery, useUpdateApplicationStatusMutation } from "../../redux/api/applicationApiSlice";
+import { Modal, Spin, Button, message } from "antd";
 
 const statusColors = {
   "Mới nhận": "bg-blue-200 text-blue-800",
@@ -19,30 +20,70 @@ const ApplicantsTab = () => {
   const user = useSelector((state) => state.auth.userState);
   const employerId = user?.user?.id;
 
-  const { data, error, isLoading } = useGetApplicationsWithInfoQuery(
+  // Lấy danh sách ứng viên, refetch để cập nhật khi cần
+  const { data, error, isLoading, refetch } = useGetApplicationsWithInfoQuery(
     { employerId },
     { skip: !employerId }
   );
 
+  // Mutation cập nhật trạng thái ứng dụng
+  const [updateApplicationStatus, { isLoading: isUpdating }] = useUpdateApplicationStatusMutation();
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalFileUrl, setModalFileUrl] = useState("");
+  const [selectedApplication, setSelectedApplication] = useState(null);
 
   if (isLoading) return <div>Đang tải dữ liệu...</div>;
   if (error) return <div>Lỗi tải dữ liệu</div>;
 
   const applications = data?.data || [];
 
-  // Lọc theo search term (tên ứng viên)
   const filteredApplicants = applications.filter((app) =>
     app.applicantId?.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // TODO: Bạn có thể lọc theo activeTab nếu muốn, hiện mình bỏ qua phần này
+  const handleOpenCV = (app) => {
+    if (!app.resumeFile || !app.resumeFile.path) {
+      alert("Ứng viên chưa nộp CV.");
+      return;
+    }
+    const fileUrl = `http://localhost:3000/${app.resumeFile.path.replace(/\\/g, "/")}`;
+    setModalFileUrl(fileUrl);
+    setModalVisible(true);
+    setSelectedApplication(app);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setModalFileUrl("");
+    setSelectedApplication(null);
+  };
+
+  // Hàm cập nhật trạng thái ứng dụng
+  const handleUpdateStatus = async (status) => {
+    if (!selectedApplication) return;
+
+    try {
+      await updateApplicationStatus({
+        applicationId: selectedApplication._id,
+        status,
+      }).unwrap();
+
+      message.success(`Cập nhật trạng thái thành công: ${status}`);
+      refetch(); // Cập nhật lại dữ liệu ứng viên
+      handleCloseModal(); // Đóng modal sau khi cập nhật
+    } catch (error) {
+      message.error("Cập nhật trạng thái thất bại, vui lòng thử lại.");
+      console.error(error);
+    }
+  };
 
   return (
     <div className="p-5 bg-gray-100 rounded-lg max-w-5xl mx-auto">
       <h1 className="text-xl font-bold mb-4">Ứng viên đã ứng tuyển</h1>
 
+      {/* Bộ lọc giữ nguyên */}
       <div className="flex flex-wrap gap-4 mb-6">
         <input
           type="text"
@@ -51,6 +92,7 @@ const ApplicantsTab = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+        {/* Các select khác giữ nguyên */}
         <select className="p-2 border border-gray-300 rounded min-w-[150px]">
           <option>Vị trí ứng tuyển</option>
         </select>
@@ -71,12 +113,7 @@ const ApplicantsTab = () => {
         </button>
       </div>
 
-      {/* Tabs */}
-      <div className="flex border border-gray-300 rounded mb-6 overflow-hidden">
-        {/* Nếu muốn dùng tab lọc có thể implement, hiện tạm ignore */}
-      </div>
-
-      {/* Table */}
+      {/* Bảng dữ liệu ứng viên */}
       <div className="overflow-x-auto">
         <table className="w-full bg-white rounded-lg overflow-hidden shadow">
           <thead className="bg-green-800 text-white text-left">
@@ -132,6 +169,7 @@ const ApplicantsTab = () => {
                       src="/bxs-file.svg"
                       alt="CV"
                       className="w-6 h-6 cursor-pointer opacity-80 hover:opacity-100"
+                      onClick={() => handleOpenCV(app)}
                     />
                   </td>
                 </tr>
@@ -140,6 +178,45 @@ const ApplicantsTab = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Modal xem CV */}
+      <Modal
+        open={modalVisible}
+        title="Xem CV ứng viên"
+        onCancel={handleCloseModal}
+        footer={[
+          <Button
+            key="reject"
+            danger
+            loading={isUpdating}
+            onClick={() => handleUpdateStatus("Từ chối")}
+          >
+            Từ chối
+          </Button>,
+          <Button
+            key="accept"
+            type="primary"
+            loading={isUpdating}
+            onClick={() => handleUpdateStatus("Phỏng vấn")}
+          >
+            Chấp nhận
+          </Button>,
+        ]}
+        width={800}
+        bodyStyle={{ height: "80vh" }}
+        centered
+      >
+        {modalFileUrl ? (
+          <iframe
+            src={modalFileUrl}
+            width="100%"
+            height="100%"
+            title="CV PDF"
+          />
+        ) : (
+          <p>Không có file để hiển thị</p>
+        )}
+      </Modal>
     </div>
   );
 };

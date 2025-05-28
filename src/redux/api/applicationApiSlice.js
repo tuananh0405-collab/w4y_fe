@@ -31,8 +31,18 @@ export const applicationApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+
+    updateApplicationStatus: builder.mutation({
+  query: ({ applicationId, status }) => ({
+    url: `${APPLICATION_URL}/update-status/${applicationId}`,
+    method: "PATCH",
+    credentials: "include",
+    body: { status },
+  }),
+}),
+
   }),
 });
 
-export const { useApplyJobMutation, useViewApplicationStatusQuery,useGetApplicationsWithInfoQuery } =
+export const { useApplyJobMutation, useUpdateApplicationStatusMutation, useViewApplicationStatusQuery,useGetApplicationsWithInfoQuery } =
   applicationApiSlice;
