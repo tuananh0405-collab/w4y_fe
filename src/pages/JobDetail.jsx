@@ -61,7 +61,7 @@ const JobDetail = () => {
             Ứng viên nộp hồ sơ trực tuyến bằng cách bấm Ứng tuyển ngay dưới đây.
           </p>
 
-          <p className="text-lg mb-8">Hạn nộp hồ sơ: {job?.deadline.slice(0, 10)}</p>
+          <p className="text-lg mb-8">Hạn nộp hồ sơ: {job?.deadline?.slice(0, 10)}</p>
 
           {/* File CV input */}
           {/* <div className="mb-4">

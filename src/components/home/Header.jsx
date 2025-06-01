@@ -2,116 +2,158 @@ import React from "react";
 import Avatar from "@mui/material/Avatar";
 import Chip from "@mui/material/Chip";
 import { userIcon, logoIcon } from "../../assets";
-import { useSelector, useDispatch } from "react-redux"; // Import useSelector để lấy dữ liệu từ Redux
-import { logout } from "../../redux/features/authSlice"; // Import logout action
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../../redux/features/authSlice";
 import { useNavigate } from "react-router-dom";
-import { Dropdown, Menu } from "antd"; // Import Dropdown và Menu của Ant Design
+import { Dropdown, Menu } from "antd";
 import { useSignOutMutation } from "../../redux/api/authApiSlice";
 import theme from "../../utils/theme";
 
 const Header = () => {
-  const user = useSelector((state) => state.auth.userState); // Lấy thông tin người dùng từ Redux state
-  const dispatch = useDispatch(); // Để gọi dispatch cho action logout
+  const user = useSelector((state) => state.auth.userState);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [signOut] = useSignOutMutation(); // Khởi tạo useSignOutMutation hook
+  const [signOut] = useSignOutMutation();
 
   const handleLogout = async () => {
     try {
       await signOut().unwrap();
-      dispatch(logout()); // Gọi action logout khi người dùng click vào nút Đăng xuất
-      navigate('/');
-    } catch (error) {
-      console.error("Login failed: ", err); // Xử lý lỗi nếu có
+      dispatch(logout());
+      navigate("/");
+    } catch (err) {
+      console.error("Logout failed: ", err);
     }
   };
 
   const menu = (
-    <Menu>
-      {user?.user?.accountType !== "Nhà Tuyển Dụng" && (
-      <Menu.Item key="1" onClick={() => navigate("/profile")}>
-        <span className="font-inter text-[14px]">Hồ sơ cá nhân</span>
-      </Menu.Item>
-    )}
-      <Menu.Divider />
-      <Menu.Item key="3" onClick={handleLogout}>
-        Đăng xuất
-      </Menu.Item>
-    </Menu>
+    <Menu
+      items={[
+        user?.user?.accountType !== "Nhà Tuyển Dụng" && {
+          key: "profile",
+          label: (
+            <span
+              className="font-inter text-[14px] cursor-pointer hover:text-teal-600"
+              onClick={() => navigate("/profile")}
+            >
+              Hồ sơ cá nhân
+            </span>
+          ),
+        },
+        {
+          type: "divider",
+        },
+        {
+          key: "logout",
+          label: (
+            <span
+              className="font-inter text-[14px] text-red-600 cursor-pointer hover:text-red-800"
+              onClick={handleLogout}
+            >
+              Đăng xuất
+            </span>
+          ),
+        },
+      ].filter(Boolean)}
+    />
   );
 
   return (
-    <header className="flex justify-between items-center h-32 px-8 bg-white">
-      <div className="text-4xl font-normal cursor-pointer"  onClick={() => navigate("/")}>
-        <img src={logoIcon} alt="Logo" className="h-20 w-auto" />
+    <header className="flex flex-wrap justify-between items-center py-4 px-6 md:px-10 bg-white shadow-md sticky top-0 z-50">
+      <div
+        className="text-4xl font-extrabold cursor-pointer select-none flex items-center gap-2"
+        onClick={() => navigate("/")}
+        aria-label="Trang chủ"
+      >
+        <img src={logoIcon} alt="Logo W4U" className="h-14 w-auto" />
+        <span className="hidden sm:inline text-teal-700 tracking-wide">W4U</span>
       </div>
-      <nav className="flex gap-10">
-        <a href="/" className="text-xl font-bold text-gray-800">
+
+      <nav className="flex flex-wrap items-center gap-6 md:gap-10 mt-4 md:mt-0">
+        <a
+          href="/"
+          className="text-lg font-semibold text-gray-800 hover:text-teal-600 transition-colors duration-300"
+        >
           Việc làm
         </a>
-        
-        {user && user.user.accountType === "Nhà Tuyển Dụng" ? (
-          <></>
-        ) : (
-          <a href="/up-cv" className="text-xl font-bold text-gray-800">
-          Hồ sơ & CV
-        </a>
+
+        {user && user.user.accountType === "Nhà Tuyển Dụng" ? null : (
+          <a
+            href="/up-cv"
+            className="text-lg font-semibold text-gray-800 hover:text-teal-600 transition-colors duration-300"
+          >
+            Hồ sơ & CV
+          </a>
         )}
-        <a href="#" className="text-xl font-bold text-gray-800">
+
+        <a
+          href="#"
+          className="text-lg font-semibold text-gray-800 hover:text-teal-600 transition-colors duration-300"
+        >
           Công cụ
         </a>
-        <a href="#" className="text-xl font-bold text-gray-800">
+
+        <a
+          href="#"
+          className="text-lg font-semibold text-gray-800 hover:text-teal-600 transition-colors duration-300"
+        >
           W4UVIP
         </a>
+
         {user && user.user.accountType === "Nhà Tuyển Dụng" ? (
-          <a href="/up-job" className="text-xl font-bold text-gray-800">
+          <a
+            href="/up-job"
+            className="text-lg font-semibold text-white bg-teal-600 rounded-md px-5 py-2 hover:bg-teal-700 active:scale-95 transition-transform duration-200"
+          >
             Đăng tuyển ngay
           </a>
         ) : (
-          <a href="/" className="text-xl font-bold text-gray-800">
+          <a
+            href="/"
+            className="text-lg font-semibold text-gray-800 hover:text-teal-600 transition-colors duration-300"
+          >
             Tìm việc
           </a>
         )}
       </nav>
 
-      {/* Hiển thị thông tin người dùng nếu đã đăng nhập */}
+      {/* User info */}
       {user ? (
-        <div className="flex items-center w-[300px] p-1 gap-2">
-          <Dropdown overlay={menu} trigger={["click"]}>
+        <div className="flex items-center gap-3 mt-4 md:mt-0 w-full md:w-auto">
+          <Dropdown overlay={menu} trigger={["click"]} placement="bottomRight" arrow>
             <Avatar
               src={userIcon}
               alt="User avatar"
-              className="w-[49px] h-[49px] cursor-pointer"
+              className="w-12 h-12 cursor-pointer hover:ring-2 hover:ring-teal-600 hover:ring-offset-2 transition"
+              aria-label="Menu người dùng"
             />
           </Dropdown>
-          <div className="flex flex-col gap-1">
-            <span className="font-inter text-[20px] font-medium text-[#151515]">
+          <div className="flex flex-col min-w-[150px]">
+            <span className="font-inter text-lg font-semibold text-[#151515] truncate">
               {user.user.name}
             </span>
-            <div className="flex p-2">
-              <span className="font-inter text-[12px] font-normal text-[#151515]">
-                {user.user.accountType}
-              </span>
-            </div>
+            <span className="font-inter text-xs text-gray-500 tracking-wide truncate">
+              {user.user.accountType}
+            </span>
           </div>
           <Chip
             label="General"
-            className="bg-[#ee4806] text-white font-inter text-[12px] font-medium rounded-lg ml-auto"
-            style={{ background: theme.colors.mintGreen }}
+            className="font-inter text-xs font-medium rounded-lg ml-auto select-none"
+            style={{ background: theme.colors.mintGreen, color: "#fff" }}
           />
         </div>
       ) : (
-        // Nếu chưa có user, hiển thị các nút Đăng ký và Đăng nhập
-        <div className="flex gap-5">
+        <div className="flex gap-4 mt-4 md:mt-0">
           <button
-            className="text-xl font-medium text-gray-800 cursor-pointer"
+            className="text-lg font-semibold text-gray-700 hover:text-teal-600 transition-colors duration-300"
             onClick={() => navigate("/auth")}
+            aria-label="Đăng nhập"
           >
             Đăng nhập
           </button>
           <button
-            className="text-xl font-medium text-gray-800 rounded-md px-5 py-2 cursor-pointer"
+            className="text-lg font-semibold rounded-md px-6 py-2 bg-teal-600 text-white hover:bg-teal-700 active:scale-95 transition-transform duration-200"
             onClick={() => navigate("/welcome")}
-            style={{ background: theme.colors.mintGreen }}
+            aria-label="Đăng ký"
           >
             Đăng ký
           </button>
