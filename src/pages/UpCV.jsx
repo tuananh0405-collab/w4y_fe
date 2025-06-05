@@ -13,22 +13,22 @@ const UpCV = () => {
   return (
     <div className="flex flex-col min-h-screen w-full bg-white">
       <Header />
-      <div className="flex flex-row justify-start items-center mx-20">
-        <h1 className="text-4xl font-bold  mb-8" style={{color: theme.colors.darkTeal}}>
+      <div className="flex flex-row justify-start items-center mx-5 sm:mx-10 md:mx-20">
+        <h1 className="text-4xl font-bold mb-8 text-teal-700 mt-5">
           Tải lên CV của bạn
         </h1>
-        {/* <img src={cvLookUpIcon} alt="cv lookup icon" /> */}
       </div>
-      <div className="flex flex-col mx-20 bg-white my-5 rounded-lg">
-        <StepperNavigation currentStep={1} />
+      <div className="flex flex-col mx-5 sm:mx-10 md:mx-20 bg-white my-5 rounded-lg">
+        {/* <StepperNavigation currentStep={1} /> */}
         <UploadCVSection />
         <CreateNewCVSection />
         <CVTemplateSelection />
-        <PreviewSection />
+        {/* <PreviewSection /> */}
       </div>
       <Footer />
     </div>
   );
 };
+
 
 export default UpCV;

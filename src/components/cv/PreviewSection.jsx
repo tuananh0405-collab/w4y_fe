@@ -4,9 +4,9 @@ import theme from '../../utils/theme';
 
 const PreviewSection = () => {
   return (
-    <div className="w-full max-w-[1133px] bg-[#fff] rounded-lg p-5 mb-5 box-border mx-auto">
+    <div className="w-full max-w-[1133px] bg-white rounded-lg p-5 mb-5 box-border mx-auto">
       <div className="flex flex-col items-center gap-2 mb-8">
-        <h1 className="font-inter text-4xl font-bold text-orange-500 text-center" style={{color: theme.colors.darkTeal}}>Xem trước CV</h1>
+        <h1 className="font-inter text-4xl font-bold text-orange-500 text-center text-teal-700">Xem trước CV</h1>
         <p className="font-inter text-xl font-normal text-black text-center">
           Hoàn thành các bước trên để xem trước CV của bạn
         </p>
@@ -15,16 +15,16 @@ const PreviewSection = () => {
         {/* Nút Quay lại */}
         <Button
           variant="outlined"
-          color=''
-          className="bg-[#b0b0b0] text-white rounded-lg py-3 px-6 min-w-[135px] hover:bg-[#9e9e9e]"
+          color=""
+          className="bg-gray-400 text-white rounded-lg py-3 px-6 min-w-[135px] hover:bg-gray-500 transition-colors"
         >
           Quay lại
         </Button>
         {/* Nút Tiếp tục */}
         <Button
           variant="contained"
-          color='success'
-          className="bg-[#6A9183] text-white rounded-lg py-3 px-6 min-w-[135px] hover:bg-[#6A9183]"
+          color="success"
+          className="bg-teal-600 text-white rounded-lg py-3 px-6 min-w-[135px] hover:bg-teal-700 transition-colors"
         >
           Tiếp tục
         </Button>
@@ -32,5 +32,6 @@ const PreviewSection = () => {
     </div>
   );
 };
+
 
 export default PreviewSection;

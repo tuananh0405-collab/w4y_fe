@@ -51,6 +51,39 @@ export const applicantApiSlice = apiSlice.injectEndpoints({
         credentials: "include", // nếu cần gửi cookie/token
       }),
     }),
+
+    forgotPassword: builder.mutation({
+      query: (email) => ({
+        url: `${USER_URL}/forgot_password`, // API backend của bạn
+        method: "POST",
+        body: { email },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+    }),
+
+    resetPassword: builder.mutation({
+      query: ({ token, password }) => ({
+        url: `${USER_URL}/reset_password/${token}`, // token truyền trong URL params
+        method: "POST", // hoặc PATCH tùy backend, bạn backend dùng POST hoặc PATCH thì thay đổi
+        body: { password },
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+    }),
+
+ searchApplicants: builder.query({
+      query: (filters) => ({
+        url: `${APPLICANT_URL}/search`, // URL cho API tìm kiếm ứng viên
+        method: "GET",
+        params: filters, // Filters sẽ là đối tượng chứa các tham số tìm kiếm
+        credentials: "include",
+      }),
+    }),
+
   }),
 });
 
@@ -60,4 +93,7 @@ export const {
   useGetApplicantProfileQuery,
   useUpdateUserProfileMutation,
   useCountApplicationsQuery,
+   useForgotPasswordMutation,
+  useResetPasswordMutation,
+useSearchApplicantsQuery
 } = applicantApiSlice;

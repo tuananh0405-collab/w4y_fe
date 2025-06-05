@@ -144,14 +144,14 @@ const Header = () => {
       ) : (
         <div className="flex gap-4 mt-4 md:mt-0">
           <button
-            className="text-lg font-semibold text-gray-700 hover:text-teal-600 transition-colors duration-300"
+            className="text-lg font-semibold text-gray-700 hover:text-teal-600 transition-colors duration-300 cursor-pointer"
             onClick={() => navigate("/auth")}
             aria-label="Đăng nhập"
           >
             Đăng nhập
           </button>
           <button
-            className="text-lg font-semibold rounded-md px-6 py-2 bg-teal-600 text-white hover:bg-teal-700 active:scale-95 transition-transform duration-200"
+            className="text-lg font-semibold rounded-md px-6 py-2 bg-teal-600 text-white hover:bg-teal-700 active:scale-95 transition-transform duration-200 cursor-pointer"
             onClick={() => navigate("/welcome")}
             aria-label="Đăng ký"
           >

@@ -10,36 +10,24 @@ import {
   useGetApplicantProfileQuery,
   useUpdateUserProfileMutation,
 } from "../redux/api/applicantApiSlice";
+import theme from "../utils/theme";
 
-const theme = {
-  colors: {
-    lightGray: "#A8BBB4",
-    tealGreen: "#6A9183",
-    mintGreen: "#A8E6CF",
-    darkTeal: "#3A6656",
-    veryDarkGreen: "#183C2E",
-  },
-};
+
 
 const Profile = () => {
-  // Lấy userId từ redux (hoặc context)
   const user = useSelector((state) => state.auth.userState);
   const userId = user?.user?.id;
 
-  // Gọi API lấy profile dữ liệu
   const { data, isLoading, error } = useGetApplicantProfileQuery({
     skip: !userId,
   });
 
-  // Mutation cập nhật profile
   const [updateUserProfile, { isLoading: isUpdating }] =
     useUpdateUserProfileMutation();
-// Lấy số dự án đã ứng tuyển
   const { data: countData, isLoading: isCountLoading } = useCountApplicationsQuery(
     undefined,
     { skip: !userId }
   );
-  // Local state chỉnh sửa
   const [editMode, setEditMode] = useState(false);
   const [jobTitle, setJobTitle] = useState("");
   const [skills, setSkills] = useState([]);
@@ -48,7 +36,6 @@ const Profile = () => {
   const [city, setCity] = useState("");
   const [district, setDistrict] = useState("");
 
-  // Sync dữ liệu từ API về form khi data load xong hoặc thay đổi
   useEffect(() => {
     if (data?.data) {
       const profile = data.data;
@@ -77,7 +64,6 @@ const Profile = () => {
     );
   }
 
-  // Thêm kỹ năng khi nhấn Enter
   const handleAddSkill = (e) => {
     if (e.key === "Enter" && e.target.value.trim()) {
       e.preventDefault();
@@ -88,12 +74,10 @@ const Profile = () => {
     }
   };
 
-  // Xóa kỹ năng
   const handleRemoveSkill = (skill) => {
     setSkills(skills.filter((s) => s !== skill));
   };
 
-  // Lưu thay đổi
   const handleSave = async () => {
     try {
       await updateUserProfile({
@@ -114,9 +98,6 @@ const Profile = () => {
 
   const profile = data?.data || [];
   const resumeFiles = profile.resumeFiles || [];
-  console.log('====================================');
-  console.log(countData);
-  console.log('====================================');
   const applicationCount = countData?.data?.totalApplications || 0;
 
   const defaultProjects = [

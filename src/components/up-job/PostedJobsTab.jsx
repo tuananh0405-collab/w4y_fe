@@ -96,7 +96,7 @@ const PostedJobsTab = () => {
                   <div className="font-bold">{job.title}</div>
                   <div className="flex justify-between mt-1 text-gray-600 text-sm font-normal">
                     <span>Lượt xem: {job.views}</span>
-                    <span>CV: {job.cvs}</span>
+                    {/* <span>CV: {job.cvs}</span> */}
                   </div>
                 </td>
                 <td className="p-3 border border-gray-300 font-semibold">

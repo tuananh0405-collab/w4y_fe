@@ -1,97 +1,178 @@
-import React, { useState } from "react";
+// src/components/SearchApplicantsTab.jsx
+import React, { useState } from 'react';
+import { useSearchApplicantsQuery } from '../../redux/api/applicantApiSlice';
 
 const SearchApplicantsTab = () => {
-  const [keyword, setKeyword] = useState("");
-  const [industry, setIndustry] = useState("");
-  const [experience, setExperience] = useState("");
-  const [location, setLocation] = useState("");
+  const [jobTitle, setJobTitle] = useState('');
+  const [skills, setSkills] = useState('');
+  const [experience, setExperience] = useState('');
+  const [location, setLocation] = useState('');
 
-  const handleReset = () => {
-    setKeyword("");
-    setIndustry("");
-    setExperience("");
-    setLocation("");
+  // Xử lý thay đổi trong các trường input
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    switch (name) {
+      case 'jobTitle':
+        setJobTitle(value);
+        break;
+      case 'skills':
+        setSkills(value);
+        break;
+      case 'experience':
+        setExperience(value);
+        break;
+      case 'location':
+        setLocation(value);
+        break;
+      default:
+        break;
+    }
   };
+  // Lấy các filters từ state
+  const filters = { jobTitle, skills, experience, location };
 
+  // Gọi API tìm kiếm với các bộ lọc
+  const { data: applicants, error, isLoading } = useSearchApplicantsQuery(filters);
+console.log('====================================');
+console.log(applicants);
+console.log('====================================');
   const handleSearch = () => {
-    // Xử lý tìm kiếm ở đây
-    console.log({ keyword, industry, experience, location });
+    // Xử lý tìm kiếm ở đây (gửi dữ liệu đến backend hoặc lọc trong frontend)
+    console.log({ jobTitle, skills, experience, location });
   };
+  return(
+ <div className="container mx-auto p-5">
+    <div className="box p-5 bg-[#D8F7F2]">
+      <div className="header text-2xl font-bold mb-5">Tìm kiếm ứng viên</div>
 
-  return (
-    <div className="bg-white p-6 rounded-lg max-w-4xl mx-auto shadow-md">
-      <h2 className="text-xl font-bold mb-6">Tìm kiếm ứng viên</h2>
-      <div className="bg-[#d9f7f7] p-6 rounded-md grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <div className="flex flex-col">
-          <label className="mb-2 font-semibold text-gray-700">Từ khoá</label>
-          <select
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-2"
-          >
-            <option value="">Chọn từ khoá</option>
-            <option value="Java">Java</option>
-            <option value="Python">Python</option>
-            <option value="UX/UI">UX/UI</option>
-          </select>
+      <div className="filter-section bg-[#E6F9F5] p-5 rounded-md mb-5">
+        {/* Chức danh công việc */}
+        <div className="filter-item mb-4">
+          <div className="filter-label text-lg mb-2">Chức danh công việc</div>
+          <input
+            type="text"
+            name="jobTitle"
+            value={jobTitle}
+            onChange={handleInputChange}
+            placeholder="Nhập chức danh công việc"
+            className="bg-[#F0F8F5] border text-gray-500 p-2 rounded-md w-full"
+          />
         </div>
-        <div className="flex flex-col">
-          <label className="mb-2 font-semibold text-gray-700">Ngành nghề</label>
-          <select
-            value={industry}
-            onChange={(e) => setIndustry(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-2"
-          >
-            <option value="">Chọn ngành nghề</option>
-            <option value="CNTT">CNTT</option>
-            <option value="Marketing">Marketing</option>
-            <option value="Kinh doanh">Kinh doanh</option>
-          </select>
+
+        {/* Kỹ năng */}
+        <div className="filter-item mb-4">
+          <div className="filter-label text-lg mb-2">Kỹ năng</div>
+          <input
+            type="text"
+            name="skills"
+            value={skills}
+            onChange={handleInputChange}
+            placeholder="Nhập kỹ năng (vd: Java, Python, AWS)"
+            className="bg-[#F0F8F5] border text-gray-500 p-2 rounded-md w-full"
+          />
         </div>
-        <div className="flex flex-col">
-          <label className="mb-2 font-semibold text-gray-700">Kinh nghiệm</label>
-          <select
+
+        {/* Kinh nghiệm */}
+        <div className="filter-item mb-4">
+          <div className="filter-label text-lg mb-2">Kinh nghiệm</div>
+          <input
+            type="text"
+            name="experience"
             value={experience}
-            onChange={(e) => setExperience(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-2"
-          >
-            <option value="">Chọn kinh nghiệm</option>
-            <option value="0-1">0-1 năm</option>
-            <option value="2-5">2-5 năm</option>
-            <option value="5+">5 năm trở lên</option>
-          </select>
+            onChange={handleInputChange}
+            placeholder="Nhập số năm kinh nghiệm"
+            className="bg-[#F0F8F5] border text-gray-500 p-2 rounded-md w-full"
+          />
         </div>
-        <div className="flex flex-col">
-          <label className="mb-2 font-semibold text-gray-700">Địa điểm</label>
-          <select
+
+        {/* Địa điểm */}
+        <div className="filter-item mb-4">
+          <div className="filter-label text-lg mb-2">Địa điểm</div>
+          <input
+            type="text"
+            name="location"
             value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-2"
+            onChange={handleInputChange}
+            placeholder="Nhập địa điểm (vd: Hà Nội)"
+            className="bg-[#F0F8F5] border text-gray-500 p-2 rounded-md w-full"
+          />
+        </div>
+
+        {/* Nút lọc */}
+        <div className="filter-buttons flex justify-end gap-4 mt-5">
+          <button
+            onClick={() => {
+              setJobTitle('');
+              setSkills('');
+              setExperience('');
+              setLocation('');
+            }}
+            className="text-[#4F4F4F] text-md border-2 py-2 px-5 rounded-md border-[#BDBDBD] hover:bg-[#E0E0E0]"
           >
-            <option value="">Chọn địa điểm</option>
-            <option value="HaNoi">Hà Nội</option>
-            <option value="HCM">TP. Hồ Chí Minh</option>
-            <option value="DaNang">Đà Nẵng</option>
-          </select>
+            Đặt lại
+          </button>
+          <button
+            onClick={handleSearch}
+            className="bg-[#4CAF50] text-white py-2 px-5 rounded-md hover:bg-[#45A049]"
+          >
+            Tìm kiếm
+          </button>
         </div>
       </div>
+    </div>
+      <div className="results-section mt-5">
+    <div className="results-header text-2xl font-bold mb-5">
+      Kết quả ({applicants?.length || 0})
+    </div>
 
-      <div className="flex justify-end gap-4">
-        <button
-          onClick={handleReset}
-          className="px-4 py-2 border border-gray-400 rounded hover:bg-gray-100"
-        >
-          Đặt lại
-        </button>
-        <button
-          onClick={handleSearch}
-          className="px-6 py-2 bg-[#3a6656] text-white rounded hover:bg-[#2e5244]"
-        >
-          Tìm kiếm
+   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  {applicants?.data?.map((applicant, index) => (
+    <div key={index} className="card bg-white p-5 shadow-lg rounded-xl border transition-all hover:shadow-xl hover:bg-gray-50">
+      <div className="candidate-card text-center mb-4">
+        {/* Candidate Initials */}
+        <div className="candidate-initials text-lg font-bold bg-gray-300 rounded-full w-16 h-16 mx-auto flex items-center justify-center text-white text-xl">
+          {applicant.name ? applicant.name.charAt(0) : 'N/A'}
+        </div>
+
+        {/* Candidate Name */}
+        <div className="candidate-name text-xl font-semibold mt-3 text-gray-800">
+          {applicant.name || 'N/A'}
+        </div>
+
+        {/* Job Title */}
+        <div className="candidate-title text-md text-gray-600 mb-2">
+          {applicant.profile?.jobTitle || 'N/A'}
+        </div>
+
+        {/* Experience */}
+        <div className="candidate-experience text-sm text-gray-500 mb-2">
+          {applicant.profile?.experience || 'N/A'} năm kinh nghiệm
+        </div>
+
+        {/* Location */}
+        <div className="candidate-location text-sm text-gray-500 mb-2">
+          {applicant.city || 'N/A'}
+        </div>
+
+        {/* Skills */}
+        <div className="candidate-skills text-sm text-gray-500 mb-4">
+          Kỹ năng: {applicant.profile?.skills || 'N/A'}
+        </div>
+
+        {/* Detail Button */}
+        <button className="bg-[#4CAF50] text-white py-2 px-6 mt-3 rounded-md hover:bg-[#45A049] focus:outline-none focus:ring-2 focus:ring-green-500 transition-all">
+          Xem hồ sơ chi tiết
         </button>
       </div>
     </div>
-  );
-};
+  ))}
+</div>
+
+  </div>
+  </div>
+  )
+}
+ 
+
 
 export default SearchApplicantsTab;
