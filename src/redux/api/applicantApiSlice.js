@@ -13,6 +13,25 @@ export const applicantApiSlice = apiSlice.injectEndpoints({
         },
         credentials: "include",
       }),
+      invalidatesTags: ["UploadedCVs"], // Invalidates the cache for uploaded CVs
+    }),
+
+    getUploadedCVs: builder.query({
+      query: () => ({
+        url: `${APPLICANT_URL}/get-uploaded-cvs`, // URL để lấy danh sách CV đã tải lên
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["UploadedCVs"],
+    }),
+
+    deleteUploadedCV: builder.mutation({
+      query: (cvId) => ({
+        url: `${APPLICANT_URL}/uploaded-cv/${cvId}`,
+        method: "DELETE",
+        credentials: "include",
+      }),
+      invalidatesTags: ["UploadedCVs"], // Invalidates the cache for uploaded CVs after deletion
     }),
     getProfile: builder.query({
       query: () => ({
@@ -93,7 +112,9 @@ export const {
   useGetApplicantProfileQuery,
   useUpdateUserProfileMutation,
   useCountApplicationsQuery,
-   useForgotPasswordMutation,
+  useForgotPasswordMutation,
   useResetPasswordMutation,
-useSearchApplicantsQuery
+  useSearchApplicantsQuery,
+  useGetUploadedCVsQuery,
+  useDeleteUploadedCVMutation,
 } = applicantApiSlice;
