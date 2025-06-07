@@ -23,6 +23,9 @@ import { Provider } from "react-redux";
 import store from "./redux/store.js";
 import JobDetail from "./pages/JobDetail.jsx";
 import Profile from "./pages/Profile.jsx";
+import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
+import AdminLogin from "./pages/admin/AdminLogin.jsx";
+import AdminViewsRecruiter from "./pages/admin/AdminViewsRecruiter.jsx";
 import TopJobs from "./pages/TopJobs.jsx";
 
 const router = createBrowserRouter(
@@ -31,12 +34,16 @@ const router = createBrowserRouter(
       {/* AUTH  */}
       <Route path="/welcome" element={<Welcome />} />
       <Route path="/auth" element={<Auth />} />
-      {/* PRIVATE  */}
+
+      {/* ADMIN ROUTES */}
       <Route path="/admin" element={<App />}>
-        <Route path="" element={<AdminRoute />}>
-          {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+        <Route element={<AdminRoute />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="login" element={<AdminLogin />} />
+          <Route path="recruiters" element={<AdminViewsRecruiter />} />
         </Route>
       </Route>
+
       {/* PUBLIC  */}
       <Route path="/" element={<App />}>
         <Route path="" element={<UserRoute />}>
