@@ -24,6 +24,7 @@ import store from "./redux/store.js";
 import JobDetail from "./pages/JobDetail.jsx";
 import Profile from "./pages/Profile.jsx";
 import TopJobs from "./pages/TopJobs.jsx";
+import ChatRoom from "./pages/ChatRoom.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -49,6 +50,7 @@ const router = createBrowserRouter(
           <Route path="/job-detail/:jobId" element={<JobDetail />} />
           <Route path="/top-jobs" element={<TopJobs />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/chat" element={<ChatRoom />} />
         </Route>
       </Route>
       {/* Route 404 cho tất cả các route khác */}
