@@ -28,7 +28,7 @@ const Header = () => {
   const menu = (
     <Menu
       items={[
-        user?.user?.accountType !== "Nhà Tuyển Dụng" && {
+        user?.user?.accountType !== "Nhà tuyển dụng" && {
           key: "profile",
           label: (
             <span
@@ -76,7 +76,7 @@ const Header = () => {
           Việc làm
         </a>
 
-        {user && user.user.accountType === "Nhà Tuyển Dụng" ? null : (
+        {user && user?.user?.accountType === "Nhà tuyển dụng" ? null : (
           <a
             href="/up-cv"
             className="text-lg font-semibold text-gray-800 hover:text-teal-600 transition-colors duration-300"
@@ -99,7 +99,7 @@ const Header = () => {
           W4UVIP
         </a>
 
-        {user && user.user.accountType === "Nhà Tuyển Dụng" ? (
+        {user && user?.user?.accountType === "Nhà tuyển dụng" ? (
           <a
             href="/up-job"
             className="text-lg font-semibold text-white bg-teal-600 rounded-md px-5 py-2 hover:bg-teal-700 active:scale-95 transition-transform duration-200"
@@ -129,10 +129,10 @@ const Header = () => {
           </Dropdown>
           <div className="flex flex-col min-w-[150px]">
             <span className="font-inter text-lg font-semibold text-[#151515] truncate">
-              {user.user.name}
+              {user?.user?.name}
             </span>
             <span className="font-inter text-xs text-gray-500 tracking-wide truncate">
-              {user.user.accountType}
+              {user?.user?.accountType}
             </span>
           </div>
           <Chip

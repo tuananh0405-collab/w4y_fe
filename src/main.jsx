@@ -24,6 +24,7 @@ import store from "./redux/store.js";
 import JobDetail from "./pages/JobDetail.jsx";
 import Profile from "./pages/Profile.jsx";
 import TopJobs from "./pages/TopJobs.jsx";
+import GoogleCallback from "./components/auth/GoogleCallback.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -31,6 +32,7 @@ const router = createBrowserRouter(
       {/* AUTH  */}
       <Route path="/welcome" element={<Welcome />} />
       <Route path="/auth" element={<Auth />} />
+      <Route path="/auth/google/callback" element={<GoogleCallback />} />
       {/* PRIVATE  */}
       <Route path="/admin" element={<App />}>
         <Route path="" element={<AdminRoute />}>

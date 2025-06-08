@@ -79,6 +79,12 @@ const Register_Employee = () => {
     setIsModalVisible(false); // Đóng Modal
   };
 
+  const handleGoogleLogin = () => {
+    // Store the account type in localStorage before redirecting
+    localStorage.setItem('googleAuthType', 'Ứng viên');
+    window.location.href = 'http://localhost:3000/api/v1/auth/google?accountType=Ứng viên';
+  };
+
   return (
      <div
       className="flex flex-col items-center justify-center w-full h-full relative"
@@ -91,7 +97,8 @@ const Register_Employee = () => {
           
           <button
             className="flex items-center justify-center w-full h-16 rounded-lg text-white text-xl font-medium mb-5 hover:brightness-90 transition-all duration-300"
-            style={{ backgroundColor: theme.colors.darkTeal }} // đổi màu nút google đăng ký
+            style={{ backgroundColor: theme.colors.darkTeal }}
+            onClick={handleGoogleLogin}
           >
             <img src={deviconGoogleIcon} alt="Google" className="w-9 h-9 mr-2" />
             Đăng ký bằng Google
