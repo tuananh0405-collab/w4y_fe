@@ -25,6 +25,7 @@ import JobDetail from "./pages/JobDetail.jsx";
 import Profile from "./pages/Profile.jsx";
 import TopJobs from "./pages/TopJobs.jsx";
 import GoogleCallback from "./components/auth/GoogleCallback.jsx";
+import ProjectRoom from "./pages/ProjectRoom.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -51,6 +52,7 @@ const router = createBrowserRouter(
           <Route path="/job-detail/:jobId" element={<JobDetail />} />
           <Route path="/top-jobs" element={<TopJobs />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/project-room" element={<ProjectRoom />} />
         </Route>
       </Route>
       {/* Route 404 cho tất cả các route khác */}
