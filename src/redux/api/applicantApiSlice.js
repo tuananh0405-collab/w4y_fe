@@ -20,7 +20,16 @@ export const applicantApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
-
+    uploadAvatar: builder.mutation({
+      query: (formData) => ({
+        url: `${USER_URL}/upload_avatar`, // URL cho API upload avatar
+        method: "POST",
+        body: formData, 
+        headers: {
+        },
+        credentials: "include",
+      }),
+    }),
     getApplicantProfile: builder.query({
       query: () => ({
         url: `${USER_URL}/profile`,
@@ -93,7 +102,8 @@ export const {
   useGetApplicantProfileQuery,
   useUpdateUserProfileMutation,
   useCountApplicationsQuery,
-   useForgotPasswordMutation,
+  useForgotPasswordMutation,
   useResetPasswordMutation,
-useSearchApplicantsQuery
+  useSearchApplicantsQuery,
+  useUploadAvatarMutation,
 } = applicantApiSlice;
