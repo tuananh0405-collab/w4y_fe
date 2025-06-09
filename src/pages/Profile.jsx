@@ -13,12 +13,19 @@ import {
   useUploadAvatarMutation
 } from "../redux/api/applicantApiSlice";
 import theme from "../utils/theme";
+import { useGetUserReviewsQuery } from "../redux/api/applicationApiSlice";
 
 
 
 const Profile = () => {
   const user = useSelector((state) => state.auth.userState);
   const userId = user?.user?.id;
+  const {
+  data: reviewsData,
+  isLoading: isReviewLoading,
+  error: reviewError,
+} = useGetUserReviewsQuery(userId, { skip: !userId });
+
   const fileInputRef = useRef(null);
   const { data, isLoading, error } = useGetApplicantProfileQuery({
     skip: !userId,
@@ -430,7 +437,7 @@ const handleAvatarChange = async (e) => {
       {/* Testimonials Section */}
       <div className="flex flex-col items-center w-[1360px] p-8 bg-white rounded-2xl shadow-sm justify-center mx-auto">
         <h1 className="font-bold text-2xl mb-6">
-          Đánh giá từ đồng nghiệp & khách hàng
+          Đánh giá từ nhà tuyển dụng
         </h1>
         <img
           src="https://dashboard.codeparrot.ai/api/image/Z9zDwZIdzXb5Olpw/line-20.png"
@@ -438,10 +445,28 @@ const handleAvatarChange = async (e) => {
           className="w-full h-px bg-gray-400 mb-8"
         />
         <div className="flex flex-col gap-8 w-full">
-          <TestimonialCard />
-          <TestimonialCard />
-          <TestimonialCard />
-        </div>
+  {isReviewLoading ? (
+    <p>Đang tải đánh giá...</p>
+  ) : reviewError ? (
+    <p className="text-red-600">Lỗi khi tải đánh giá</p>
+  ) : reviewsData?.length === 0 ? (
+    <p className="text-gray-500">Chưa có đánh giá nào</p>
+  ) : (
+    reviewsData.map((review, index) => (
+      <TestimonialCard
+        key={index}
+        name={review.reviewer?.name || "Ẩn danh"}
+        designation={"Nhà tuyển dụng"}
+        rating={review.rating}
+        description={review.comment || "Không có nhận xét"}
+        avatarSrc={
+          review.reviewer?.avatarUrl || "https://dashboard.codeparrot.ai/api/image/Z9zDwZIdzXb5Olpw/ellipse.png"
+        }
+      />
+    ))
+  )}
+</div>
+
       </div>
 
       <Footer />

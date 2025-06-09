@@ -1,5 +1,5 @@
 import { apiSlice } from "./apiSlice"; // Import apiSlice
-import { APPLICATION_URL } from "../constants"; // Đảm bảo bạn có URL API cho ứng viên
+import { APPLICATION_URL, REVIEW_URL } from "../constants"; // Đảm bảo bạn có URL API cho ứng viên
 
 export const applicationApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -33,16 +33,39 @@ export const applicationApiSlice = apiSlice.injectEndpoints({
     }),
 
     updateApplicationStatus: builder.mutation({
-  query: ({ applicationId, status }) => ({
-    url: `${APPLICATION_URL}/update-status/${applicationId}`,
-    method: "PATCH",
-    credentials: "include",
-    body: { status },
-  }),
-}),
+      query: ({ applicationId, status }) => ({
+        url: `${APPLICATION_URL}/update-status/${applicationId}`,
+        method: "PATCH",
+        credentials: "include",
+        body: { status },
+      }),
+    }),
 
+    // Tạo review mới
+    createReview: builder.mutation({
+      query: ({ reviewUserId, rating, comment }) => ({
+        url: `${REVIEW_URL}/create/${reviewUserId}`,
+        method: "POST",
+        body: { rating, comment },
+        credentials: "include",
+      }),
+    }),
+
+    // Lấy danh sách review mà user đã nhận
+    getUserReviews: builder.query({
+      query: (userId) => ({
+        url: `${REVIEW_URL}/list/${userId}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useApplyJobMutation, useUpdateApplicationStatusMutation, useViewApplicationStatusQuery,useGetApplicationsWithInfoQuery } =
-  applicationApiSlice;
+export const {
+  useApplyJobMutation,
+  useUpdateApplicationStatusMutation,
+  useViewApplicationStatusQuery,
+  useGetApplicationsWithInfoQuery,
+  useCreateReviewMutation,
+  useGetUserReviewsQuery,
+} = applicationApiSlice;

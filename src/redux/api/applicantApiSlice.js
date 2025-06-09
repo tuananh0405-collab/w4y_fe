@@ -124,7 +124,7 @@ export const {
   useForgotPasswordMutation,
   useResetPasswordMutation,
     useSearchApplicantsQuery,
-  useUploadAvatarMutation,,
+  useUploadAvatarMutation,
   useGetUploadedCVsQuery,
   useDeleteUploadedCVMutation,
 } = applicantApiSlice;

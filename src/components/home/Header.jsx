@@ -16,11 +16,14 @@ const Header = () => {
   const navigate = useNavigate();
   const [signOut] = useSignOutMutation();
   const userId = user?.user?.id;
+  const points = user?.user?.points || 0;
 
-   const { data, isLoading, error } = useGetApplicantProfileQuery({
-     skip: !userId,
-   });
-   const profile = data?.data || [];
+  // Fetch user profile data from API
+  const { data, isLoading, error } = useGetApplicantProfileQuery({
+    skip: !userId,
+  });
+  const profile = data?.data || {};
+
   const handleLogout = async () => {
     try {
       await signOut().unwrap();
@@ -34,7 +37,7 @@ const Header = () => {
   const menu = (
     <Menu
       items={[
-        user?.user?.accountType !== "Nhà tuyển dụng" && {
+        user?.user?.accountType !== "Nhà Tuyển Dụng" && {
           key: "profile",
           label: (
             <span
@@ -82,7 +85,7 @@ const Header = () => {
           Việc làm
         </a>
 
-        {user && user?.user?.accountType === "Nhà tuyển dụng" ? null : (
+        {user && user.user.accountType === "Nhà Tuyển Dụng" ? null : (
           <a
             href="/up-cv"
             className="text-lg font-semibold text-gray-800 hover:text-teal-600 transition-colors duration-300"
@@ -99,13 +102,13 @@ const Header = () => {
         </a>
 
         <a
-          href="#"
+          href="/vip"
           className="text-lg font-semibold text-gray-800 hover:text-teal-600 transition-colors duration-300"
         >
           W4UVIP
         </a>
 
-        {user && user?.user?.accountType === "Nhà tuyển dụng" ? (
+        {user && user.user.accountType === "Nhà Tuyển Dụng" ? (
           <a
             href="/up-job"
             className="text-lg font-semibold text-white bg-teal-600 rounded-md px-5 py-2 hover:bg-teal-700 active:scale-95 transition-transform duration-200"
@@ -127,7 +130,7 @@ const Header = () => {
         <div className="flex items-center gap-3 mt-4 md:mt-0 w-full md:w-auto">
           <Dropdown overlay={menu} trigger={["click"]} placement="bottomRight" arrow>
             <Avatar
-              src={profile.avatarUrl}
+              src={profile.avatarUrl || userIcon} // fallback to default if avatarUrl is unavailable
               alt="User Avatar"
               className="w-12 h-12 cursor-pointer hover:ring-2 hover:ring-teal-600 hover:ring-offset-2 transition"
               aria-label="Menu người dùng"
@@ -138,7 +141,7 @@ const Header = () => {
               {user?.user?.name}
             </span>
             <span className="font-inter text-xs text-gray-500 tracking-wide truncate">
-              {user?.user?.accountType}
+              {user?.user?.accountType} ({points} điểm)
             </span>
           </div>
           <Chip
