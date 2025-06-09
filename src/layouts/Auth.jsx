@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux"; 
-import { useSignInMutation } from "../redux/api/authApiSlice"; 
+import { useSignInMutation, useGoogleAuthMutation } from "../redux/api/authApiSlice"; 
 import { setCredentials } from "../redux/features/authSlice"; 
 import { cskhImage, emailIcon, googleBlackIcon, keyPasswordIcon, logoIcon } from "../assets";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +13,8 @@ import {Modal} from 'antd';
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [signIn, { isLoading, error }] = useSignInMutation(); 
+  const [signIn, { isLoading, error }] = useSignInMutation();
+  const [googleAuth] = useGoogleAuthMutation();
   const dispatch = useDispatch(); 
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -33,6 +34,16 @@ const Auth = () => {
       console.error("Login failed: ", err); 
     }
   };
+
+  const handleGoogleLogin = async () => {
+    try {
+      // Redirect to Google OAuth endpoint
+      window.location.href = 'http://localhost:3000/api/v1/auth/google';
+    } catch (err) {
+      console.error("Google login failed: ", err);
+    }
+  };
+
  const menuItems = [
     { label: "Việc làm", path: "/" },
     { label: "Hồ sơ & CV", path: "/up-cv" },
@@ -263,9 +274,10 @@ const Auth = () => {
             </div>
           )}
 
-          {/* Google login button */}
+          {/* Updated Google login button */}
           <button 
             type="button"
+            onClick={handleGoogleLogin}
             className="flex items-center justify-center gap-2 border rounded-lg py-3 transition-all duration-300"
             style={{ borderColor: theme.colors.tealGreen, color: theme.colors.darkTeal }}
             onMouseEnter={e => {

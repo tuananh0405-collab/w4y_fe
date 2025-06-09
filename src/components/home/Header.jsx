@@ -7,6 +7,7 @@ import { logout } from "../../redux/features/authSlice";
 import { useNavigate } from "react-router-dom";
 import { Dropdown, Menu } from "antd";
 import { useSignOutMutation } from "../../redux/api/authApiSlice";
+import { useGetApplicantProfileQuery } from "../../redux/api/applicantApiSlice";
 import theme from "../../utils/theme";
 
 const Header = () => {
@@ -14,6 +15,14 @@ const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [signOut] = useSignOutMutation();
+  const userId = user?.user?.id;
+  const points = user?.user?.points || 0;
+
+  // Fetch user profile data from API
+  const { data, isLoading, error } = useGetApplicantProfileQuery({
+    skip: !userId,
+  });
+  const profile = data?.data || {};
 
   const handleLogout = async () => {
     try {
@@ -93,7 +102,7 @@ const Header = () => {
         </a>
 
         <a
-          href="#"
+          href="/vip"
           className="text-lg font-semibold text-gray-800 hover:text-teal-600 transition-colors duration-300"
         >
           W4UVIP
@@ -121,18 +130,18 @@ const Header = () => {
         <div className="flex items-center gap-3 mt-4 md:mt-0 w-full md:w-auto">
           <Dropdown overlay={menu} trigger={["click"]} placement="bottomRight" arrow>
             <Avatar
-              src={userIcon}
-              alt="User avatar"
+              src={profile.avatarUrl || userIcon} // fallback to default if avatarUrl is unavailable
+              alt="User Avatar"
               className="w-12 h-12 cursor-pointer hover:ring-2 hover:ring-teal-600 hover:ring-offset-2 transition"
               aria-label="Menu người dùng"
             />
           </Dropdown>
           <div className="flex flex-col min-w-[150px]">
             <span className="font-inter text-lg font-semibold text-[#151515] truncate">
-              {user.user.name}
+              {user?.user?.name}
             </span>
             <span className="font-inter text-xs text-gray-500 tracking-wide truncate">
-              {user.user.accountType}
+              {user?.user?.accountType} ({points} điểm)
             </span>
           </div>
           <Chip
