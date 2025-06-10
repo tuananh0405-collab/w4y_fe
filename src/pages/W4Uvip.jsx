@@ -5,6 +5,7 @@ import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { updatePoints } from "../redux/features/authSlice";
 import { useLazySyncVietQRQuery } from "../redux/api/paymentApiSlice";
+import { BASE_URL } from "../redux/constants";
 
 const W4Uvip = () => {
   const [points, setPoints] = useState(0);
@@ -27,7 +28,7 @@ const W4Uvip = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:3000/api/v1/payment/create-vietqr", {
+      const res = await axios.post(`${BASE_URL}/api/v1/payment/create-vietqr`, {
         amount,
         description: `Nap ${points} diem W4U - ${email}`,
       });
