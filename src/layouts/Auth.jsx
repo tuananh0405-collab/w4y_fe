@@ -9,6 +9,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"; // thư vi
 import { useForgotPasswordMutation } from "../redux/api/applicantApiSlice";
 import { ResetPasswordBox } from "../components/home/ResetPasswordBox";
 import {Modal} from 'antd';
+import { BASE_URL } from "../redux/constants";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -38,7 +39,7 @@ const Auth = () => {
   const handleGoogleLogin = async () => {
     try {
       // Redirect to Google OAuth endpoint
-      window.location.href = 'http://localhost:3000/api/v1/auth/google';
+      window.location.href = `${BASE_URL}/api/v1/auth/google`;
     } catch (err) {
       console.error("Google login failed: ", err);
     }

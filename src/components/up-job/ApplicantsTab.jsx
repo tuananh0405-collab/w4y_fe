@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { useCreateReviewMutation, useGetApplicationsWithInfoQuery, useUpdateApplicationStatusMutation } from "../../redux/api/applicationApiSlice";
 import { Modal, Spin, Button, message, Rate, Input } from "antd";
+import { BASE_URL } from "../../redux/constants";
 
 const statusColors = {
   "Mới nhận": "bg-blue-200 text-blue-800",
@@ -88,7 +89,7 @@ const handleSubmitReview = async () => {
       alert("Ứng viên chưa nộp CV.");
       return;
     }
-    const fileUrl = `http://localhost:3000/${app.resumeFile.path.replace(/\\/g, "/")}`;
+    const fileUrl = `${BASE_URL}/${app.resumeFile.path.replace(/\\/g, "/")}`;
     setModalFileUrl(fileUrl);
     setModalVisible(true);
     setSelectedApplication(app);

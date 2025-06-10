@@ -4,6 +4,7 @@ import { useSignUpMutation, useVerifyEmailMutation } from '../redux/api/authApiS
 import { useNavigate } from 'react-router-dom';
 import { Modal, Input, Button } from "antd";
 import theme from '../utils/theme';
+import { BASE_URL } from '../redux/constants';
 
 const Register_Employee = () => {
   const [formData, setFormData] = useState({
@@ -82,7 +83,7 @@ const Register_Employee = () => {
   const handleGoogleLogin = () => {
     // Store the account type in localStorage before redirecting
     localStorage.setItem('googleAuthType', 'Ứng viên');
-    window.location.href = 'http://localhost:3000/api/v1/auth/google?accountType=Ứng viên';
+    window.location.href = `${BASE_URL}/api/v1/auth/google?accountType=Ứng viên`;
   };
 
   return (
