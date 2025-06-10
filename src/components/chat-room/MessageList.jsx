@@ -7,12 +7,16 @@ import { useEffect, useState } from "react";
 // Display a range of message in the current conversation
 const MessageList = ({ senderId, receiverId }) => {
   const { data: messageListQuery, error: fetchError, isLoading: isFetchingList } = useGetChatHistoryQuery({ senderId, receiverId });
-  const [messageList, setMessageList] = useState(messageListQuery?.messageList)
 
+  // State that both socket and api manage
+  const [messageList, setMessageList] = useState(messageListQuery?.data)
+
+  // Resets message list when renderId/receiverId changes
   useEffect(() => {
-    setMessageList(messageListQuery?.messageList)
-  }, [messageListQuery?.messageList])
+    setMessageList(messageListQuery?.data)
+  }, [messageListQuery?.data])
 
+  // Init socket events
   useEffect(() => {
     socket.on("receivedChatMessage", (message) => {
       if (messageList) {
@@ -41,7 +45,7 @@ const MessageList = ({ senderId, receiverId }) => {
     )
   }
 
-  if (!messageList) {
+  if (!messageList || messageList.length < 1) {
     return (
       <div className="grow flex flex-col gap-2 p-4 bg-blue-100">
         {JSON.stringify(messageListQuery)}
@@ -52,11 +56,9 @@ const MessageList = ({ senderId, receiverId }) => {
 
   return (
     <div className="grow flex flex-col-reverse gap-2 p-4 bg-blue-100">
-      ConversationList
-      {(messageList && messageList.length >= 1) && <>
-        {messageList.map((message) => <Message message={message} isByUser={message.senderId === senderId} />)}
-      </>}
-      {(messageList && messageList.length < 1) && <p>No messages yet</p>}
+      <>
+        {messageList.map((message) => <Message message={message} sentByUser={message.senderId === senderId} />)}
+      </>
     </div>
   );
 };

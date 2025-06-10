@@ -4,27 +4,36 @@ import { CHAT_URL } from "../constants";
 export const chatApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getChatToken: builder.query({
-      query: (senderId) => ({
+      query: ({ senderId} ) => ({
         url: `${CHAT_URL}/chatToken`,
-        method: "POST",
-        body: { senderId },
-        headers: {
-          "Content-Type": "application/json",
-        },
+        method: "GET",
+        params: { senderId },
+        credentials: "include",
       }),
     }),
 
     getChatHistory: builder.query({
-      query: ({senderId, receiverId}) => ({
+      query: ({ senderId, receiverId }) => ({
         url: `${CHAT_URL}/chatHistory`,
-        method: "POST",
-        body: { senderId, receiverId },
-        headers: {
-          "Content-Type": "application/json",
-        },
+        method: "GET",
+        params: { senderId, receiverId },
+        credentials: "include",
+      }),
+    }),
+
+    getRecentMessagedUsers: builder.query({
+      query: ({ senderId, query }) => ({
+        url: `${CHAT_URL}/recentMessagedUsers`,
+        method: "GET",
+        params: { senderId, query },
+        credentials: "include",
       }),
     }),
   }),
 });
 
-export const { useGetChatTokenQuery, useGetChatHistoryQuery } = chatApiSlice;
+export const {
+  useGetChatTokenQuery,
+  useGetChatHistoryQuery,
+  useGetRecentMessagedUsersQuery,
+} = chatApiSlice;

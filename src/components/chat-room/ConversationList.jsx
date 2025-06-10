@@ -1,14 +1,34 @@
-import { Stack } from "@mui/material";
+import { CircularProgress, Stack } from "@mui/material";
 import ConversationListItem from "./ConversationListItem";
+import { useGetRecentMessagedUsersQuery } from "../../redux/api/chatApiSlice";
 
 // List of available conversations
-const ConversationList = ({ onSelect }) => {
+const ConversationList = ({ senderId, onSelect }) => {
+  const { data: userListQuery, error: fetchError, isLoading: isFetchingList } = useGetRecentMessagedUsersQuery({ senderId, query: "a" });
+  const { data: userList } = userListQuery ?? { data: [] }
+
+  if (isFetchingList) {
+    return (
+      <div className="grow flex flex-row justify-center w-full bg-blue-100">
+        <CircularProgress />
+      </div>
+    )
+  }
+
+  if (fetchError) {
+    return (
+      <div className="grow flex flex-row justify-center w-full bg-blue-100">
+        {JSON.stringify(fetchError)}
+      </div>
+    )
+  }
+
   return (
     <div className="grow flex flex-col gap-2 p-4 bg-red-200 overflow-auto">
       <Stack>
-        ConversationList
-        <ConversationListItem name={"Test1"} title={"User1"} onSelect={() => onSelect("68445832b0c26fdd8401ee27")} />
-        <ConversationListItem name={"Test2"} title={"User2"} onSelect={() => onSelect("68439c2c3492c26a132cc511")} />
+        {userList.map((user) =>
+          <ConversationListItem name={user.name} email={user.email} lastMessage={user.lastMessage} lastMessageAt={user.lastMessageAt} onSelect={() => onSelect(user.receiverId)} />
+        )}
       </Stack>
     </div>
   );
