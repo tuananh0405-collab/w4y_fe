@@ -82,8 +82,8 @@ const Register_Employee = () => {
 
   const handleGoogleLogin = () => {
     // Store the account type in localStorage before redirecting
-    localStorage.setItem('googleAuthType', 'Ứng viên');
-    window.location.href = `${BASE_URL}/api/v1/auth/google?accountType=Ứng viên`;
+    localStorage.setItem('googleAuthType', 'Ứng Viên');
+    window.location.href = `${BASE_URL}/api/v1/auth/google?accountType=Ứng Viên`;
   };
 
   return (
