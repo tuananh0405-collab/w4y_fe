@@ -103,7 +103,7 @@ const ChatRoom = () => {
       <div className="grow-0 w-px bg-black opacity-20"></div>
 
       {/* Main/Chat panel */}
-      <div className="grow-7 flex flex-col min-h-screen bg-gray-200 p-2">
+      <div className="grow-7 flex flex-col h-screen">
         <ConversationDescriptionCard name={receiverProfile?.name} title={receiverProfile?.accountType} />
         <MessageList senderId={senderId} receiverId={receiverId} />
         <MessageComposeBar onSend={onSend} />
@@ -113,6 +113,7 @@ const ChatRoom = () => {
 
       {/* Conversation suggest panel */}
       <div className="grow-3 flex flex-col min-h-screen bg-gray-200 p-2">
+        STILL WORKING ON THIS
         {accountType === TYPE_RECRUITER && <RecruiterSuggestionList userId={senderId} onSelect={setReceiverId} />}
         {accountType === TYPE_APPLICANT && <ApplicantSuggestionList userId={senderId} onSelect={setReceiverId} />}
       </div>

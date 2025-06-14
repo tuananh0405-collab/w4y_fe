@@ -1,4 +1,4 @@
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Stack } from "@mui/material";
 import { useGetChatHistoryQuery } from "../../redux/api/chatApiSlice";
 import Message from "./Message";
 import { socket } from "../../socket";
@@ -48,14 +48,13 @@ const MessageList = ({ senderId, receiverId }) => {
   if (!messageList || messageList.length < 1) {
     return (
       <div className="grow flex flex-col gap-2 p-4">
-        {JSON.stringify(messageListQuery)}
         Connect to a conversation to start
       </div>
     );
   }
 
   return (
-    <div className="grow flex flex-col-reverse gap-2 p-4">
+    <div className="grow flex flex-col-reverse overflow-y-auto gap-2 p-2">
       <>
         {messageList.map((message) => <Message message={message} sentByUser={message.senderId === senderId} />)}
       </>

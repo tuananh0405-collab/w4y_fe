@@ -1,8 +1,7 @@
 
 // The card above message list that display information about the conversation
 
-import { CardActions, CardContent, Stack } from "@mui/material";
-import { Card } from "antd";
+import { CardActions, CardContent, Stack, Typography, Card, Avatar } from "@mui/material";
 
 /* Currently displays:
   * Recipient's avatar
@@ -11,16 +10,22 @@ import { Card } from "antd";
   */
 const ConversationDescriptionCard = ({ name, title }) => {
   return (
-    <div className="flex items-center gap-8 p-4 bg-blue-50">
-      <Stack className="w-full">
-        ConversationDescriptionCard
-        <Card variant="outlined" >
-          <CardContent>
-            {(!!name && !!title) ? name + " - " + title : ""}
-
+    <div className="flex items-center gap-8 p-4">
+      {(!!name && !!title) && <Stack className="w-full">
+        <Card
+          sx={{ backgroundColor: 'gray.100' }}
+        >
+          <CardContent >
+            <Stack direction={"row"} alignItems={"center"} gap={2}>
+              <Avatar src="" sx={{ width: 48, height: 48 }} />
+              <Stack>
+                {!!name && <Typography variant="h5">{name}</Typography>}
+                {!!title && <Typography>{title}</Typography>}
+              </Stack>
+            </Stack>
           </CardContent>
         </Card>
-      </Stack>
+      </Stack>}
     </div>
   );
 };
