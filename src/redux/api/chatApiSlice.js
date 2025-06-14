@@ -4,7 +4,7 @@ import { CHAT_URL } from "../constants";
 export const chatApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getChatToken: builder.query({
-      query: ({ senderId} ) => ({
+      query: ({ senderId }) => ({
         url: `${CHAT_URL}/chatToken`,
         method: "GET",
         params: { senderId },
@@ -29,6 +29,24 @@ export const chatApiSlice = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
+
+    getRecruitersGroupedByApplications: builder.query({
+      query: ({ applicantId }) => ({
+        url: `${CHAT_URL}/recruitersGroupedByApplications`,
+        method: "GET",
+        params: { applicantId },
+        credentials: "include",
+      }),
+    }),
+
+    getApplicantsGroupedByApplications: builder.query({
+      query: ({ recruiterId }) => ({
+        url: `${CHAT_URL}/applicantsGroupedByApplications`,
+        method: "GET",
+        params: { recruiterId },
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -36,4 +54,6 @@ export const {
   useGetChatTokenQuery,
   useGetChatHistoryQuery,
   useGetRecentMessagedUsersQuery,
+  useGetRecruitersGroupedByApplicationsQuery,
+  useGetApplicantsGroupedByApplicationsQuery,
 } = chatApiSlice;

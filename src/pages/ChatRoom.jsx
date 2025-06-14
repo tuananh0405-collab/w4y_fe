@@ -9,10 +9,17 @@ import { useGetChatTokenQuery } from "../redux/api/chatApiSlice";
 import { useEffect, useState } from "react";
 import { socket } from "../socket";
 import { useSelector } from "react-redux";
+import ApplicantSuggestionList from "../components/chat-room/SuggestionList_Applicant";
+import RecruiterSuggestionList from "../components/chat-room/SuggestionList_Recruiter";
+
+// TODO: Get these from an centralized enum file
+const TYPE_APPLICANT = "Ứng Viên"
+const TYPE_RECRUITER = "Nhà Tuyển Dụng"
 
 const ChatRoom = () => {
   const user = useSelector((state) => state.auth.userState);
   const senderId = user?.user?.id;
+  const accountType = user?.user?.accountType;
 
   const { data: chatTokenQuery, error: fetchError, isLoading: isFetchingToken } = useGetChatTokenQuery({ senderId });
   const { data: chatToken } = chatTokenQuery || { data: null }
@@ -90,6 +97,8 @@ const ChatRoom = () => {
 
       {/* Conversation suggest panel */}
       <div className="grow-3 flex flex-col min-h-screen bg-gray-200 p-2">
+        {accountType === TYPE_RECRUITER && <RecruiterSuggestionList userId={senderId} onSelect={setReceiverId} />}
+        {accountType === TYPE_APPLICANT && <ApplicantSuggestionList userId={senderId} onSelect={setReceiverId} />}
       </div>
     </div>
   );
