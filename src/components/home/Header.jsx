@@ -164,7 +164,7 @@ const Header = () => {
               <NotificationsActive />
             </Button>
           </Dropdown>
-          <a href="chat">
+          <a href="/chat">
             <Button
               className="w-12 h-12 cursor-pointer hover:ring-2 hover:ring-teal-600 hover:ring-offset-2 transition"
             >

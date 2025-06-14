@@ -3,8 +3,8 @@ import ConversationListItem from "./ConversationListItem";
 import { useGetRecentMessagedUsersQuery } from "../../redux/api/chatApiSlice";
 
 // List of available conversations
-const ConversationList = ({ senderId, onSelect }) => {
-  const { data: userListQuery, error: fetchError, isLoading: isFetchingList } = useGetRecentMessagedUsersQuery({ senderId, query: "a" });
+const ConversationList = ({ senderId, onSelect, query }) => {
+  const { data: userListQuery, error: fetchError, isLoading: isFetchingList } = useGetRecentMessagedUsersQuery({ senderId, query });
   const { data: userList } = userListQuery ?? { data: [] }
 
   if (isFetchingList) {

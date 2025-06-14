@@ -16,6 +16,9 @@ import RecruiterSuggestionList from "../components/chat-room/SuggestionList_Recr
 const TYPE_APPLICANT = "Ứng Viên"
 const TYPE_RECRUITER = "Nhà Tuyển Dụng"
 
+// Amount of time in milliseconds to wait after user stops typing before fetching
+const QUERY_DELAY_MS = 700
+
 const ChatRoom = () => {
   const user = useSelector((state) => state.auth.userState);
   const senderId = user?.user?.id;
@@ -26,6 +29,21 @@ const ChatRoom = () => {
   const [receiverId, setReceiverId] = useState(null);
   const [receiverProfile, setReceiverProfile] = useState(null);
 
+  // Manage query for inputs
+  const [conversationQuery, setConversationQuery] = useState("");
+  // Manage query for fetch (separate so that a delay can be added)
+  const [conversationQuery_fetch, setConversationQuery_fetch] = useState("");
+
+  // Wait for QUERY_DELAY_MS in milliseconds after user stops typing before fetching
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setConversationQuery_fetch(conversationQuery);
+    }, QUERY_DELAY_MS);
+
+    return () => clearTimeout(timeout);
+  }, [conversationQuery]);
+
+
   const onSend = (!chatToken) ? () => { alert("Invalid chat token") } :
     (!receiverId) ? () => { alert("Please choose an user to chat with") } :
       (message) => {
@@ -35,12 +53,11 @@ const ChatRoom = () => {
   // Init socket events
   useEffect(() => {
     socket.on("connect", () => {
-      console.log("Connected:", socket.id);
+      // console.log("Connected:", socket.id);
     });
 
     socket.on("connectToConversation", ({ success, receiver }) => {
       if (success) {
-        console.log(receiver)
         setReceiverProfile(receiver)
       }
       alert("Connected to conversation")
@@ -56,7 +73,6 @@ const ChatRoom = () => {
   useEffect(() => {
     if (chatToken && receiverId) {
       socket.emit("setActiveConversation", { chatToken, receiverId })
-      console.log(`Emmited ${JSON.stringify({ chatToken, receiverId })}`)
     }
   }, [receiverId, chatToken])
 
@@ -80,8 +96,8 @@ const ChatRoom = () => {
       {/* Conversation pick Panel */}
       <div className="grow-3 flex flex-col min-h-screen bg-gray-200 p-2">
         <ConversationListHeader />
-        <ConversationFilterBar />
-        <ConversationList senderId={senderId} onSelect={(str) => { setReceiverId(str); console.log(str) }} />
+        <ConversationFilterBar value={conversationQuery} onSetQuery={setConversationQuery} />
+        <ConversationList senderId={senderId} onSelect={(str) => setReceiverId(str)} query={conversationQuery_fetch} />
       </div>
 
       <div className="grow-0 w-px bg-black opacity-20"></div>
