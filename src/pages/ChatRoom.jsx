@@ -92,9 +92,9 @@ const ChatRoom = () => {
   }
 
   return (
-    <div className="flex flex-row w-full min-h-screen bg-gray-200">
+    <div className="flex flex-row w-full min-h-screen">
       {/* Conversation pick Panel */}
-      <div className="grow-3 flex flex-col min-h-screen bg-gray-200 p-2">
+      <div className="grow-3 flex flex-col min-h-screen">
         <ConversationListHeader />
         <ConversationFilterBar value={conversationQuery} onSetQuery={setConversationQuery} />
         <ConversationList senderId={senderId} onSelect={(str) => setReceiverId(str)} query={conversationQuery_fetch} />

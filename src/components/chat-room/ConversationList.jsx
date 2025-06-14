@@ -9,7 +9,7 @@ const ConversationList = ({ senderId, onSelect, query }) => {
 
   if (isFetchingList) {
     return (
-      <div className="grow flex flex-row justify-center w-full bg-blue-100">
+      <div className="grow flex flex-row justify-center w-full">
         <CircularProgress />
       </div>
     )
@@ -17,14 +17,14 @@ const ConversationList = ({ senderId, onSelect, query }) => {
 
   if (fetchError) {
     return (
-      <div className="grow flex flex-row justify-center w-full bg-blue-100">
+      <div className="grow flex flex-row justify-center w-full">
         {JSON.stringify(fetchError)}
       </div>
     )
   }
 
   return (
-    <div className="grow flex flex-col gap-2 p-4 bg-red-200 overflow-auto">
+    <div className="grow flex flex-col gap-2 overflow-auto">
       <Stack>
         {userList.map((user) =>
           <ConversationListItem name={user.name} email={user.email} lastMessage={user.lastMessage} lastMessageAt={user.lastMessageAt} onSelect={() => onSelect(user.receiverId)} />

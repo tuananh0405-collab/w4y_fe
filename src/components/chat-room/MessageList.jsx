@@ -31,7 +31,7 @@ const MessageList = ({ senderId, receiverId }) => {
 
   if (isFetchingList) {
     return (
-      <div className="grow flex flex-row justify-center w-full bg-blue-100">
+      <div className="grow flex flex-row justify-center w-full">
         <CircularProgress />
       </div>
     )
@@ -39,7 +39,7 @@ const MessageList = ({ senderId, receiverId }) => {
 
   if (fetchError) {
     return (
-      <div className="grow flex flex-row justify-center w-full bg-blue-100">
+      <div className="grow flex flex-row justify-center w-full">
         {JSON.stringify(fetchError)}
       </div>
     )
@@ -47,7 +47,7 @@ const MessageList = ({ senderId, receiverId }) => {
 
   if (!messageList || messageList.length < 1) {
     return (
-      <div className="grow flex flex-col gap-2 p-4 bg-blue-100">
+      <div className="grow flex flex-col gap-2 p-4">
         {JSON.stringify(messageListQuery)}
         Connect to a conversation to start
       </div>
@@ -55,7 +55,7 @@ const MessageList = ({ senderId, receiverId }) => {
   }
 
   return (
-    <div className="grow flex flex-col-reverse gap-2 p-4 bg-blue-100">
+    <div className="grow flex flex-col-reverse gap-2 p-4">
       <>
         {messageList.map((message) => <Message message={message} sentByUser={message.senderId === senderId} />)}
       </>
