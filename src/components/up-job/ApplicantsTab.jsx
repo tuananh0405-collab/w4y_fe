@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { useGetApplicationsWithInfoQuery, useUpdateApplicationStatusMutation } from "../../redux/api/applicationApiSlice";
-import { Modal, Spin, Button, message } from "antd";
+import { useCreateReviewMutation, useGetApplicationsWithInfoQuery, useUpdateApplicationStatusMutation } from "../../redux/api/applicationApiSlice";
+import { Modal, Spin, Button, message, Rate, Input } from "antd";
+import { BASE_URL } from "../../redux/constants";
 
 const statusColors = {
   "Mới nhận": "bg-blue-200 text-blue-800",
@@ -34,6 +35,46 @@ const ApplicantsTab = () => {
   const [modalFileUrl, setModalFileUrl] = useState("");
   const [selectedApplication, setSelectedApplication] = useState(null);
 
+  const [reviewModalVisible, setReviewModalVisible] = useState(false);
+const [reviewingUser, setReviewingUser] = useState(null);
+const [rating, setRating] = useState(0);
+const [comment, setComment] = useState("");
+const [createReview, { isLoading: isReviewing }] = useCreateReviewMutation();
+
+const openReviewModal = (user) => {
+  setReviewingUser(user);
+  setReviewModalVisible(true);
+};
+
+const closeReviewModal = () => {
+  setReviewModalVisible(false);
+  setReviewingUser(null);
+  setRating(0);
+  setComment("");
+};
+
+const handleSubmitReview = async () => {
+  if (!rating || !comment.trim()) {
+    message.warning("Vui lòng điền đầy đủ đánh giá và bình luận.");
+    return;
+  }
+
+  try {
+    await createReview({
+      reviewUserId: reviewingUser._id,
+      rating,
+      comment,
+    }).unwrap();
+
+    message.success("Gửi đánh giá thành công!");
+    closeReviewModal();
+  } catch (err) {
+    console.error(err);
+    message.error("Đánh giá thất bại.");
+  }
+};
+
+
   if (isLoading) return <div>Đang tải dữ liệu...</div>;
   if (error) return <div>Lỗi tải dữ liệu</div>;
 
@@ -48,7 +89,7 @@ const ApplicantsTab = () => {
       alert("Ứng viên chưa nộp CV.");
       return;
     }
-    const fileUrl = `http://localhost:3000/${app.resumeFile.path.replace(/\\/g, "/")}`;
+    const fileUrl = `${BASE_URL}/${app.resumeFile.path.replace(/\\/g, "/")}`;
     setModalFileUrl(fileUrl);
     setModalVisible(true);
     setSelectedApplication(app);
@@ -123,6 +164,7 @@ const ApplicantsTab = () => {
               <th className="py-3 px-4">Ngày ứng tuyển</th>
               <th className="py-3 px-4">Trạng thái</th>
               <th className="py-3 px-4">CV</th>
+              <th className="py-3 px-4">Đánh giá</th>
             </tr>
           </thead>
           <tbody>
@@ -172,6 +214,15 @@ const ApplicantsTab = () => {
                       onClick={() => handleOpenCV(app)}
                     />
                   </td>
+                  <td className="py-4 px-4">
+  <button
+    className="text-blue-600 underline hover:text-blue-800"
+    onClick={() => openReviewModal(app.applicantId)}
+  >
+    Review
+  </button>
+</td>
+
                 </tr>
               ))
             )}
@@ -217,6 +268,32 @@ const ApplicantsTab = () => {
           <p>Không có file để hiển thị</p>
         )}
       </Modal>
+
+      <Modal
+  open={reviewModalVisible}
+  title={`Đánh giá ứng viên: ${reviewingUser?.name}`}
+  onCancel={closeReviewModal}
+  onOk={handleSubmitReview}
+  okText="Gửi"
+  cancelText="Hủy"
+  confirmLoading={isReviewing}
+  centered
+>
+  <div className="mb-4">
+    <label className="block mb-2 font-medium">Số sao</label>
+    <Rate value={rating} onChange={setRating} />
+  </div>
+  <div>
+    <label className="block mb-2 font-medium">Bình luận</label>
+    <Input.TextArea
+      value={comment}
+      onChange={(e) => setComment(e.target.value)}
+      rows={4}
+      placeholder="Nhập nhận xét của bạn"
+    />
+  </div>
+</Modal>
+
     </div>
   );
 };

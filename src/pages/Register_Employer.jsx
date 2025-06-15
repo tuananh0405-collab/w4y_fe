@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { useSignUpMutation, useVerifyEmailMutation } from "../redux/api/authApiSlice";
 import { Modal, Input, Button } from "antd";
 import theme from "../utils/theme";
+import { BASE_URL } from "../redux/constants";
 
 const Register_Employer = () => {
   const [formData, setFormData] = useState({
@@ -85,7 +86,7 @@ const Register_Employer = () => {
     // Thêm accountType, loại bỏ agreeToTerms khỏi data gửi lên server
     const updatedFormData = {
       ...formData,
-      accountType: "Nhà Tuyển Dụng",
+      accountType: "Nhà tuyển dụng",
       agreeToTerms: undefined,
     };
 
@@ -121,6 +122,12 @@ const Register_Employer = () => {
     setIsModalVisible(false);
   };
 
+  const handleGoogleLogin = () => {
+    // Store the account type in localStorage before redirecting
+    localStorage.setItem('googleAuthType', 'Nhà tuyển dụng');
+    window.location.href = `${BASE_URL}/api/v1/auth/google?accountType=Nhà tuyển dụng`;
+  };
+
   return (
     <div
       className="flex justify-center items-center w-full h-full relative"
@@ -142,7 +149,7 @@ const Register_Employer = () => {
             <button
               className="flex items-center justify-center w-full h-16 text-white text-xl font-medium rounded-lg mb-5 hover:brightness-90 active:scale-[0.98] transition-all duration-300"
               style={{ backgroundColor: theme.colors.darkTeal }}
-              type="button"
+              onClick={handleGoogleLogin}
             >
               <img src={deviconGoogleIcon} alt="Google" className="w-9 h-9 mr-2" />
               Đăng ký bằng Google

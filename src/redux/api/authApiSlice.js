@@ -37,6 +37,23 @@ export const authApiSlice = apiSlice.injectEndpoints({
         credentials: "include", // Giữ cookie khi yêu cầu
       }),
     }),
+
+    // Google authentication endpoints
+    googleAuth: builder.mutation({
+      query: () => ({
+        url: `${AUTH_URL}/google`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
+
+    googleCallback: builder.mutation({
+      query: () => ({
+        url: `${AUTH_URL}/google/callback`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -45,4 +62,6 @@ export const {
   useSignUpMutation,
   useVerifyEmailMutation,
   useSignOutMutation,
+  useGoogleAuthMutation,
+  useGoogleCallbackMutation,
 } = authApiSlice;

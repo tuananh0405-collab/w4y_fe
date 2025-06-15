@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Footer from "../components/home/Footer";
 import Header from "../components/home/Header";
 import Avatar from "@mui/material/Avatar";
+import EditIcon from "@mui/icons-material/Edit";
 import Rating from "@mui/material/Rating";
 import TestimonialCard from "../components/profile/TestimonialCard";
 import { useSelector } from "react-redux";
@@ -9,18 +10,29 @@ import {
   useCountApplicationsQuery,
   useGetApplicantProfileQuery,
   useUpdateUserProfileMutation,
+  useUploadAvatarMutation
 } from "../redux/api/applicantApiSlice";
 import theme from "../utils/theme";
+import { useGetUserReviewsQuery } from "../redux/api/applicationApiSlice";
 
 
 
 const Profile = () => {
   const user = useSelector((state) => state.auth.userState);
   const userId = user?.user?.id;
+  const {
+  data: reviewsData,
+  isLoading: isReviewLoading,
+  error: reviewError,
+} = useGetUserReviewsQuery(userId, { skip: !userId });
 
+  const fileInputRef = useRef(null);
   const { data, isLoading, error } = useGetApplicantProfileQuery({
     skip: !userId,
   });
+  
+  const [updateAvatar, { isLoading: isUploading }] =
+    useUploadAvatarMutation();
 
   const [updateUserProfile, { isLoading: isUpdating }] =
     useUpdateUserProfileMutation();
@@ -73,7 +85,21 @@ const Profile = () => {
       e.target.value = "";
     }
   };
+const handleAvatarChange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
+  const formData = new FormData();
+  formData.append("avatar", file);
+
+  try {
+    await updateAvatar(formData).unwrap();
+    alert("Cập nhật avatar thành công");
+    window.location.reload(); // Refresh page after successful upload
+  } catch (error) {
+    console.error("Lỗi khi upload avatar:", error);
+  }
+};
   const handleRemoveSkill = (skill) => {
     setSkills(skills.filter((s) => s !== skill));
   };
@@ -125,18 +151,36 @@ const Profile = () => {
       <div className="flex flex-col md:flex-row justify-center p-8 space-y-8 md:space-y-0 md:space-x-8">
         {/* Bên trái - Profile & Edit */}
         <div className="flex-1 bg-white rounded-2xl p-8">
-          <div className="flex flex-col items-center gap-8 mb-8">
+          <div className="flex flex-col items-center gap-8 mb-8 relative group"
+               onClick={() => fileInputRef.current?.click()}>
             <Avatar
               alt={profile.name || "User"}
               src={profile.avatarUrl || ""}
-              sx={{ width: 210, height: 210, bgcolor: "#d9d9d9" }}
+              sx={{ width: 210, height: 210, bgcolor: "#d9d9d9",
+                opacity: 1,
+                transition: "opacity 0.3s",
+                cursor: "pointer",
+                "&:hover": {
+                  opacity: 0.6,
+                },
+               }}
+            />
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <EditIcon className="text-white text-4xl" />
+            </div>
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleAvatarChange}
+              className="hidden"
             />
             <div className="text-center">
               <h1 className="text-3xl font-bold text-gray-900">
                 {profile.name || "Chưa có tên"}
               </h1>
 
-              {/* Job Title */}
+              {/* Job Title */} 
               {editMode ? (
                 <input
                   type="text"
@@ -393,7 +437,7 @@ const Profile = () => {
       {/* Testimonials Section */}
       <div className="flex flex-col items-center w-[1360px] p-8 bg-white rounded-2xl shadow-sm justify-center mx-auto">
         <h1 className="font-bold text-2xl mb-6">
-          Đánh giá từ đồng nghiệp & khách hàng
+          Đánh giá từ nhà tuyển dụng
         </h1>
         <img
           src="https://dashboard.codeparrot.ai/api/image/Z9zDwZIdzXb5Olpw/line-20.png"
@@ -401,10 +445,28 @@ const Profile = () => {
           className="w-full h-px bg-gray-400 mb-8"
         />
         <div className="flex flex-col gap-8 w-full">
-          <TestimonialCard />
-          <TestimonialCard />
-          <TestimonialCard />
-        </div>
+  {isReviewLoading ? (
+    <p>Đang tải đánh giá...</p>
+  ) : reviewError ? (
+    <p className="text-red-600">Lỗi khi tải đánh giá</p>
+  ) : reviewsData?.length === 0 ? (
+    <p className="text-gray-500">Chưa có đánh giá nào</p>
+  ) : (
+    reviewsData.map((review, index) => (
+      <TestimonialCard
+        key={index}
+        name={review.reviewer?.name || "Ẩn danh"}
+        designation={"Nhà tuyển dụng"}
+        rating={review.rating}
+        description={review.comment || "Không có nhận xét"}
+        avatarSrc={
+          review.reviewer?.avatarUrl || "https://dashboard.codeparrot.ai/api/image/Z9zDwZIdzXb5Olpw/ellipse.png"
+        }
+      />
+    ))
+  )}
+</div>
+
       </div>
 
       <Footer />
