@@ -1,4 +1,4 @@
-import { CircularProgress, Stack } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import SuggestionListItem from "./SuggestionListItem";
 import { useGetApplicantsGroupedByApplicationsQuery } from "../../redux/api/chatApiSlice";
 
@@ -10,7 +10,7 @@ const RecruiterSuggestionList = ({ userId, onSelect }) => {
 
   if (isFetchingList) {
     return (
-      <div className="grow flex flex-row justify-center w-full bg-blue-100">
+      <div className="grow flex flex-row justify-center w-full">
         <CircularProgress />
       </div>
     )
@@ -18,26 +18,25 @@ const RecruiterSuggestionList = ({ userId, onSelect }) => {
 
   if (fetchError) {
     return (
-      <div className="grow flex flex-row justify-center w-full bg-blue-100">
+      <div className="grow flex flex-row justify-center w-full">
         {JSON.stringify(fetchError)}
       </div>
     )
   }
 
   return (
-    <div className="grow flex flex-col gap-2 p-4 bg-red-200 overflow-auto">
-      <Stack>
-        {jobApplicantsList.map((jobApplicantsRecord) =>
-          <SuggestionListItem
-            id={jobApplicantsRecord.applicant._id}
-            name={jobApplicantsRecord.applicant.name}
-            email={jobApplicantsRecord.applicant.email}
-            descriptionsLabel={`Position${(jobApplicantsRecord.applications.length > 1) ? "s" : ""} applied`}
-            descriptionsStack={jobApplicantsRecord.applications.map((application) => `Title: ${application.job.title}, statue: ${application.applicationStatus}`)}
-            onSelect={onSelect}
-          />
-        )}
-      </Stack>
+    <div className="grow flex flex-col gap-4 overflow-auto">
+      {jobApplicantsList.map((jobApplicantsRecord) =>
+        <SuggestionListItem
+          key={jobApplicantsRecord.applicant._id}
+          id={jobApplicantsRecord.applicant._id}
+          name={jobApplicantsRecord.applicant.name}
+          email={jobApplicantsRecord.applicant.email}
+          descriptionsLabel={`Vị trí đã ứng tuyển:`}
+          descriptionsStack={jobApplicantsRecord.applications.map((application, index) => `${index + 1}: ${application.job.title}, trạng thái: ${application.applicationStatus}`)}
+          onSelect={onSelect}
+        />
+      )}
     </div>
   );
 };

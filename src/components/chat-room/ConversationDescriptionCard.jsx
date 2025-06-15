@@ -10,10 +10,10 @@ import { CardActions, CardContent, Stack, Typography, Card, Avatar } from "@mui/
   */
 const ConversationDescriptionCard = ({ name, title }) => {
   return (
-    <div className="flex items-center gap-8 p-4">
+    <div className="flex items-center gap-8 p-4  border-b border-gray-300">
       {(!!name && !!title) && <Stack className="w-full">
         <Card
-          sx={{ backgroundColor: 'gray.100' }}
+          sx={{ backgroundColor: '#e5e7eb' }}
         >
           <CardContent >
             <Stack direction={"row"} alignItems={"center"} gap={2}>

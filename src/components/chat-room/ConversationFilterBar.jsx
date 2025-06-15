@@ -1,5 +1,5 @@
 import { Search } from "@mui/icons-material";
-import { TextField, InputAdornment, Stack } from "@mui/material";
+import { TextField, InputAdornment } from "@mui/material";
 
 // The bar above conversation list that searches for conversation based on a query
 const ConversationFilterBar = ({ value, onSetQuery }) => {
@@ -15,11 +15,12 @@ const ConversationFilterBar = ({ value, onSetQuery }) => {
           },
         }}
         sx={{
-          // Rounded
+          // Style for the box that surrounds the input
           '& .MuiOutlinedInput-root': {
             borderRadius: '24px',
+            backgroundColor: 'white',
           },
-          // Inner input's padding
+          // Style for the inner input
           '& .MuiOutlinedInput-input': {
             padding: '8px 10px',
           },

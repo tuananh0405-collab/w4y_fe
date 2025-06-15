@@ -1,12 +1,9 @@
-
-// A header for the conversation panel
-
 import { Button, Stack } from "@mui/material";
 import { logoIcon } from "../../assets";
 import { Settings } from "@mui/icons-material";
 import { Dropdown } from "antd";
 
-// Placholder
+// Placholder, TODO
 const SETTING_OPTIONS = [
   {
     key: '1',
@@ -26,14 +23,15 @@ const SETTING_OPTIONS = [
   },
 ];
 
+// A header for the conversation panel
 /* Currently includes:
   * W4U banner
   * Setting button
   */
 const ConversationListHeader = () => {
   return (
-    <div className="flex items-center gap-8 p-4">
-      <Stack direction={"row"} width={"100%"} alignItems={"center"} gap={2}>
+    <div>
+      <Stack direction={"row"} width={"100%"} alignItems={"center"} gap={2} p={2}>
         <img src={logoIcon} alt="Logo W4U" className="h-14 w-auto" />
         <div className="grow" />
         <a href="/" >
@@ -60,6 +58,7 @@ const ConversationListHeader = () => {
           </Button>
         </Dropdown>
       </Stack>
+      <div className="h-px bg-black opacity-20" />
     </div >
   );
 };

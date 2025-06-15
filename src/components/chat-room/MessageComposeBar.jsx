@@ -1,5 +1,5 @@
-import { EmojiEmotions, Search, Send } from "@mui/icons-material";
-import { Button, Input, InputAdornment, Stack, TextField } from "@mui/material";
+import { EmojiEmotions, Send } from "@mui/icons-material";
+import { Button, Stack, TextField } from "@mui/material";
 import { useState } from "react";
 
 // The bar right below message list that allows typing and sending message
@@ -10,7 +10,7 @@ const MessageComposeBar = ({ onSend }) => {
     <div className="flex p-4">
       <Stack width="100%" direction={"row"} gap={2}>
         <Button
-          // onClick={() => onSend(message)}
+          onClick={() => alert("Not Implemented")}
           className="hover:ring-2 hover:ring-teal-600 hover:ring-offset-2 transition"
           sx={{
             color: "#0f766e",

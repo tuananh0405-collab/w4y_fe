@@ -1,8 +1,9 @@
-import { CircularProgress, Stack } from "@mui/material";
+import { CircularProgress, Typography } from "@mui/material";
 import { useGetChatHistoryQuery } from "../../redux/api/chatApiSlice";
 import Message from "./Message";
 import { socket } from "../../socket";
 import { useEffect, useState } from "react";
+import { EmojiPeople } from "@mui/icons-material";
 
 // Display a range of message in the current conversation
 const MessageList = ({ senderId, receiverId }) => {
@@ -47,8 +48,9 @@ const MessageList = ({ senderId, receiverId }) => {
 
   if (!messageList || messageList.length < 1) {
     return (
-      <div className="grow flex flex-col gap-2 p-4">
-        Connect to a conversation to start
+      <div className="grow flex flex-col gap-2 p-4 justify-center items-center">
+        <EmojiPeople sx={{ fontSize: 80, color: "gray" }} />
+        <Typography variant="p" className="text-gray">Hãy bắt đầu một cuộc trò chuyện!</Typography>
       </div>
     );
   }

@@ -1,4 +1,4 @@
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Typography } from "@mui/material";
 import ConversationListHeader from "../components/chat-room/ConversationListHeader";
 import ConversationFilterBar from "../components/chat-room/ConversationFilterBar";
 import ConversationList from "../components/chat-room/ConversationList";
@@ -33,18 +33,26 @@ const ChatRoom = () => {
   const [conversationQuery, setConversationQuery] = useState("");
   // Manage query for fetch (separate so that a delay can be added)
   const [conversationQuery_fetch, setConversationQuery_fetch] = useState("");
+  // For the loading effect when fetch with new query
+  const [isChangingQuery, setIsChangingQuery] = useState(false);
 
   // Wait for QUERY_DELAY_MS in milliseconds after user stops typing before fetching
   useEffect(() => {
+    setIsChangingQuery(true);
     const timeout = setTimeout(() => {
       setConversationQuery_fetch(conversationQuery);
+
+      // Ensure that loading state is disabled only after setConversationQuery_fetch has been flushed
+      requestAnimationFrame(() => {
+        setIsChangingQuery(false);
+      });
     }, QUERY_DELAY_MS);
 
     return () => clearTimeout(timeout);
   }, [conversationQuery]);
 
 
-  const onSend = (!chatToken) ? () => { alert("Invalid chat token") } :
+  const onSend = (!chatToken) ? () => { alert("Invalid chat token, please login and try again") } :
     (!receiverId) ? () => { alert("Please choose an user to chat with") } :
       (message) => {
         socket.emit("sendChatMessage", { chatToken, receiverId, message });
@@ -60,7 +68,6 @@ const ChatRoom = () => {
       if (success) {
         setReceiverProfile(receiver)
       }
-      alert("Connected to conversation")
     })
 
     return () => {
@@ -92,30 +99,37 @@ const ChatRoom = () => {
   }
 
   return (
-    <div className="flex flex-row w-full min-h-screen">
-      {/* Conversation pick Panel */}
-      <div className="grow-3 flex flex-col min-h-screen">
-        <ConversationListHeader />
-        <ConversationFilterBar value={conversationQuery} onSetQuery={setConversationQuery} />
-        <ConversationList senderId={senderId} onSelect={(str) => setReceiverId(str)} query={conversationQuery_fetch} />
+    <div className="w-full max-w-1024 min-h-screen grid grid-cols-[1fr_auto_2fr_auto_1fr]">
+      <div className="flex justify-center">
+        <div className="w-full bg-gray-50 min-w-32 max-w-128">
+          <ConversationListHeader />
+          <ConversationFilterBar value={conversationQuery} onSetQuery={setConversationQuery} />
+          <ConversationList senderId={senderId} onSelect={(str) => setReceiverId(str)} query={conversationQuery_fetch} isChangingQuery={isChangingQuery} />
+        </div>
       </div>
 
-      <div className="grow-0 w-px bg-black opacity-20"></div>
+      <div className="w-px bg-black opacity-20" />
 
-      {/* Main/Chat panel */}
-      <div className="grow-7 flex flex-col h-screen">
+      {/* Main Content */}
+      <div className="flex flex-col h-screen">
         <ConversationDescriptionCard name={receiverProfile?.name} title={receiverProfile?.accountType} />
         <MessageList senderId={senderId} receiverId={receiverId} />
         <MessageComposeBar onSend={onSend} />
       </div>
 
-      <div className="grow-0 w-px bg-black opacity-20"></div>
+      <div className="w-px bg-black opacity-20" />
 
-      {/* Conversation suggest panel */}
-      <div className="grow-3 flex flex-col min-h-screen bg-gray-200 p-2">
-        STILL WORKING ON THIS
-        {accountType === TYPE_RECRUITER && <RecruiterSuggestionList userId={senderId} onSelect={setReceiverId} />}
-        {accountType === TYPE_APPLICANT && <ApplicantSuggestionList userId={senderId} onSelect={setReceiverId} />}
+      <div className="flex justify-center">
+        <div className="w-full bg-gray-50 min-w-32 max-w-128">
+          {accountType === TYPE_RECRUITER && <>
+            <Typography variant="body1" paddingX={2} className="w-full bg-gray-200 font-light">CÁC ỨNG VIÊN ĐÃ ỨNG TUYỂN GẦN ĐÂY:</Typography>
+            <RecruiterSuggestionList userId={senderId} onSelect={setReceiverId} />
+          </>}
+          {accountType === TYPE_APPLICANT && <>
+            <Typography variant="body1" paddingX={2} className="w-full bg-gray-200 font-light">CÁC VỊ TRÍ BẠN ỨNG TUYỂN:</Typography>
+            <ApplicantSuggestionList userId={senderId} onSelect={setReceiverId} />
+          </>}
+        </div>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { Avatar, Card, CardContent, Stack, Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 
 // Represents each messages in the message list
 const Message = ({ message, sentByUser }) => {
