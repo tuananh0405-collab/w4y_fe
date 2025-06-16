@@ -123,11 +123,11 @@ const ChatRoom = () => {
         <div className="w-full bg-gray-50 min-w-32 max-w-128">
           {accountType === TYPE_RECRUITER && <>
             <Typography variant="body1" paddingX={2} className="w-full bg-gray-200 font-light">CÁC ỨNG VIÊN ĐÃ ỨNG TUYỂN GẦN ĐÂY:</Typography>
-            <RecruiterSuggestionList userId={senderId} onSelect={setReceiverId} />
+            <RecruiterSuggestionList userId={senderId} onSelect={(id) => setReceiverId(id)} />
           </>}
           {accountType === TYPE_APPLICANT && <>
             <Typography variant="body1" paddingX={2} className="w-full bg-gray-200 font-light">CÁC VỊ TRÍ BẠN ỨNG TUYỂN:</Typography>
-            <ApplicantSuggestionList userId={senderId} onSelect={setReceiverId} />
+            <ApplicantSuggestionList userId={senderId} onSelect={(id) => setReceiverId(id)} />
           </>}
         </div>
       </div>

@@ -7,10 +7,12 @@ import { Avatar, Stack } from "@mui/material";
   * descriptions stack
   */
 const SuggestionListItem = ({ id, name, email, descriptionsLabel, descriptionsStack, onSelect }) => {
-  id
   return (
     <div key={id}>
-      <div className="flex items-center w-full gap-2 cursor-pointer transition-colors duration-200 hover:bg-gray-100 p-1" onClick={onSelect}>
+      <div
+        className="flex items-center w-full gap-2 cursor-pointer transition-colors duration-200 hover:bg-gray-100 p-1"
+        onClick={() => onSelect(id)}
+      >
         <Stack className="ps-4 mt-2">
           <Stack direction={"row"} gap={2}>
             <Avatar src="" sx={{ width: 48, height: 48 }} />
