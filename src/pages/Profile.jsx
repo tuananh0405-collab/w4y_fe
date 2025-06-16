@@ -8,38 +8,79 @@ import TestimonialCard from "../components/profile/TestimonialCard";
 import { useSelector } from "react-redux";
 import {
   useCountApplicationsQuery,
+  useCreateProjectMutation,
   useGetApplicantProfileQuery,
+  useGetMyProjectsQuery,
   useUpdateUserProfileMutation,
-  useUploadAvatarMutation
+  useUploadAvatarMutation,
 } from "../redux/api/applicantApiSlice";
 import theme from "../utils/theme";
 import { useGetUserReviewsQuery } from "../redux/api/applicationApiSlice";
-
-
+import { useNavigate } from "react-router-dom";
+import CreateProjectForm from "../components/profile/CreateProjectForm";
 
 const Profile = () => {
   const user = useSelector((state) => state.auth.userState);
   const userId = user?.user?.id;
   const {
-  data: reviewsData,
-  isLoading: isReviewLoading,
-  error: reviewError,
-} = useGetUserReviewsQuery(userId, { skip: !userId });
+    data: reviewsData,
+    isLoading: isReviewLoading,
+    error: reviewError,
+  } = useGetUserReviewsQuery(userId, { skip: !userId });
+  const {
+    data: projectData,
+    isLoading: isProjectLoading,
+    error: projectError,
+  } = useGetMyProjectsQuery();
+
+  const navigate = useNavigate();
 
   const fileInputRef = useRef(null);
   const { data, isLoading, error } = useGetApplicantProfileQuery({
     skip: !userId,
   });
-  
-  const [updateAvatar, { isLoading: isUploading }] =
-    useUploadAvatarMutation();
+
+  const [updateAvatar, { isLoading: isUploading }] = useUploadAvatarMutation();
 
   const [updateUserProfile, { isLoading: isUpdating }] =
     useUpdateUserProfileMutation();
-  const { data: countData, isLoading: isCountLoading } = useCountApplicationsQuery(
-    undefined,
-    { skip: !userId }
-  );
+  const { data: countData, isLoading: isCountLoading } =
+    useCountApplicationsQuery(undefined, { skip: !userId });
+      const [createProject, { isLoading: isCreating }] = useCreateProjectMutation();
+
+     const [isFormVisible, setIsFormVisible] = useState(false);
+
+  // Show form to add a new project
+  const showForm = () => {
+    setIsFormVisible(true);
+  };
+
+  // Hide form
+  const handleCancel = () => {
+    setIsFormVisible(false);
+  };
+
+  // Handle form submission for creating a new project
+  const handleCreateProject = async (values) => {
+  try {
+    // Xử lý media: đảm bảo nó là một mảng đối tượng
+    const media = values.media ? [{ url: values.media, type: 'image' }] : [];
+
+    // Gửi dữ liệu lên API với media đã được xử lý
+    const projectData = {
+      ...values,
+      media,  // Truyền media dưới dạng mảng các đối tượng
+    };
+
+    await createProject(projectData).unwrap();
+    alert("Dự án đã được tạo thành công");
+    setIsFormVisible(false);
+  } catch (error) {
+    alert("Lỗi khi tạo dự án mới");
+    console.error(error);
+  }
+};
+
   const [editMode, setEditMode] = useState(false);
   const [jobTitle, setJobTitle] = useState("");
   const [skills, setSkills] = useState([]);
@@ -85,21 +126,21 @@ const Profile = () => {
       e.target.value = "";
     }
   };
-const handleAvatarChange = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  const formData = new FormData();
-  formData.append("avatar", file);
+    const formData = new FormData();
+    formData.append("avatar", file);
 
-  try {
-    await updateAvatar(formData).unwrap();
-    alert("Cập nhật avatar thành công");
-    window.location.reload(); // Refresh page after successful upload
-  } catch (error) {
-    console.error("Lỗi khi upload avatar:", error);
-  }
-};
+    try {
+      await updateAvatar(formData).unwrap();
+      alert("Cập nhật avatar thành công");
+      window.location.reload(); // Refresh page after successful upload
+    } catch (error) {
+      console.error("Lỗi khi upload avatar:", error);
+    }
+  };
   const handleRemoveSkill = (skill) => {
     setSkills(skills.filter((s) => s !== skill));
   };
@@ -126,24 +167,25 @@ const handleAvatarChange = async (e) => {
   const resumeFiles = profile.resumeFiles || [];
   const applicationCount = countData?.data?.totalApplications || 0;
 
-  const defaultProjects = [
-    {
-      id: 1,
-      title: "Exhibition AR",
-      description: "Ứng dụng thực tế tăng cường cho bảo tàng Việt Nam",
-      status: "featured",
-      image:
-        "https://dashboard.codeparrot.ai/api/image/Z9zBKSppvFKitUlc/rectangl.png",
-    },
-    {
-      id: 2,
-      title: "Exhibition AR",
-      description: "Ứng dụng thực tế tăng cường cho bảo tàng Việt Nam",
-      status: "featured",
-      image:
-        "https://dashboard.codeparrot.ai/api/image/Z9zBKSppvFKitUlc/rectangl-2.png",
-    },
-  ];
+  // const defaultProjects = [
+  //   {
+  //     id: 1,
+  //     title: "Exhibition AR",
+  //     description: "Ứng dụng thực tế tăng cường cho bảo tàng Việt Nam",
+  //     status: "featured",
+  //     image:
+  //       "https://dashboard.codeparrot.ai/api/image/Z9zBKSppvFKitUlc/rectangl.png",
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "Exhibition AR",
+  //     description: "Ứng dụng thực tế tăng cường cho bảo tàng Việt Nam",
+  //     status: "featured",
+  //     image:
+  //       "https://dashboard.codeparrot.ai/api/image/Z9zBKSppvFKitUlc/rectangl-2.png",
+  //   },
+  // ];
+  const projects = projectData?.data || [];
 
   return (
     <div className="bg-[#F8FDFC]">
@@ -151,19 +193,24 @@ const handleAvatarChange = async (e) => {
       <div className="flex flex-col md:flex-row justify-center p-8 space-y-8 md:space-y-0 md:space-x-8">
         {/* Bên trái - Profile & Edit */}
         <div className="flex-1 bg-white rounded-2xl p-8">
-          <div className="flex flex-col items-center gap-8 mb-8 relative group"
-               onClick={() => fileInputRef.current?.click()}>
+          <div
+            className="flex flex-col items-center gap-8 mb-8 relative group"
+            onClick={() => fileInputRef.current?.click()}
+          >
             <Avatar
               alt={profile.name || "User"}
               src={profile.avatarUrl || ""}
-              sx={{ width: 210, height: 210, bgcolor: "#d9d9d9",
+              sx={{
+                width: 210,
+                height: 210,
+                bgcolor: "#d9d9d9",
                 opacity: 1,
                 transition: "opacity 0.3s",
                 cursor: "pointer",
                 "&:hover": {
                   opacity: 0.6,
                 },
-               }}
+              }}
             />
             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
               <EditIcon className="text-white text-4xl" />
@@ -180,7 +227,7 @@ const handleAvatarChange = async (e) => {
                 {profile.name || "Chưa có tên"}
               </h1>
 
-              {/* Job Title */} 
+              {/* Job Title */}
               {editMode ? (
                 <input
                   type="text"
@@ -368,7 +415,7 @@ const handleAvatarChange = async (e) => {
           <div className="bg-white rounded-xl p-6 shadow-md">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-xl font-bold">Các dự án tiêu biểu của bạn</h2>
-              <button
+              <button  onClick={showForm}
                 className="text-white px-4 py-2 rounded-lg"
                 style={{ backgroundColor: theme.colors.tealGreen }}
               >
@@ -376,9 +423,16 @@ const handleAvatarChange = async (e) => {
               </button>
             </div>
             <div className="h-px bg-black mb-8"></div>
-
+ {/* Show CreateProjectForm when isFormVisible is true */}
+      {isFormVisible && (
+        <CreateProjectForm
+          onCancel={handleCancel}
+          onCreate={handleCreateProject}
+          loading={isCreating}
+        />
+      )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {defaultProjects.map((project) => (
+              {projects.map((project) => (
                 <div
                   key={project.id}
                   className="border border-gray-400 rounded-lg overflow-hidden"
@@ -411,19 +465,21 @@ const handleAvatarChange = async (e) => {
                     <p className="mb-8">{project.description}</p>
                     <div className="flex gap-4">
                       <button
-                        className="border px-4 py-2 rounded-lg"
+                        onClick={() => navigate(`/project-room/${project._id}`)}
+                        className="border px-4 py-2 rounded-lg cursor-pointer"
                         style={{
                           borderColor: theme.colors.tealGreen,
                           color: theme.colors.tealGreen,
                         }}
                       >
-                        Chỉnh sửa
+                        Xem chi tiết
                       </button>
+
                       <button
-                        className="text-white px-4 py-2 rounded-lg"
+                        className="text-white px-4 py-2 rounded-lg cursor-pointer"
                         style={{ backgroundColor: theme.colors.tealGreen }}
                       >
-                        Xoá khỏi nổi bật
+                        Xoá dự án
                       </button>
                     </div>
                   </div>
@@ -436,37 +492,35 @@ const handleAvatarChange = async (e) => {
 
       {/* Testimonials Section */}
       <div className="flex flex-col items-center w-[1360px] p-8 bg-white rounded-2xl shadow-sm justify-center mx-auto">
-        <h1 className="font-bold text-2xl mb-6">
-          Đánh giá từ nhà tuyển dụng
-        </h1>
+        <h1 className="font-bold text-2xl mb-6">Đánh giá từ nhà tuyển dụng</h1>
         <img
           src="https://dashboard.codeparrot.ai/api/image/Z9zDwZIdzXb5Olpw/line-20.png"
           alt="line"
           className="w-full h-px bg-gray-400 mb-8"
         />
         <div className="flex flex-col gap-8 w-full">
-  {isReviewLoading ? (
-    <p>Đang tải đánh giá...</p>
-  ) : reviewError ? (
-    <p className="text-red-600">Lỗi khi tải đánh giá</p>
-  ) : reviewsData?.length === 0 ? (
-    <p className="text-gray-500">Chưa có đánh giá nào</p>
-  ) : (
-    reviewsData.map((review, index) => (
-      <TestimonialCard
-        key={index}
-        name={review.reviewer?.name || "Ẩn danh"}
-        designation={"Nhà tuyển dụng"}
-        rating={review.rating}
-        description={review.comment || "Không có nhận xét"}
-        avatarSrc={
-          review.reviewer?.avatarUrl || "https://dashboard.codeparrot.ai/api/image/Z9zDwZIdzXb5Olpw/ellipse.png"
-        }
-      />
-    ))
-  )}
-</div>
-
+          {isReviewLoading ? (
+            <p>Đang tải đánh giá...</p>
+          ) : reviewError ? (
+            <p className="text-red-600">Lỗi khi tải đánh giá</p>
+          ) : reviewsData?.length === 0 ? (
+            <p className="text-gray-500">Chưa có đánh giá nào</p>
+          ) : (
+            reviewsData.map((review, index) => (
+              <TestimonialCard
+                key={index}
+                name={review.reviewer?.name || "Ẩn danh"}
+                designation={"Nhà tuyển dụng"}
+                rating={review.rating}
+                description={review.comment || "Không có nhận xét"}
+                avatarSrc={
+                  review.reviewer?.avatarUrl ||
+                  "https://dashboard.codeparrot.ai/api/image/Z9zDwZIdzXb5Olpw/ellipse.png"
+                }
+              />
+            ))
+          )}
+        </div>
       </div>
 
       <Footer />

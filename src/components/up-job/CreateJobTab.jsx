@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import theme from "../../utils/theme";
 import { useCreateJobMutation } from "../../redux/api/jobApiSlice";
+import { useNavigate } from "react-router-dom";
 
 const technicalOptions = [
   "Công nghệ thông tin / Lập trình",
@@ -27,6 +28,7 @@ const locationOptions = ["Online", "Offline"];
 const experienceOptions = ["< 1 năm", "1-3 năm", "> 3 năm"];
 
 const CreateJobTab = ({ onBack, onSubmit }) => {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     title: "",
     quantity: "",
@@ -138,6 +140,7 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
       };
 
       await createJob(jobData);
+      navigate('/')
       console.log("Job created successfully");
       if (onSubmit) onSubmit();
     } catch (error) {

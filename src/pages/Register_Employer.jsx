@@ -86,7 +86,7 @@ const Register_Employer = () => {
     // Thêm accountType, loại bỏ agreeToTerms khỏi data gửi lên server
     const updatedFormData = {
       ...formData,
-      accountType: "Nhà tuyển dụng",
+      accountType: "Nhà Tuyển Dụng",
       agreeToTerms: undefined,
     };
 
@@ -124,8 +124,8 @@ const Register_Employer = () => {
 
   const handleGoogleLogin = () => {
     // Store the account type in localStorage before redirecting
-    localStorage.setItem('googleAuthType', 'Nhà tuyển dụng');
-    window.location.href = `${BASE_URL}/api/v1/auth/google?accountType=Nhà tuyển dụng`;
+    localStorage.setItem('googleAuthType', 'Nhà Tuyển Dụng');
+    window.location.href = `${BASE_URL}/api/v1/auth/google?accountType=Nhà Tuyển Dụng`;
   };
 
   return (
@@ -279,7 +279,7 @@ const Register_Employer = () => {
 
             {/* Công ty */}
             <div className="w-full mb-5">
-              <label className="block text-lg font-medium text-gray-900 mb-2">Công ty*</label>
+              <label className="block text-lg font-medium text-gray-900 mb-2">Công ty (quán nước, nhà hàng ...)*</label>
               <div className="relative">
                 <img src={companyIcon} alt="Company" className="absolute left-3 top-3 w-6 h-6" />
                 <input
