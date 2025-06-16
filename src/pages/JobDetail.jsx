@@ -7,6 +7,7 @@ import Header from "../components/home/Header";
 import theme from "../utils/theme";
 import ApplicationForm from "../components/up-job/ApplicationForm";
 import { Modal } from "antd";
+import { FastApply } from "../components/FastApply ";
 
 const colors = {
   lightGray: "#A8BBB4",
@@ -21,6 +22,7 @@ const JobDetail = () => {
   const { data, error, isLoading } = useGetJobDetailQuery(jobId);
  
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isQuickApplyOpen, setIsQuickApplyOpen] = useState(false);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading job details</div>;
@@ -83,6 +85,14 @@ const JobDetail = () => {
             >
               Ứng tuyển ngay
             </button>
+            <button
+  onClick={() => setIsQuickApplyOpen(true)}
+  className="text-white px-6 py-3 rounded-lg"
+  style={{ backgroundColor: colors.darkTeal }}
+>
+  Ứng tuyển nhanh
+</button>
+
 <Modal
   open={isModalOpen}
   onCancel={() => setIsModalOpen(false)}
@@ -167,6 +177,20 @@ const JobDetail = () => {
           </div>
         </div>
       </div>
+{isQuickApplyOpen && (
+  <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-50">
+    <div className="bg-white p-6 rounded-lg max-w-4xl w-full overflow-auto max-h-[90vh]">
+      <button
+        onClick={() => setIsQuickApplyOpen(false)}
+        className="ml-auto mb-4 block px-4 py-2 bg-gray-200 rounded"
+      >
+        Đóng
+      </button>
+      <FastApply jobTitle={job?.title} />
+
+    </div>
+  </div>
+)}
 
       <Footer />
     </div>

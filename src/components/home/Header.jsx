@@ -94,12 +94,12 @@ const Header = () => {
           </a>
         )}
 
-        <a
+        {/* <a
           href="#"
           className="text-lg font-semibold text-gray-800 hover:text-teal-600 transition-colors duration-300"
         >
           Công cụ
-        </a>
+        </a> */}
 
         <a
           href="/vip"
@@ -117,7 +117,7 @@ const Header = () => {
           </a>
         ) : (
           <a
-            href="/"
+            href="/top-jobs"
             className="text-lg font-semibold text-gray-800 hover:text-teal-600 transition-colors duration-300"
           >
             Tìm việc

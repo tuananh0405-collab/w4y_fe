@@ -112,6 +112,52 @@ export const applicantApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
+// ======================= PROJECT API =========================
+
+createProject: builder.mutation({
+  query: (projectData) => ({
+    url: `${APPLICANT_URL}/projects`,
+    method: "POST",
+    body: projectData,
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }),
+  invalidatesTags: ["MyProjects"],
+}),
+
+getMyProjects: builder.query({
+  query: () => ({
+    url: `${APPLICANT_URL}/projects`,
+    method: "GET",
+    credentials: "include",
+  }),
+}),
+
+updateProject: builder.mutation({
+  query: ({ projectId, updates }) => ({
+    url: `${APPLICANT_URL}/projects/${projectId}`,
+    method: "PUT",
+    body: updates,
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }),
+  invalidatesTags: ["MyProjects"],
+}),
+
+deleteProject: builder.mutation({
+  query: (projectId) => ({
+    url: `${APPLICANT_URL}/projects/${projectId}`,
+    method: "DELETE",
+    credentials: "include",
+  }),
+  invalidatesTags: ["MyProjects"],
+}),
+
+
   }),
 });
 
@@ -127,4 +173,9 @@ export const {
   useUploadAvatarMutation,
   useGetUploadedCVsQuery,
   useDeleteUploadedCVMutation,
+    useCreateProjectMutation,
+  useGetMyProjectsQuery,
+  useUpdateProjectMutation,
+  useDeleteProjectMutation,
+
 } = applicantApiSlice;

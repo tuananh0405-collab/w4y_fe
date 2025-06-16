@@ -6,9 +6,30 @@ import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import { playBtnIcon } from "../assets";
 import theme from "../utils/theme";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  useGetApplicantProfileQuery,
+  useGetMyProjectsQuery,
+} from "../redux/api/applicantApiSlice";
 
 const ProjectRoom = () => {
-  const techTags = ["React Native", "AR Core", "3D Modeling", "Fire base"];
+  const navigate = useNavigate();
+
+  const { projectId } = useParams();
+  const { data: projectData, isLoading } = useGetMyProjectsQuery();
+  const { data: profileData, isLoading: profileLoading } =
+    useGetApplicantProfileQuery(); // Get user profile info
+
+  if (isLoading) return <p>Đang tải...</p>;
+
+  const project = projectData?.data?.find((p) => p._id === projectId);
+
+  if (!project) return <p>Không tìm thấy dự án</p>;
+  console.log("====================================");
+  console.log(profileData);
+  console.log("====================================");
+  const techTags = project.technologies || [];
+  const mediaItems = project.media || [];
 
   return (
     <div className="flex flex-col w-full bg-[#fff] ">
@@ -17,10 +38,10 @@ const ProjectRoom = () => {
         <section className=" p-8 md:p-10 font-sans bg-[theme.colors.bgColor]">
           <header className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 mb-8">
             <span className="text-xl sm:text-2xl font-semibold text-[#000]">
-              Đỗ Thế Hào /
+              {profileData?.data?.name} /
             </span>
             <h2 className="text-xl sm:text-2xl font-semibold text-[#000]">
-              Exhibition AR
+              {project.title}
             </h2>
           </header>
           <div className="flex flex-col sm:flex-row gap-8 sm:gap-12">
@@ -28,7 +49,7 @@ const ProjectRoom = () => {
             <div className="flex-1 w-1/2 h-[472px] bg-[#3a6656] rounded-2xl relative flex items-center justify-center">
               <div className="relative w-[68px] h-[78px] hover:opacity-90 transition duration-300">
                 <img
-                  src={playBtnIcon}
+                  src={project.media[0]?.url}
                   alt="Play button"
                   className="w-full h-full object-contain"
                   loading="lazy"
@@ -39,7 +60,7 @@ const ProjectRoom = () => {
             {/* Details section */}
             <div className="flex-1 w-1/2">
               <h3 className="text-2xl sm:text-3xl font-bold text-[#000] mb-4">
-                Exhibition AR
+                {project.title}
               </h3>
               <ul className="flex flex-wrap gap-4 mb-6 list-none p-0">
                 {techTags.map((tag) => (
@@ -52,10 +73,7 @@ const ProjectRoom = () => {
                 ))}
               </ul>
               <p className="text-lg sm:text-xl font-normal text-[#000] leading-relaxed">
-                Ứng dụng thực tế ảo tăng cường (AR) cho triển lãm, cho phép
-                người dùng tương tác với các đối tượng 3D và nhận thông tin chi
-                tiết thông qua camera điện thoại. Dự án tích hợp công nghệ AR
-                hiện đại với giao diện người dùng trực quan....
+                {project.description}
               </p>
             </div>
           </div>
@@ -76,19 +94,15 @@ const ProjectRoom = () => {
                 </Title>
                 <Paragraph>
                   <Text strong>Vấn đề: </Text>
-                  Các triển lãm truyền thống thiếu tính tương tác và khó thu hút
-                  sự chú ý của du khách, đặc biệt là thế hệ trẻ.
+                  {project.summary || "Không có thông tin"}
                 </Paragraph>
                 <Paragraph>
                   <Text strong>Giải pháp: </Text>
-                  Phát triển ứng dụng AR cho phép du khách quét các exhibit để
-                  hiển thị thông tin 3D, video giải thích và trải nghiệm tương
-                  tác phong phú.
+                  {project.features.join(", ") || "Không có thông tin"}
                 </Paragraph>
                 <Paragraph>
                   <Text strong>Kết quả: </Text>
-                  Tăng 75% thời gian lưu trú của du khách và 90% phản hồi tích
-                  cực về trải nghiệm triển lãm.
+                  {project.result || "Không có kết quả"}
                 </Paragraph>
               </div>
               <div
@@ -103,56 +117,16 @@ const ProjectRoom = () => {
                   Tính năng chính
                 </Title>
                 <Row gutter={[16, 16]}>
-                  <Col span={2}>
-                    <Image
-                      src="https://c.animaapp.com/mblrhzumfhRI2m/img/vector.svg"
-                      preview={false}
-                    />
-                  </Col>
+                  {project.features?.map((feature, index) => (
+                    <Col span={2} key={index}>
+                      <Image
+                        src="https://c.animaapp.com/mblrhzumfhRI2m/img/vector.svg"
+                        preview={false}
+                      />
+                    </Col>
+                  ))}
                   <Col span={22}>
-                    <Paragraph>
-                      Quét QR code để kích hoạt AR experience
-                    </Paragraph>
-                  </Col>
-                  <Col span={2}>
-                    <Image
-                      src="https://c.animaapp.com/mblrhzumfhRI2m/img/vector.svg"
-                      preview={false}
-                    />
-                  </Col>
-                  <Col span={22}>
-                    <Paragraph>
-                      Hiển thị mô hình 3D interactive cho từng exhibit
-                    </Paragraph>
-                  </Col>
-                  <Col span={2}>
-                    <Image
-                      src="https://c.animaapp.com/mblrhzumfhRI2m/img/vector.svg"
-                      preview={false}
-                    />
-                  </Col>
-                  <Col span={22}>
-                    <Paragraph>
-                      Audio guide tự động khi đến gần đối tượng
-                    </Paragraph>
-                  </Col>
-                  <Col span={2}>
-                    <Image
-                      src="https://c.animaapp.com/mblrhzumfhRI2m/img/vector.svg"
-                      preview={false}
-                    />
-                  </Col>
-                  <Col span={22}>
-                    <Paragraph>Chụp ảnh, quay video với AR overlay</Paragraph>
-                  </Col>
-                  <Col span={2}>
-                    <Image
-                      src="https://c.animaapp.com/mblrhzumfhRI2m/img/vector.svg"
-                      preview={false}
-                    />
-                  </Col>
-                  <Col span={22}>
-                    <Paragraph>Map navigation với AR directions</Paragraph>
+                    <Paragraph>{project.features.join(", ")}</Paragraph>
                   </Col>
                 </Row>
               </div>
@@ -169,7 +143,7 @@ const ProjectRoom = () => {
                   <Col span={24}>
                     <Text>Thời gian thực hiện</Text>
                     <Text strong style={{ float: "right" }}>
-                      3 tháng
+                      {project.duration || "Chưa xác định"}
                     </Text>
                   </Col>
                   <Col span={24}>
@@ -181,7 +155,7 @@ const ProjectRoom = () => {
                   <Col span={24}>
                     <Text>Vai trò</Text>
                     <Text strong style={{ float: "right" }}>
-                      Graphic Designer
+                      {project.role || "Chưa xác định"}
                     </Text>
                   </Col>
                   <Col span={24}>
@@ -193,7 +167,7 @@ const ProjectRoom = () => {
                   <Col span={24}>
                     <Text>Team size</Text>
                     <Text strong style={{ float: "right" }}>
-                      3 người
+                      {project.teamSize || "Chưa xác định"}
                     </Text>
                   </Col>
                   <Col span={24}>
@@ -220,8 +194,8 @@ const ProjectRoom = () => {
                     />
                   </Col>
                   <Col span={24} style={{ textAlign: "center" }}>
-                    <Title level={3}>Đỗ Thế Hảo</Title>
-                    <Text>Junior Designer</Text>
+                    <Title level={3}>{profileData?.data?.name}</Title>
+                    <Text>{profileData?.data?.jobTitle}</Text>
                   </Col>
                   <Col span={24} style={{ textAlign: "center" }}>
                     <Image
@@ -273,216 +247,104 @@ const ProjectRoom = () => {
                 Screenshot &amp; Demo
               </h1>
             </Col>
-            <Col span={12} style={{ padding: "10px" }}>
-              <div
-                style={{
-                  backgroundColor: "#d9d9d9",
-                  borderRadius: "16px",
-                  height: "263px",
-                }}
-              />
-              <div
-                style={{
-                  textAlign: "center",
-                  marginTop: "10px",
-                  fontFamily: "Inter, Helvetica",
-                  fontSize: "20px",
-                }}
-              >
-                AR Scanning
-              </div>
-            </Col>
-            <Col span={12} style={{ padding: "10px" }}>
-              <div
-                style={{
-                  backgroundColor: "#d9d9d9",
-                  borderRadius: "16px",
-                  height: "263px",
-                }}
-              />
-              <div
-                style={{
-                  textAlign: "center",
-                  marginTop: "10px",
-                  fontFamily: "Inter, Helvetica",
-                  fontSize: "20px",
-                }}
-              >
-                3D Model View
-              </div>
-            </Col>
-            <Col span={12} style={{ padding: "10px" }}>
-              <div
-                style={{
-                  backgroundColor: "#d9d9d9",
-                  borderRadius: "16px",
-                  height: "263px",
-                }}
-              />
-              <div
-                style={{
-                  textAlign: "center",
-                  marginTop: "10px",
-                  fontFamily: "Inter, Helvetica",
-                  fontSize: "20px",
-                }}
-              >
-                Info Overlay
-              </div>
-            </Col>
-            <Col span={12} style={{ padding: "10px" }}>
-              <div
-                style={{
-                  backgroundColor: "#d9d9d9",
-                  borderRadius: "16px",
-                  height: "263px",
-                }}
-              />
-              <div
-                style={{
-                  textAlign: "center",
-                  marginTop: "10px",
-                  fontFamily: "Inter, Helvetica",
-                  fontSize: "20px",
-                }}
-              >
-                Navigation Map
-              </div>
-            </Col>
+
+            {mediaItems.map((media, index) => (
+              <Col span={12} style={{ padding: "10px" }} key={index}>
+                <div
+                  style={{
+                    backgroundColor: "#d9d9d9",
+                    borderRadius: "16px",
+                    height: "263px",
+                  }}
+                />
+                <div
+                  style={{
+                    textAlign: "center",
+                    marginTop: "10px",
+                    fontFamily: "Inter, Helvetica",
+                    fontSize: "20px",
+                  }}
+                >
+                  {media.type === "image" ? "Image Demo" : "Video Demo"}
+                </div>
+              </Col>
+            ))}
           </Row>
         </div>
 
-         <div className="p-8 md:p-10">
-      <Row
-        justify="center"
-        align="middle"
-        style={{
-          backgroundColor: "#f8fdfc",
-          borderRadius: "16px",
-          padding: "40px 0",
-        }}
-          gutter={[32, 16]}
-      >
-        <Col span={24}>
-          <Title level={2} style={{ textAlign: "center", marginBottom: "30px" }}>
-            Dự án khác
-          </Title>
-        </Col>
+        <div className="p-8 md:p-10">
+          <Row
+            justify="center"
+            align="middle"
+            style={{
+              backgroundColor: "#f8fdfc",
+              borderRadius: "16px",
+              padding: "40px 0",
+            }}
+            gutter={[32, 16]}
+          >
+            <Col span={24}>
+              <Title
+                level={2}
+                style={{ textAlign: "center", marginBottom: "30px" }}
+              >
+                Dự án khác
+              </Title>
+            </Col>
 
-        {/* Project Cards Section */}
-        <Col span={8}>
-          <div
-            style={{
-              backgroundColor: "#3a6656",
-              borderRadius: "16px 16px 0 0",
-              padding: "60px 0",
-              textAlign: "center",
-            }}
-          >
-            <Text
-              style={{
-                color: "white",
-                fontSize: "20px",
-                fontWeight: "600",
-              }}
-            >
-              W4U Web
-            </Text>
-          </div>
-          <div
-            style={{
-              backgroundColor: "#d9d9d9",
-              borderRadius: "0 0 16px 16px",
-              padding: "20px",
-              textAlign: "center",
-            }}
-          >
-            <Title level={3}>W4U - Job Matching Platform</Title>
-            <Text>Ứng dụng thực tế tăng cường cho bảo tàng Việt Nam</Text>
-          </div>
-        </Col>
+            {/* Project Cards Section */}
+            {projectData?.data.map((otherProject) => (
+              <Col span={8} key={otherProject._id}>
+                <div
+                  style={{
+                    backgroundColor: "#3a6656",
+                    borderRadius: "16px 16px 0 0",
+                    padding: "60px 0",
+                    textAlign: "center",
+                  }}
+                  onClick={() => navigate(`/project-room/${otherProject._id}`)}
+                >
+                  <Text
+                    style={{
+                      color: "white",
+                      fontSize: "20px",
+                      fontWeight: "600",
+                    }}
+                  >
+                    {otherProject.title}
+                  </Text>
+                </div>
+                <div
+                  style={{
+                    backgroundColor: "#d9d9d9",
+                    borderRadius: "0 0 16px 16px",
+                    padding: "20px",
+                    textAlign: "center",
+                  }}
+                >
+                  <Title level={3}>{otherProject.title}</Title>
+                  <Text>{otherProject.description}</Text>
+                </div>
+              </Col>
+            ))}
 
-        <Col span={8}>
-          <div
-            style={{
-              backgroundColor: "#3a6656",
-              borderRadius: "16px 16px 0 0",
-              padding: "60px 0",
-              textAlign: "center",
-            }}
-          >
-            <Text
-              style={{
-                color: "white",
-                fontSize: "20px",
-                fontWeight: "600",
-              }}
-            >
-              W4U Web
-            </Text>
-          </div>
-          <div
-            style={{
-              backgroundColor: "#d9d9d9",
-              borderRadius: "0 0 16px 16px",
-              padding: "20px",
-              textAlign: "center",
-            }}
-          >
-            <Title level={3}>W4U - Job Matching Platform</Title>
-            <Text>Ứng dụng thực tế tăng cường cho bảo tàng Việt Nam</Text>
-          </div>
-        </Col>
-
-        <Col span={8}>
-          <div
-            style={{
-              backgroundColor: "#3a6656",
-              borderRadius: "16px 16px 0 0",
-              padding: "60px 0",
-              textAlign: "center",
-            }}
-          >
-            <Text
-              style={{
-                color: "white",
-                fontSize: "20px",
-                fontWeight: "600",
-              }}
-            >
-              W4U Web
-            </Text>
-          </div>
-          <div
-            style={{
-              backgroundColor: "#d9d9d9",
-              borderRadius: "0 0 16px 16px",
-              padding: "20px",
-              textAlign: "center",
-            }}
-          >
-            <Title level={3}>W4U - Job Matching Platform</Title>
-            <Text>Ứng dụng thực tế tăng cường cho bảo tàng Việt Nam</Text>
-          </div>
-        </Col>
-
-        {/* Back Button Section */}
-        <Col span={24} style={{ textAlign: "center", marginTop: "20px" }}>
-          <Button
-            type="primary"
-            style={{
-              backgroundColor: "#3a6656",
-              borderColor: "#3a6656",
-              fontSize: "16px",
-              padding: "10px 20px",
-            }}
-            onClick={() => history.goBack()}
-          >
-            Quay lại
-          </Button>
-        </Col>
-      </Row>
-    </div>
+            {/* Back Button Section */}
+            <Col span={24} style={{ textAlign: "center", marginTop: "20px" }}>
+              <Button
+                type="primary"
+                style={{
+                  backgroundColor: "#3a6656",
+                  borderColor: "#3a6656",
+                  fontSize: "16px",
+                  padding: "10px 20px",
+                }}
+                onClick={() => navigate("/profile")}
+              >
+                Quay lại
+              </Button>
+            </Col>
+          </Row>
+        </div>
       </div>
       <Footer />
     </div>

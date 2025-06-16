@@ -53,8 +53,9 @@ const router = createBrowserRouter(
           <Route path="/job-detail/:jobId" element={<JobDetail />} />
           <Route path="/top-jobs" element={<TopJobs />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/project-room" element={<ProjectRoom />} />
+<Route path="/project-room/:projectId" element={<ProjectRoom />} />
           <Route path="/vip" element={<W4Uvip />} />
+          {/* <Route path="/test" element={< />} /> */}
         </Route>
       </Route>
       {/* Route 404 cho tất cả các route khác */}
