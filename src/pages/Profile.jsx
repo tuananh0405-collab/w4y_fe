@@ -8,6 +8,7 @@ import TestimonialCard from "../components/profile/TestimonialCard";
 import { useSelector } from "react-redux";
 import {
   useCountApplicationsQuery,
+  useCreateProjectMutation,
   useGetApplicantProfileQuery,
   useGetMyProjectsQuery,
   useUpdateUserProfileMutation,
@@ -16,6 +17,7 @@ import {
 import theme from "../utils/theme";
 import { useGetUserReviewsQuery } from "../redux/api/applicationApiSlice";
 import { useNavigate } from "react-router-dom";
+import CreateProjectForm from "../components/profile/CreateProjectForm";
 
 const Profile = () => {
   const user = useSelector((state) => state.auth.userState);
@@ -44,6 +46,41 @@ const Profile = () => {
     useUpdateUserProfileMutation();
   const { data: countData, isLoading: isCountLoading } =
     useCountApplicationsQuery(undefined, { skip: !userId });
+      const [createProject, { isLoading: isCreating }] = useCreateProjectMutation();
+
+     const [isFormVisible, setIsFormVisible] = useState(false);
+
+  // Show form to add a new project
+  const showForm = () => {
+    setIsFormVisible(true);
+  };
+
+  // Hide form
+  const handleCancel = () => {
+    setIsFormVisible(false);
+  };
+
+  // Handle form submission for creating a new project
+  const handleCreateProject = async (values) => {
+  try {
+    // Xử lý media: đảm bảo nó là một mảng đối tượng
+    const media = values.media ? [{ url: values.media, type: 'image' }] : [];
+
+    // Gửi dữ liệu lên API với media đã được xử lý
+    const projectData = {
+      ...values,
+      media,  // Truyền media dưới dạng mảng các đối tượng
+    };
+
+    await createProject(projectData).unwrap();
+    alert("Dự án đã được tạo thành công");
+    setIsFormVisible(false);
+  } catch (error) {
+    alert("Lỗi khi tạo dự án mới");
+    console.error(error);
+  }
+};
+
   const [editMode, setEditMode] = useState(false);
   const [jobTitle, setJobTitle] = useState("");
   const [skills, setSkills] = useState([]);
@@ -378,7 +415,7 @@ const Profile = () => {
           <div className="bg-white rounded-xl p-6 shadow-md">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-xl font-bold">Các dự án tiêu biểu của bạn</h2>
-              <button
+              <button  onClick={showForm}
                 className="text-white px-4 py-2 rounded-lg"
                 style={{ backgroundColor: theme.colors.tealGreen }}
               >
@@ -386,7 +423,14 @@ const Profile = () => {
               </button>
             </div>
             <div className="h-px bg-black mb-8"></div>
-
+ {/* Show CreateProjectForm when isFormVisible is true */}
+      {isFormVisible && (
+        <CreateProjectForm
+          onCancel={handleCancel}
+          onCreate={handleCreateProject}
+          loading={isCreating}
+        />
+      )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {projects.map((project) => (
                 <div

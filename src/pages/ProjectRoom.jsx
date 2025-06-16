@@ -26,7 +26,7 @@ const ProjectRoom = () => {
 
   if (!project) return <p>Không tìm thấy dự án</p>;
   console.log("====================================");
-  console.log(profileData);
+  console.log(projectData);
   console.log("====================================");
   const techTags = project.technologies || [];
   const mediaItems = project.media || [];
