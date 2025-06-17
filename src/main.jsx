@@ -27,6 +27,7 @@ import TopJobs from "./pages/TopJobs.jsx";
 import GoogleCallback from "./components/auth/GoogleCallback.jsx";
 import ProjectRoom from "./pages/ProjectRoom.jsx";
 import W4Uvip from "./pages/W4Uvip.jsx";
+import ChatRoom from "./pages/ChatRoom.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -53,7 +54,8 @@ const router = createBrowserRouter(
           <Route path="/job-detail/:jobId" element={<JobDetail />} />
           <Route path="/top-jobs" element={<TopJobs />} />
           <Route path="/profile" element={<Profile />} />
-<Route path="/project-room/:projectId" element={<ProjectRoom />} />
+          <Route path="/chat" element={<ChatRoom />} />
+          <Route path="/project-room/:projectId" element={<ProjectRoom />} />
           <Route path="/vip" element={<W4Uvip />} />
           {/* <Route path="/test" element={< />} /> */}
         </Route>
