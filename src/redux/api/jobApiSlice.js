@@ -6,7 +6,7 @@ export const jobApiSlice = apiSlice.injectEndpoints({
     // Tạo công việc mới
     createJob: builder.mutation({
       query: (data) => ({
-        url: `${JOB_URL}/create`, // URL tạo công việc
+        url: `${JOB_URL}`, // URL tạo công việc
         method: "POST",
         body: data,
         credentials: "include",
@@ -26,7 +26,7 @@ export const jobApiSlice = apiSlice.injectEndpoints({
         if (location) queryStr += `location=${location}&`;
         if (position) queryStr += `position=${position}&`;
         return {
-          url: `${JOB_URL}/list?${queryStr}`,
+          url: `${JOB_URL}?${queryStr}`,
           method: "GET",
         };
       },
@@ -35,7 +35,7 @@ export const jobApiSlice = apiSlice.injectEndpoints({
     // Lấy chi tiết công việc
     getJobDetail: builder.query({
       query: (jobId) => ({
-        url: `${JOB_URL}/detail/${jobId}`, // URL lấy chi tiết công việc
+        url: `${JOB_URL}/${jobId}`, // URL lấy chi tiết công việc
         method: "GET",
       }),
     }),
@@ -43,7 +43,7 @@ export const jobApiSlice = apiSlice.injectEndpoints({
     // Cập nhật thông tin công việc
     updateJob: builder.mutation({
       query: ({ jobId, data }) => ({
-        url: `${JOB_URL}/update/${jobId}`, // URL cập nhật công việc
+        url: `${JOB_URL}/${jobId}`, // URL cập nhật công việc
         method: "PUT",
         body: data,
         credentials: "include",
@@ -53,7 +53,7 @@ export const jobApiSlice = apiSlice.injectEndpoints({
     // Xóa công việc
     deleteJob: builder.mutation({
       query: (jobId) => ({
-        url: `${JOB_URL}/delete/${jobId}`, // URL xóa công việc
+        url: `${JOB_URL}/${jobId}`, // URL xóa công việc
         method: "DELETE",
         credentials: "include",
       }),
@@ -61,14 +61,14 @@ export const jobApiSlice = apiSlice.injectEndpoints({
 
     getFilterOptions: builder.query({
       query: () => ({
-        url: `${JOB_URL}/get-filter-options`,
+        url: `${JOB_URL}/filter-options`,
         method: "GET",
       }),
     }),
 
      getJobsByEmployer: builder.query({
       query: (employerId) => ({
-        url: `${JOB_URL}/get-by-employer/${employerId}`,
+        url: `${JOB_URL}/employer/${employerId}`,
         method: 'GET',
       }),
     }),
