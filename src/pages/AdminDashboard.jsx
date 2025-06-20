@@ -21,7 +21,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <Box className="bg-teal-50" sx={{ display: "flex", height: "100vh", width: "100%" }}>
+    <Box className="bg-teal-50" sx={{ display: "flex", height: "100%", width: "100%" }}>
         <Toolbar />
       <AdminSidebar />
         <Container className="bg-teal-50"  sx={{ flexGrow: 1, p: 3 }}>
@@ -32,7 +32,7 @@ const AdminDashboard = () => {
               recruiters={stats.recruiters}
               traffic={stats.traffic}
             />
-            <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
+            <Stack direction={{ xs: "column", md: "column" }} spacing={3}>
               <JobsChart />
               <UserGrowthChart />
             </Stack>
