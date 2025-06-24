@@ -9,7 +9,6 @@ import { Dropdown, Menu } from "antd";
 import { useSignOutMutation } from "../../redux/api/authApiSlice";
 import { useGetApplicantProfileQuery } from "../../redux/api/applicantApiSlice";
 import theme from "../../utils/theme";
-import { Button } from "@mui/material";
 import { Chat, NotificationsActive, SendToMobileOutlined } from "@mui/icons-material";
 
 const items = [
@@ -167,18 +166,18 @@ const Header = () => {
         <div className="flex items-center gap-3 mt-4 md:mt-0 w-full md:w-auto">
           {/* TODO */}
           <Dropdown menu={{ items }} trigger={["click"]} placement="bottomRight" arrow>
-            <Button
-              className="w-12 h-12 cursor-pointer hover:ring-2 hover:ring-teal-600 hover:ring-offset-2 transition"
+            <button
+              className="w-12 h-12 rounded-md cursor-pointer text-teal-600 hover:text-teal-700 bg-transparent hover:bg-gray-200 transition"
             >
               <NotificationsActive />
-            </Button>
+            </button>
           </Dropdown>
           <a href="/chat">
-            <Button
-              className="w-12 h-12 cursor-pointer hover:ring-2 hover:ring-teal-600 hover:ring-offset-2 transition"
+            <button
+              className="w-12 h-12 rounded-md cursor-pointer text-teal-600 hover:text-teal-700 bg-transparent hover:bg-gray-200 transition"
             >
               <Chat />
-            </Button>
+            </button>
           </a>
           <Dropdown overlay={menu} trigger={["click"]} placement="bottomRight" arrow>
             <Avatar
