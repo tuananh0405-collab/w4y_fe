@@ -203,12 +203,6 @@ const TrafficLineChart = () => {
     <Paper sx={{ p: 3 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
         <Typography variant="h6">Website Traffic</Typography>
-        <Chip
-          label="+21% growth"
-          color="success"
-          icon={<TrendingUpIcon />}
-          size="small"
-        />
       </Box>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
         <Tabs value={timeRange} onChange={handleTimeChange}>
