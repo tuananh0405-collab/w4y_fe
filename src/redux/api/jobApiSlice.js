@@ -26,7 +26,7 @@ export const jobApiSlice = apiSlice.injectEndpoints({
         if (location) queryStr += `location=${location}&`;
         if (position) queryStr += `position=${position}&`;
         return {
-          url: `${JOB_URL}/list?${queryStr}`,
+          url: `${JOB_URL}?${queryStr}`,
           method: "GET",
         };
       },
@@ -61,17 +61,46 @@ export const jobApiSlice = apiSlice.injectEndpoints({
 
     getFilterOptions: builder.query({
       query: () => ({
-        url: `${JOB_URL}/get-filter-options`,
+        url: `${JOB_URL}/filter-options`,
         method: "GET",
       }),
     }),
 
-     getJobsByEmployer: builder.query({
+    getJobsByEmployer: builder.query({
       query: (employerId) => ({
         url: `${JOB_URL}/get-by-employer/${employerId}`,
         method: 'GET',
       }),
     }),
+
+    getMonthlyJobStats: builder.query({
+      query: (year) => ({
+        url: `${JOB_URL}/stats/monthly?year=${year}`,
+        method: "GET",
+      }),
+    }),
+
+    getQuarterlyJobStats: builder.query({
+      query: (year) => ({
+        url: `${JOB_URL}/stats/quarterly?year=${year}`,
+        method: "GET",
+      }),
+    }),
+
+    getYearlyJobStats: builder.query({
+      query: (endYear) => ({
+        url: `${JOB_URL}/stats/yearly?endYear=${endYear}`,
+        method: "GET",
+      }),
+    }),
+
+    getJobOverview: builder.query({
+      query: () => ({
+        url: `${JOB_URL}/overview`,
+        method: "GET",
+      }),
+    }),
+
   }),
 });
 
@@ -82,5 +111,9 @@ export const {
   useUpdateJobMutation,
   useDeleteJobMutation,
   useGetFilterOptionsQuery,
-  useGetJobsByEmployerQuery
+  useGetJobsByEmployerQuery,
+  useGetMonthlyJobStatsQuery,
+  useGetQuarterlyJobStatsQuery,
+  useGetYearlyJobStatsQuery,
+  useGetJobOverviewQuery
 } = jobApiSlice;

@@ -28,6 +28,7 @@ import GoogleCallback from "./components/auth/GoogleCallback.jsx";
 import ProjectRoom from "./pages/ProjectRoom.jsx";
 import W4Uvip from "./pages/W4Uvip.jsx";
 import ChatRoom from "./pages/ChatRoom.jsx";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -39,7 +40,7 @@ const router = createBrowserRouter(
       {/* PRIVATE  */}
       <Route path="/admin" element={<App />}>
         <Route path="" element={<AdminRoute />}>
-          {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />  
         </Route>
       </Route>
       {/* PUBLIC  */}
