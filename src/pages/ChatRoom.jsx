@@ -13,19 +13,23 @@ import ApplicantSuggestionList from "../components/chat-room/SuggestionList_Appl
 import RecruiterSuggestionList from "../components/chat-room/SuggestionList_Recruiter";
 
 // TODO: Get these from an centralized enum file
-const TYPE_APPLICANT = "Ứng Viên"
-const TYPE_RECRUITER = "Nhà Tuyển Dụng"
+const TYPE_APPLICANT = "Ứng Viên";
+const TYPE_RECRUITER = "Nhà Tuyển Dụng";
 
 // Amount of time in milliseconds to wait after user stops typing before fetching
-const QUERY_DELAY_MS = 700
+const QUERY_DELAY_MS = 700;
 
 const ChatRoom = () => {
   const user = useSelector((state) => state.auth.userState);
   const senderId = user?.user?.id;
   const accountType = user?.user?.accountType;
 
-  const { data: chatTokenQuery, error: fetchError, isLoading: isFetchingToken } = useGetChatTokenQuery({ senderId });
-  const { data: chatToken } = chatTokenQuery || { data: null }
+  const {
+    data: chatTokenQuery,
+    error: fetchError,
+    isLoading: isFetchingToken,
+  } = useGetChatTokenQuery({ senderId });
+  const { data: chatToken } = chatTokenQuery || { data: null };
   const [receiverId, setReceiverId] = useState(null);
   const [receiverProfile, setReceiverProfile] = useState(null);
 
@@ -51,12 +55,17 @@ const ChatRoom = () => {
     return () => clearTimeout(timeout);
   }, [conversationQuery]);
 
-
-  const onSend = (!chatToken) ? () => { alert("Invalid chat token, please login and try again") } :
-    (!receiverId) ? () => { alert("Please choose an user to chat with") } :
-      (message) => {
-        socket.emit("sendChatMessage", { chatToken, receiverId, message });
+  const handleSend = (!chatToken)
+    ? () => {
+      alert("Invalid chat token, please login and try again");
+    }
+    : (!receiverId)
+      ? () => {
+        alert("Please choose an user to chat with");
       }
+      : (message) => {
+        socket.emit("sendChatMessage", { chatToken, receiverId, message });
+      };
 
   // Init socket events
   useEffect(() => {
@@ -66,36 +75,42 @@ const ChatRoom = () => {
 
     socket.on("connectToConversation", ({ success, receiver }) => {
       if (success) {
-        setReceiverProfile(receiver)
+        setReceiverProfile(receiver);
       }
-    })
+    });
 
     return () => {
       socket.off("connect");
       socket.off("connectToConversation");
-    }
-  }, [])
+    };
+  }, []);
 
   // Communicate conversation change to socket
   useEffect(() => {
     if (chatToken && receiverId) {
-      socket.emit("setActiveConversation", { chatToken, receiverId })
+      socket.emit("setActiveConversation", { chatToken, receiverId });
     }
-  }, [receiverId, chatToken])
+  }, [receiverId, chatToken]);
 
   // === RENDER ===
   if (isFetchingToken) {
     return (
-      <div className="flex flex-row justify-center w-full min-h-screen bg-gray-200">
-        <CircularProgress />
+      <div className="flex flex-row justify-center items-center w-full min-h-screen bg-gray-200 text-teal-300">
+        <CircularProgress
+          sx={{
+            "& .MuiCircularProgress-svg": {
+              color: "teal",
+            },
+          }}
+        />
       </div>
-    )
+    );
   }
 
   if (fetchError) {
     <div className="flex flex-row justify-center w-full min-h-screen bg-gray-200">
       {JSON.stringify(fetchError)}
-    </div>
+    </div>;
   }
 
   return (
@@ -103,8 +118,16 @@ const ChatRoom = () => {
       <div className="flex justify-center">
         <div className="w-full bg-gray-50 min-w-32 max-w-128">
           <ConversationListHeader />
-          <ConversationFilterBar value={conversationQuery} onSetQuery={setConversationQuery} />
-          <ConversationList senderId={senderId} onSelect={(str) => setReceiverId(str)} query={conversationQuery_fetch} isChangingQuery={isChangingQuery} />
+          <ConversationFilterBar
+            value={conversationQuery}
+            onSetQuery={setConversationQuery}
+          />
+          <ConversationList
+            senderId={senderId}
+            onSelect={(str) => setReceiverId(str)}
+            query={conversationQuery_fetch}
+            isChangingQuery={isChangingQuery}
+          />
         </div>
       </div>
 
@@ -112,23 +135,48 @@ const ChatRoom = () => {
 
       {/* Main Content */}
       <div className="flex flex-col h-screen">
-        <ConversationDescriptionCard name={receiverProfile?.name} title={receiverProfile?.accountType} />
+        <ConversationDescriptionCard
+          name={receiverProfile?.name}
+          title={receiverProfile?.accountType}
+        />
         <MessageList senderId={senderId} receiverId={receiverId} />
-        <MessageComposeBar onSend={onSend} />
+        <MessageComposeBar onSend={handleSend} />
       </div>
 
       <div className="w-px bg-black opacity-20" />
 
       <div className="flex justify-center">
         <div className="w-full bg-gray-50 min-w-32 max-w-128">
-          {accountType === TYPE_RECRUITER && <>
-            <Typography variant="body1" paddingX={2} className="w-full bg-gray-200 font-light">CÁC ỨNG VIÊN ĐÃ ỨNG TUYỂN GẦN ĐÂY:</Typography>
-            <RecruiterSuggestionList userId={senderId} onSelect={(id) => setReceiverId(id)} />
-          </>}
-          {accountType === TYPE_APPLICANT && <>
-            <Typography variant="body1" paddingX={2} className="w-full bg-gray-200 font-light">CÁC VỊ TRÍ BẠN ỨNG TUYỂN:</Typography>
-            <ApplicantSuggestionList userId={senderId} onSelect={(id) => setReceiverId(id)} />
-          </>}
+          {accountType === TYPE_RECRUITER && (
+            <>
+              <Typography
+                variant="body1"
+                paddingX={2}
+                className="w-full bg-gray-200 font-light"
+              >
+                CÁC ỨNG VIÊN ĐÃ ỨNG TUYỂN GẦN ĐÂY:
+              </Typography>
+              <RecruiterSuggestionList
+                userId={senderId}
+                onSelect={(id) => setReceiverId(id)}
+              />
+            </>
+          )}
+          {accountType === TYPE_APPLICANT && (
+            <>
+              <Typography
+                variant="body1"
+                paddingX={2}
+                className="w-full bg-gray-200 font-light"
+              >
+                CÁC VỊ TRÍ BẠN ỨNG TUYỂN:
+              </Typography>
+              <ApplicantSuggestionList
+                userId={senderId}
+                onSelect={(id) => setReceiverId(id)}
+              />
+            </>
+          )}
         </div>
       </div>
     </div>
