@@ -14,7 +14,7 @@ const MessageComposeBar = ({ onSend }) => {
           className="hover:ring-2 hover:ring-teal-600 hover:ring-offset-2 transition"
           sx={{
             color: "#0f766e",
-            borderRadius: '50%',
+            borderRadius: "50%",
             minWidth: 0,
             width: 40,
             height: 40,
@@ -29,21 +29,25 @@ const MessageComposeBar = ({ onSend }) => {
           className="grow p-0"
           sx={{
             // Rounded
-            '& .MuiOutlinedInput-root': {
-              borderRadius: '24px',
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "24px",
             },
             // Inner input's padding
-            '& .MuiOutlinedInput-input': {
-              padding: '8px 10px',
+            "& .MuiOutlinedInput-input": {
+              padding: "8px 10px",
             },
-          }} />
+          }}
+        />
         <Button
-          onClick={() => onSend(message)}
+          onClick={() => {
+            onSend(message);
+            setMessage("");
+          }}
           className="hover:ring-2 hover:ring-teal-600 hover:ring-offset-2 transition"
           color="inherit"
           sx={{
             color: "#0f766e",
-            borderRadius: '50%',
+            borderRadius: "50%",
             minWidth: 0,
             width: 40,
             height: 40,
