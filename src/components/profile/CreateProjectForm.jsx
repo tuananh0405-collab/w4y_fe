@@ -1,5 +1,5 @@
 // CreateProjectForm.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Form,
   Input,
@@ -11,7 +11,10 @@ import {
   message,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { useUploadMediaFileMutation, useDeleteMediaFileMutation } from "../../redux/api/mediaS3ApiSlice";
+import {
+  useUploadMediaFileMutation,
+  useDeleteMediaFileMutation,
+} from "../../redux/api/mediaS3ApiSlice";
 
 const { Option } = Select;
 
@@ -19,78 +22,78 @@ const CreateProjectForm = ({ onCancel, onCreate, loading }) => {
   const [mediaList, setMediaList] = useState([]);
   const [uploadMediaFile] = useUploadMediaFileMutation();
   const [deleteMediaFile] = useDeleteMediaFileMutation();
-  const [hasSubmitted, setHasSubmitted] = useState(false);
+  // const [hasSubmitted, setHasSubmitted] = useState(false);
+  const hasSubmittedRef = useRef(false);
 
-useEffect(() => {
-  const handleBeforeUnload = (e) => {
-    if (!hasSubmitted && mediaList.length > 0) {
-      mediaList.forEach((media) => {
-        const key = media.url.split("amazonaws.com/")[1];
-        // Fire and forget — no await
-        deleteMediaFile({ key });
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (!hasSubmittedRef.current && mediaList.length > 0) {
+        mediaList.forEach((media) => {
+          const key = media.url.split("amazonaws.com/")[1];
+          deleteMediaFile({ key });
+        });
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      handleBeforeUnload(); // also run on component unmount
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [mediaList]);
+
+  const handleUpload = async (file) => {
+    try {
+      // 1. Gọi API để lấy presigned URL
+      console.log(file);
+      const { url, key } = await uploadMediaFile({
+        fileName: file.name,
+        fileType: file.type,
+      }).unwrap();
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // This avoids uploading the actual file to our backend for performance and cost reasons, should be done from the client directly to S3
+      await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": file.type,
+        },
+        body: file,
       });
+
+      const fileType = file.type.startsWith("video/") ? "video" : "image";
+
+      setMediaList((prev) => [
+        ...prev,
+        {
+          url: url.split("?")[0], // clean presigned url
+          type: fileType,
+        },
+      ]);
+
+      message.success(`${file.name} uploaded thành công`);
+    } catch (err) {
+      console.error(err);
+      message.error(`${file.name} upload thất bại`);
     }
   };
 
-  window.addEventListener("beforeunload", handleBeforeUnload);
+  const handleRemove = async (file) => {
+    try {
+      const url = file.url || file.thumbUrl;
+      const key = url.split("amazonaws.com/")[1];
 
-  return () => {
-    handleBeforeUnload(); // same cleanup on unmount
-    window.removeEventListener("beforeunload", handleBeforeUnload);
+      await deleteMediaFile({ key }).unwrap();
+
+      setMediaList((prev) => prev.filter((m) => m.url !== url));
+      message.success("Đã xoá media khỏi S3");
+    } catch (err) {
+      console.error(err);
+      message.error("Lỗi khi xoá media");
+    }
   };
-}, [hasSubmitted, mediaList]);
-
-  const handleUpload = async (file) => {
-  try {
-    // 1. Gọi API để lấy presigned URL
-    console.log(file)
-    const { url, key } = await uploadMediaFile({
-  fileName: file.name,
-  fileType: file.type,
-}).unwrap();
-const formData = new FormData();
-formData.append("file", file);
-
-// This avoids uploading the actual file to our backend for performance and cost reasons, should be done from the client directly to S3
-await fetch(url, {
-  method: "PUT",
-  headers: {
-    "Content-Type": file.type,
-  },
-  body: file,
-});
-
-const fileType = file.type.startsWith("video/") ? "video" : "image";
-
-setMediaList((prev) => [
-  ...prev,
-  {
-    url: url.split("?")[0], // clean presigned url
-    type: fileType,
-  },
-]);
-
-    message.success(`${file.name} uploaded thành công`);
-  } catch (err) {
-    console.error(err);
-    message.error(`${file.name} upload thất bại`);
-  }
-};
-
-const handleRemove = async (file) => {
-  try {
-    const url = file.url || file.thumbUrl;
-    const key = url.split("amazonaws.com/")[1];
-
-    await deleteMediaFile({ key }).unwrap();
-
-    setMediaList((prev) => prev.filter((m) => m.url !== url));
-    message.success("Đã xoá media khỏi S3");
-  } catch (err) {
-    console.error(err);
-    message.error("Lỗi khi xoá media");
-  }
-};
 
   return (
     <div className="p-8 bg-white rounded-xl shadow-md">
@@ -100,10 +103,10 @@ const handleRemove = async (file) => {
       <Form
         layout="vertical"
         onFinish={(values) => {
-          setHasSubmitted(true);
+          hasSubmittedRef.current = true;
           onCreate({
             ...values,
-            media: mediaList, // Array of { url, type }
+            media: mediaList,
           });
         }}
       >

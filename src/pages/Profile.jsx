@@ -21,8 +21,6 @@ import CreateProjectForm from "../components/profile/CreateProjectForm";
 
 const Profile = () => {
 
-
-
   const user = useSelector((state) => state.auth.userState);
   const userId = user?.user?.id;
   const {
@@ -30,6 +28,7 @@ const Profile = () => {
     isLoading: isReviewLoading,
     error: reviewError,
   } = useGetUserReviewsQuery(userId, { skip: !userId });
+
   const {
     data: projectData,
     isLoading: isProjectLoading,
@@ -179,6 +178,7 @@ const handleCreateProject = async (values) => {
   //       "https://dashboard.codeparrot.ai/api/image/Z9zBKSppvFKitUlc/rectangl-2.png",
   //   },
   // ];
+  console.log("projectData", projectData);
   const projects = projectData?.data || [];
 
   return (
@@ -432,7 +432,7 @@ const handleCreateProject = async (values) => {
                   className="border border-gray-400 rounded-lg overflow-hidden"
                 >
                   <img
-                    src={project.image}
+                    src={project.media[0].type === "image" ? project.media[0].url : "https://img.freepik.com/premium-vector/man-working-laptop-flat-character-illustration_648489-379.jpg?semt=ais_items_boosted&w=740"}
                     alt={project.title}
                     className="w-full h-52 object-cover bg-gray-300"
                   />
