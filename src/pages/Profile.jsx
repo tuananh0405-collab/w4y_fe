@@ -20,6 +20,9 @@ import { useNavigate } from "react-router-dom";
 import CreateProjectForm from "../components/profile/CreateProjectForm";
 
 const Profile = () => {
+
+
+
   const user = useSelector((state) => state.auth.userState);
   const userId = user?.user?.id;
   const {
@@ -61,18 +64,9 @@ const Profile = () => {
   };
 
   // Handle form submission for creating a new project
-  const handleCreateProject = async (values) => {
+const handleCreateProject = async (values) => {
   try {
-    // Xử lý media: đảm bảo nó là một mảng đối tượng
-    const media = values.media ? [{ url: values.media, type: 'image' }] : [];
-
-    // Gửi dữ liệu lên API với media đã được xử lý
-    const projectData = {
-      ...values,
-      media,  // Truyền media dưới dạng mảng các đối tượng
-    };
-
-    await createProject(projectData).unwrap();
+    await createProject(values).unwrap();
     alert("Dự án đã được tạo thành công");
     setIsFormVisible(false);
   } catch (error) {

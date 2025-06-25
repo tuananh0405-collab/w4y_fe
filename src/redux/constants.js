@@ -8,3 +8,4 @@ export const APPLICATION_URL = "/api/v1/application";
 export const REVIEW_URL = "/api/v1/review";
 export const PAYMENT_URL = "/api/v1/payment";
 export const CHAT_URL = "/api/v1/chat";
+export const MEDIA_URL = "/api/v1/media";
