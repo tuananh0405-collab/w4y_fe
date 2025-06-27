@@ -13,13 +13,16 @@ import {
   useGetMyProjectsQuery,
   useUpdateUserProfileMutation,
   useUploadAvatarMutation,
+  useDeleteProjectMutation,
 } from "../redux/api/applicantApiSlice";
 import theme from "../utils/theme";
 import { useGetUserReviewsQuery } from "../redux/api/applicationApiSlice";
 import { useNavigate } from "react-router-dom";
 import CreateProjectForm from "../components/profile/CreateProjectForm";
+import { message } from "antd";
 
 const Profile = () => {
+
   const user = useSelector((state) => state.auth.userState);
   const userId = user?.user?.id;
   const {
@@ -27,10 +30,12 @@ const Profile = () => {
     isLoading: isReviewLoading,
     error: reviewError,
   } = useGetUserReviewsQuery(userId, { skip: !userId });
+
   const {
     data: projectData,
     isLoading: isProjectLoading,
     error: projectError,
+    refetch: refetchProjects,
   } = useGetMyProjectsQuery();
 
   const navigate = useNavigate();
@@ -61,23 +66,30 @@ const Profile = () => {
   };
 
   // Handle form submission for creating a new project
-  const handleCreateProject = async (values) => {
+const handleCreateProject = async (values) => {
   try {
-    // Xử lý media: đảm bảo nó là một mảng đối tượng
-    const media = values.media ? [{ url: values.media, type: 'image' }] : [];
-
-    // Gửi dữ liệu lên API với media đã được xử lý
-    const projectData = {
-      ...values,
-      media,  // Truyền media dưới dạng mảng các đối tượng
-    };
-
-    await createProject(projectData).unwrap();
+    await createProject(values).unwrap();
     alert("Dự án đã được tạo thành công");
+    refetchProjects(); // Refetch projects to update the list
     setIsFormVisible(false);
   } catch (error) {
     alert("Lỗi khi tạo dự án mới");
     console.error(error);
+  }
+};
+
+const [deleteProject, { isLoading: isDeleting }] = useDeleteProjectMutation();
+
+const handleDeleteProject = async (projectId) => {
+  if (window.confirm("Bạn có chắc chắn muốn xoá dự án này?")) {
+    try {
+      await deleteProject(projectId).unwrap();
+      message.success("Dự án đã được xoá thành công");
+      refetchProjects(); // Refetch projects to update the list
+    } catch (error) {
+      message.error("Xoá dự án không thành công");
+      console.error(error);
+    }
   }
 };
 
@@ -185,6 +197,7 @@ const Profile = () => {
   //       "https://dashboard.codeparrot.ai/api/image/Z9zBKSppvFKitUlc/rectangl-2.png",
   //   },
   // ];
+  console.log("projectData", projectData);
   const projects = projectData?.data || [];
 
   return (
@@ -434,11 +447,11 @@ const Profile = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {projects.map((project) => (
                 <div
-                  key={project.id}
+                  key={project._id}
                   className="border border-gray-400 rounded-lg overflow-hidden"
                 >
                   <img
-                    src={project.image}
+                    src={project.media[0].type === "image" ? project.media[0].url : "https://img.freepik.com/premium-vector/man-working-laptop-flat-character-illustration_648489-379.jpg?semt=ais_items_boosted&w=740"}
                     alt={project.title}
                     className="w-full h-52 object-cover bg-gray-300"
                   />
@@ -476,6 +489,7 @@ const Profile = () => {
                       </button>
 
                       <button
+                      onClick={() => handleDeleteProject(project._id)}
                         className="text-white px-4 py-2 rounded-lg cursor-pointer"
                         style={{ backgroundColor: theme.colors.tealGreen }}
                       >
