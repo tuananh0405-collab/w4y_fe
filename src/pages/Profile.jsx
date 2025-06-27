@@ -13,11 +13,13 @@ import {
   useGetMyProjectsQuery,
   useUpdateUserProfileMutation,
   useUploadAvatarMutation,
+  useDeleteProjectMutation,
 } from "../redux/api/applicantApiSlice";
 import theme from "../utils/theme";
 import { useGetUserReviewsQuery } from "../redux/api/applicationApiSlice";
 import { useNavigate } from "react-router-dom";
 import CreateProjectForm from "../components/profile/CreateProjectForm";
+import { message } from "antd";
 
 const Profile = () => {
 
@@ -33,6 +35,7 @@ const Profile = () => {
     data: projectData,
     isLoading: isProjectLoading,
     error: projectError,
+    refetch: refetchProjects,
   } = useGetMyProjectsQuery();
 
   const navigate = useNavigate();
@@ -67,10 +70,26 @@ const handleCreateProject = async (values) => {
   try {
     await createProject(values).unwrap();
     alert("Dự án đã được tạo thành công");
+    refetchProjects(); // Refetch projects to update the list
     setIsFormVisible(false);
   } catch (error) {
     alert("Lỗi khi tạo dự án mới");
     console.error(error);
+  }
+};
+
+const [deleteProject, { isLoading: isDeleting }] = useDeleteProjectMutation();
+
+const handleDeleteProject = async (projectId) => {
+  if (window.confirm("Bạn có chắc chắn muốn xoá dự án này?")) {
+    try {
+      await deleteProject(projectId).unwrap();
+      message.success("Dự án đã được xoá thành công");
+      refetchProjects(); // Refetch projects to update the list
+    } catch (error) {
+      message.error("Xoá dự án không thành công");
+      console.error(error);
+    }
   }
 };
 
@@ -428,7 +447,7 @@ const handleCreateProject = async (values) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {projects.map((project) => (
                 <div
-                  key={project.id}
+                  key={project._id}
                   className="border border-gray-400 rounded-lg overflow-hidden"
                 >
                   <img
@@ -470,6 +489,7 @@ const handleCreateProject = async (values) => {
                       </button>
 
                       <button
+                      onClick={() => handleDeleteProject(project._id)}
                         className="text-white px-4 py-2 rounded-lg cursor-pointer"
                         style={{ backgroundColor: theme.colors.tealGreen }}
                       >

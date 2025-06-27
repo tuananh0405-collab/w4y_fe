@@ -1,7 +1,5 @@
-import { Button, Col, Image, Row, Typography } from "antd";
-import React from "react";
-
-const { Title, Text, Paragraph } = Typography;
+import { Avatar, Button, Col, Image, Row, Typography } from "antd";
+import { useEffect, useState } from "react";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import { playBtnIcon } from "../assets";
@@ -11,6 +9,9 @@ import {
   useGetApplicantProfileQuery,
   useGetMyProjectsQuery,
 } from "../redux/api/applicantApiSlice";
+import { Carousel } from "antd";
+
+const { Title, Text, Paragraph } = Typography;
 
 const ProjectRoom = () => {
   const navigate = useNavigate();
@@ -22,6 +23,12 @@ const ProjectRoom = () => {
 
   if (isLoading) return <p>Đang tải...</p>;
 
+  const [carouselReady, setCarouselReady] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => setCarouselReady(true), 50);
+  }, []);
+
   const project = projectData?.data?.find((p) => p._id === projectId);
 
   if (!project) return <p>Không tìm thấy dự án</p>;
@@ -31,8 +38,10 @@ const ProjectRoom = () => {
   const techTags = project.technologies || [];
   const mediaItems = project.media || [];
 
+  console.log("media: ", mediaItems);
+
   return (
-    <div className="flex flex-col w-full bg-[#fff] ">
+    <div className="flex flex-col w-full bg-[#fff] overflow-x-hidden">
       <Header />
       <div className="w-full flex flex-col justify-between">
         <section className=" p-8 md:p-10 font-sans bg-[theme.colors.bgColor]">
@@ -46,15 +55,48 @@ const ProjectRoom = () => {
           </header>
           <div className="flex flex-col sm:flex-row gap-8 sm:gap-12">
             {/* Media section */}
-            <div className="flex-1 w-1/2 h-[472px] bg-[#3a6656] rounded-2xl relative flex items-center justify-center">
-              <div className="relative w-[68px] h-[78px] hover:opacity-90 transition duration-300">
-                <img
-                  src={project.media[0]?.url}
-                  alt="Play button"
-                  className="w-full h-full object-contain"
-                  loading="lazy"
-                />
-              </div>
+            <div className="w-full max-w-[640px] h-[472px] bg-[#3a6656] rounded-2xl relative mx-auto">
+              {carouselReady && mediaItems.length > 0 ? (
+                <Carousel
+                  autoplay={false}
+                  arrows={true}
+                  dotPosition="bottom"
+                  className="w-full h-full rounded-2xl"
+                >
+                  {mediaItems.map((media, index) => {
+                    const key = `${media.type}-${index}-${media.url}`;
+                    if (!media.url) return null;
+
+                    if (media.type === "image") {
+                      return (
+                        <div key={key} className="h-[472px] bg-black">
+                          <img
+                            src={media.url}
+                            alt={`Media ${index}`}
+                            className="w-full h-full object-contain rounded-2xl"
+                          />
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div key={key} className="h-[472px] bg-black">
+                          <video
+                            src={media.url}
+                            controls
+                            className="w-full h-full object-contain rounded-2xl"
+                          />
+                        </div>
+                      );
+                    }
+                  })}
+                </Carousel>
+              ) : (
+                <div className="flex items-center justify-center w-full h-full">
+                  <div className="text-white text-lg">
+                    Không có media để hiển thị
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Details section */}
@@ -119,10 +161,7 @@ const ProjectRoom = () => {
                 <Row gutter={[16, 16]}>
                   {project.features?.map((feature, index) => (
                     <Col span={2} key={index}>
-                      <Image
-                        src="https://c.animaapp.com/mblrhzumfhRI2m/img/vector.svg"
-                        preview={false}
-                      />
+                      <Image src="" preview={false} />
                     </Col>
                   ))}
                   <Col span={22}>
@@ -147,10 +186,7 @@ const ProjectRoom = () => {
                     </Text>
                   </Col>
                   <Col span={24}>
-                    <Image
-                      src="https://c.animaapp.com/mblrhzumfhRI2m/img/line-42.svg"
-                      preview={false}
-                    />
+                    <Image src="" preview={false} />
                   </Col>
                   <Col span={24}>
                     <Text>Vai trò</Text>
@@ -159,10 +195,7 @@ const ProjectRoom = () => {
                     </Text>
                   </Col>
                   <Col span={24}>
-                    <Image
-                      src="https://c.animaapp.com/mblrhzumfhRI2m/img/line-42.svg"
-                      preview={false}
-                    />
+                    <Image src="" preview={false} />
                   </Col>
                   <Col span={24}>
                     <Text>Team size</Text>
@@ -171,10 +204,7 @@ const ProjectRoom = () => {
                     </Text>
                   </Col>
                   <Col span={24}>
-                    <Image
-                      src="https://c.animaapp.com/mblrhzumfhRI2m/img/line-42.svg"
-                      preview={false}
-                    />
+                    <Image src="" preview={false} />
                   </Col>
                   <Col span={24}>
                     <Text>Rating</Text>
@@ -182,26 +212,18 @@ const ProjectRoom = () => {
                       4.8/5.0
                     </Text>
                   </Col>
-                  <Col span={24}>
-                    <div
-                      style={{
-                        width: "90px",
-                        height: "90px",
-                        backgroundColor: "#d9d9d9",
-                        borderRadius: "45px",
-                        margin: "0 auto",
-                      }}
-                    />
+                  <Col span={24} style={{ textAlign: "center" }}>
+                    <Avatar size={90} src={profileData?.data?.avatarUrl}>
+                      {/* Fallback: Hiển thị chữ cái đầu của tên nếu không có avatarUrl */}
+                      {profileData?.data?.name?.[0]?.toUpperCase()}
+                    </Avatar>
                   </Col>
                   <Col span={24} style={{ textAlign: "center" }}>
                     <Title level={3}>{profileData?.data?.name}</Title>
                     <Text>{profileData?.data?.jobTitle}</Text>
                   </Col>
                   <Col span={24} style={{ textAlign: "center" }}>
-                    <Image
-                      src="https://c.animaapp.com/mblrhzumfhRI2m/img/group-408.png"
-                      preview={false}
-                    />
+                    <Image src="" preview={false} />
                     <Text>(4.2)</Text>
                   </Col>
                   <Col span={24} style={{ textAlign: "center" }}>
@@ -219,56 +241,6 @@ const ProjectRoom = () => {
                 </Row>
               </div>
             </Col>
-          </Row>
-        </div>
-
-        <div data-model-id="1678:70-frame" className="p-8 md:p-10">
-          <Row
-            justify="center"
-            align="middle"
-            style={{
-              height: "100vh",
-              backgroundColor: "#f8fdfc",
-              borderRadius: "16px",
-            }}
-          >
-            <Col
-              span={24}
-              style={{ textAlign: "center", marginBottom: "20px" }}
-            >
-              <h1
-                style={{
-                  fontFamily: "Inter, Helvetica",
-                  fontWeight: "bold",
-                  color: "black",
-                  fontSize: "32px",
-                }}
-              >
-                Screenshot &amp; Demo
-              </h1>
-            </Col>
-
-            {mediaItems.map((media, index) => (
-              <Col span={12} style={{ padding: "10px" }} key={index}>
-                <div
-                  style={{
-                    backgroundColor: "#d9d9d9",
-                    borderRadius: "16px",
-                    height: "263px",
-                  }}
-                />
-                <div
-                  style={{
-                    textAlign: "center",
-                    marginTop: "10px",
-                    fontFamily: "Inter, Helvetica",
-                    fontSize: "20px",
-                  }}
-                >
-                  {media.type === "image" ? "Image Demo" : "Video Demo"}
-                </div>
-              </Col>
-            ))}
           </Row>
         </div>
 

@@ -25,23 +25,23 @@ const CreateProjectForm = ({ onCancel, onCreate, loading }) => {
   // const [hasSubmitted, setHasSubmitted] = useState(false);
   const hasSubmittedRef = useRef(false);
 
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (!hasSubmittedRef.current && mediaList.length > 0) {
-        mediaList.forEach((media) => {
-          const key = media.url.split("amazonaws.com/")[1];
-          deleteMediaFile({ key });
-        });
-      }
-    };
+useEffect(() => {
+  const handleBeforeUnload = (e) => {
+    if (!hasSubmittedRef.current && mediaList.length > 0) {
+      // Chặn unload để xoá file
+      mediaList.forEach((media) => {
+        const key = media.url.split("amazonaws.com/")[1];
+        deleteMediaFile({ key });
+      });
+    }
+  };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
+  window.addEventListener("beforeunload", handleBeforeUnload);
 
-    return () => {
-      handleBeforeUnload(); // also run on component unmount
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [mediaList]);
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  };
+}, [mediaList]);
 
   const handleUpload = async (file) => {
     try {
