@@ -20,17 +20,21 @@ export const jobApiSlice = apiSlice.injectEndpoints({
     //     method: "GET",
     //   }),
     // }),
-    getJobList: builder.query({
-      query: ({ location, position } = {}) => {
-        let queryStr = "";
-        if (location) queryStr += `location=${location}&`;
-        if (position) queryStr += `position=${position}&`;
-        return {
-          url: `${JOB_URL}?${queryStr}`,
-          method: "GET",
-        };
-      },
-    }),
+  getJobList: builder.query({
+  query: (params = {}) => {
+    // Tạo query string từ tất cả các cặp key-value có giá trị
+    const queryStr = Object.entries(params)
+      .filter(([_, value]) => value !== undefined && value !== "")
+      .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+      .join("&");
+
+    return {
+      url: `${JOB_URL}?${queryStr}`,
+      method: "GET",
+    };
+  },
+}),
+
 
     // Lấy chi tiết công việc
     getJobDetail: builder.query({
