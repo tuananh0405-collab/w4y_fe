@@ -1,8 +1,11 @@
 import { CircularProgress, Typography } from "@mui/material";
-import { useGetChatHistoryQuery } from "../../redux/api/chatApiSlice";
+import {
+  useGetChatHistoryQuery,
+  useMarkMessagesAsReadMutation,
+} from "../../redux/api/chatApiSlice";
 import Message from "./Message";
 import { socket } from "../../socket";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EmojiPeople } from "@mui/icons-material";
 import { isValidDateString } from "../../utils/dateUtils";
 import DateDivider from "./DateDivider";
@@ -28,6 +31,7 @@ const MessageList = ({ senderId, receiverId }) => {
     error: fetchError,
     isLoading: isFetchingList,
   } = useGetChatHistoryQuery({ senderId, receiverId });
+  const [markMessagesAsRead] = useMarkMessagesAsReadMutation();
 
   // State that both socket and api manage
   const [messageList, setMessageList] = useState(messageListQuery?.data);
@@ -57,6 +61,67 @@ const MessageList = ({ senderId, receiverId }) => {
 
     return result;
   }, [messageList]);
+
+  const [messageToSetReadBatch, setMessageToSetReadBatch] = useState(new Set()); // Batch of messages that is unread and will all have their is_read updated to true
+
+  const handleMessageOnRead = useCallback((msgId) => {
+    setMessageToSetReadBatch(
+      (prev) => {
+        if (prev.has(msgId)) return prev; // No update if already present
+        const newSet = new Set(prev);
+        newSet.add(msgId);
+        return newSet;
+      },
+    );
+  }, []);
+
+  const updateMessageReadBatch = async () => {
+    console.log(`1: ${messageToSetReadBatch.size}`);
+    if (messageToSetReadBatch.size > 0) {
+      try {
+        const results = (await markMessagesAsRead({
+          messageIds: Array.from(messageToSetReadBatch),
+        })).data;
+        console.log(`2`);
+        console.log(results.success);
+        console.log(results.data);
+        console.log(results.data.modifiedCount);
+        if (
+          results.success && !!results.data && results.data.modifiedCount > 0
+        ) {
+          console.log("3");
+          const { modifiedIds, is_read } = results.data;
+          console.log(modifiedIds);
+          console.log(is_read);
+          setMessageList((prev) => {
+            console.log("4");
+            console.log(prev);
+            const updatedList = prev.map((message) =>
+              modifiedIds.find((modifiedMessage) =>
+                modifiedMessage === message._id
+              )
+                ? { ...message, is_read }
+                : message
+            );
+            return updatedList;
+          });
+          setMessageToSetReadBatch(new Set());
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+
+  const scrollTimeout = useRef();
+
+  const handleScroll = () => {
+    clearTimeout(scrollTimeout.current);
+
+    scrollTimeout.current = setTimeout(() => {
+      updateMessageReadBatch();
+    }, 300);
+  };
 
   // Resets message list when renderId/receiverId changes
   useEffect(() => {
@@ -110,7 +175,10 @@ const MessageList = ({ senderId, receiverId }) => {
   }
 
   return (
-    <div className="grow flex flex-col-reverse overflow-y-auto gap-2 p-2">
+    <div
+      className="grow flex flex-col-reverse overflow-y-auto gap-2 p-2"
+      onScroll={handleScroll}
+    >
       {groupedMessages.map((msgGroup) => (
         <div key={msgGroup.date}>
           <DateDivider label={msgGroup.date} />
@@ -120,6 +188,7 @@ const MessageList = ({ senderId, receiverId }) => {
                 key={message.id}
                 message={message}
                 sentByUser={message.senderId === senderId}
+                onRead={handleMessageOnRead}
               />
             ))}
           </div>

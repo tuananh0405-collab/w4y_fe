@@ -47,6 +47,15 @@ export const chatApiSlice = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
+
+    markMessagesAsRead: builder.mutation({
+      query: ({ messageIds, is_read = true }) => ({
+        url: `${CHAT_URL}/markMessagesAsRead`,
+        method: "POST",
+        body: { messageIds, is_read },
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -56,4 +65,5 @@ export const {
   useGetRecentMessagedUsersQuery,
   useGetRecruitersGroupedByApplicationsQuery,
   useGetApplicantsGroupedByApplicationsQuery,
+  useMarkMessagesAsReadMutation,
 } = chatApiSlice;
