@@ -56,6 +56,15 @@ export const chatApiSlice = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
+
+    getUnreadMessageSenders: builder.query({
+      query: ({ startDate, endDate } = {}) => ({
+        url: `${CHAT_URL}/unreadMessageSenders`,
+        method: "GET",
+        params: { startDate, endDate },
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -66,4 +75,5 @@ export const {
   useGetRecruitersGroupedByApplicationsQuery,
   useGetApplicantsGroupedByApplicationsQuery,
   useMarkMessagesAsReadMutation,
+  useGetUnreadMessageSendersQuery,
 } = chatApiSlice;

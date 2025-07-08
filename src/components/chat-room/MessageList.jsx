@@ -82,20 +82,11 @@ const MessageList = ({ senderId, receiverId }) => {
         const results = (await markMessagesAsRead({
           messageIds: Array.from(messageToSetReadBatch),
         })).data;
-        console.log(`2`);
-        console.log(results.success);
-        console.log(results.data);
-        console.log(results.data.modifiedCount);
         if (
           results.success && !!results.data && results.data.modifiedCount > 0
         ) {
-          console.log("3");
           const { modifiedIds, is_read } = results.data;
-          console.log(modifiedIds);
-          console.log(is_read);
           setMessageList((prev) => {
-            console.log("4");
-            console.log(prev);
             const updatedList = prev.map((message) =>
               modifiedIds.find((modifiedMessage) =>
                 modifiedMessage === message._id
