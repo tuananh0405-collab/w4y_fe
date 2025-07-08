@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { Modal, Input, Button } from "antd";
 import theme from '../utils/theme';
 import { BASE_URL } from '../redux/constants';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Register_Employee = () => {
   const [formData, setFormData] = useState({
@@ -33,7 +35,8 @@ const Register_Employee = () => {
     e.preventDefault();
 
     if (!formData.agreeToTerms) {
-      return alert("You must agree to the terms before registering!"); // Kiểm tra xem có đồng ý điều khoản chưa
+      toast.error("You must agree to the terms before registering!"); // Kiểm tra xem có đồng ý điều khoản chưa
+      return;
     }
 
     // Thêm trường `accountType` với giá trị "Nhà Tuyển Dụng"
@@ -51,12 +54,21 @@ const Register_Employee = () => {
       // Hiển thị Modal yêu cầu nhập verification code
       setIsModalVisible(true);
     } catch (error) {
+      const errorMsg =
+        Array.isArray(error?.data?.errors)
+          ? error.data.errors.map(e => e.msg).join(', ')
+          : error?.data?.errors?.msg ||
+            error?.data?.message ||
+            error?.error ||
+            "Registration failed. Please try again.";
+
+      toast.error(errorMsg);
       console.error("Registration failed:", error);
     }
   };
   const handleVerifyEmail = async () => {
     if (verificationCode.trim() === "") {
-      alert("Please enter the verification code.");
+      toast.error("Please enter the verification code.");
       return;
     }
 
@@ -72,6 +84,15 @@ const Register_Employee = () => {
       // Sau khi xác minh thành công, điều hướng về trang đăng nhập
       navigate("/auth");
     } catch (error) {
+      const errorMsg =
+        Array.isArray(error?.data?.errors)
+          ? error.data.errors.map(e => e.msg).join(', ')
+          : error?.data?.errors?.msg ||
+            error?.data?.message ||
+            error?.error ||
+            "Verification failed. Please try again.";
+
+      toast.error(errorMsg);
       console.error("Verification failed:", error);
     }
   };
@@ -243,6 +264,7 @@ const Register_Employee = () => {
           </form>
         </div>
       </div>
+      <ToastContainer />
     </div>
   )
 }
