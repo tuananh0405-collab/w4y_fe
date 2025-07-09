@@ -12,7 +12,6 @@ const Message = memo(({ message, sentByUser, onRead }) => {
 
   useEffect(() => {
     if (!sentByUser && inView && !message.is_read) {
-      console.log(`Calling from ${message._id}`);
       if (onRead) onRead(message._id);
     }
   }, [sentByUser, inView, message, onRead]);

@@ -2,8 +2,9 @@ import { useMemo } from "react";
 import { useGetUnreadMessageSendersQuery } from "../../redux/api/chatApiSlice";
 import { userIcon } from "../../assets";
 import { getMessageAge } from "../../utils/dateUtils";
-import { Dropdown } from "antd";
+import { Avatar, Dropdown } from "antd";
 import { NotificationsActive } from "@mui/icons-material";
+import { Stack } from "@mui/material";
 
 export default function NotificationsDropdownButton() {
   const {
@@ -51,33 +52,35 @@ export default function NotificationsDropdownButton() {
     return unreadMessagesNotifications.data.map((user) => ({
       key: user.senderId,
       label: (
-        <a href="/a">
-          <Stack
-            direction={"row"}
-            gap={2}
-            alignItems={"center"}
-            className="px-3 py-2 rounded-md hover:bg-teal-600/20"
-          >
-            <Avatar
-              src={user.avatarUrl || userIcon}
-              alt="User Avatar"
-              className="w-12 h-12 cursor-pointer hover:ring-2 hover:ring-teal-600 hover:ring-offset-2 transition"
-              aria-label="Menu người dùng"
-            />
-            <Stack>
-              <div>
-                <strong>{user.unreadCount}</strong> Tin nhắn chưa đọc từ{" "}
-                <strong>{user.name || user.email}</strong>
-              </div>
-              <div style={{ fontSize: 12, color: "#888" }}>
-                {user.latestMessage}
-              </div>
-              <div style={{ fontSize: 11, color: "#aaa" }}>
-                {getMessageAge(user.latestSentAt)}
-              </div>
+        <div>
+          <a href="/chat">
+            <Stack
+              direction={"row"}
+              gap={2}
+              alignItems={"center"}
+              className="px-3 py-2 rounded-md hover:bg-teal-600/20"
+            >
+              <Avatar
+                src={user.avatarUrl || userIcon}
+                alt="User Avatar"
+                className="w-12 h-12 cursor-pointer hover:ring-2 hover:ring-teal-600 hover:ring-offset-2 transition"
+                aria-label="Menu người dùng"
+              />
+              <Stack>
+                <div className="text-black">
+                  <strong>{user.unreadCount}</strong> Tin nhắn chưa đọc từ{" "}
+                  <strong>{user.name || user.email}</strong>
+                </div>
+                <div style={{ fontSize: 12, color: "#888" }}>
+                  {user.latestMessage}
+                </div>
+                <div style={{ fontSize: 11, color: "#aaa" }}>
+                  {getMessageAge(user.latestSentAt)}
+                </div>
+              </Stack>
             </Stack>
-          </Stack>
-        </a>
+          </a>
+        </div>
       ),
       isNotification: true, // Set this for the element to be counted by the badge on top right that counts the number of notifications
     }));

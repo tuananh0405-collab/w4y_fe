@@ -1,4 +1,4 @@
-import { CircularProgress, Typography } from "@mui/material";
+import { Button, CircularProgress, Typography } from "@mui/material";
 import {
   useGetChatHistoryQuery,
   useMarkMessagesAsReadMutation,
@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EmojiPeople } from "@mui/icons-material";
 import { isValidDateString } from "../../utils/dateUtils";
 import DateDivider from "./DateDivider";
+import FetchMoreTriggerSkeleton from "./FetchMoreTriggerSkeleton";
 
 const parseTime = (val) => {
   if (val && isValidDateString(val)) {
@@ -26,15 +27,35 @@ const parseTime = (val) => {
 
 // Display a range of message in the current conversation
 const MessageList = ({ senderId, receiverId }) => {
+  const [page, setPage] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+
   const {
     data: messageListQuery,
     error: fetchError,
     isLoading: isFetchingList,
-  } = useGetChatHistoryQuery({ senderId, receiverId });
+  } = useGetChatHistoryQuery({ senderId, receiverId, page, limit: 20 }, {
+    refetchOnMountOrArgChange: true, // Prevent caching
+    refetchOnReconnect: true, // Refetch when network connection is regained, because might as well
+  });
   const [markMessagesAsRead] = useMarkMessagesAsReadMutation();
 
   // State that both socket and api manage
   const [messageList, setMessageList] = useState(messageListQuery?.data);
+
+  // Resets message list when renderId/receiverId changes
+  useEffect(() => {
+    setPage(1);
+  }, [senderId, receiverId]);
+
+  // If messageListQuery?.data changes but page is 1 (on senderId or receiverId change, most likely), replace the messageList
+  useEffect(() => {
+    if (page == 1) {
+      setMessageList(messageListQuery?.data);
+    }
+  }, [page, messageListQuery?.data]);
+
   const groupedMessages = useMemo(() => {
     if (!messageList || !messageList.length) {
       return [];
@@ -61,6 +82,31 @@ const MessageList = ({ senderId, receiverId }) => {
 
     return result;
   }, [messageList]);
+
+  useEffect(() => {
+    if (messageListQuery && messageListQuery.data) {
+      const { data, pagination } = messageListQuery;
+      if (!!pagination.currentPage && !!data && data.length) {
+        // Since this effect hook depends on messageListQuery and page, pagination.currentPage === page means that messageListQuery's hook have updated it
+        // from the old page to the new one which was fetched as a result of setPage((prev) => prev + 1). In that case, append the newly fetched message to messageList.
+        // Do not do any appending if page == 1 since another hook above already override messageList when page == 1 (can be due to senderId or receiverId changing).
+        // Simply setIsLoadingMore(false) in that case
+        if (page != 1 && pagination.currentPage === page) {
+          setMessageList((prev) => [...prev, ...data]);
+          setIsLoadingMore(false);
+        } else if (page == 1) {
+          setIsLoadingMore(false);
+        }
+        setHasMore(pagination.hasNextPage);
+      }
+    }
+  }, [messageListQuery, page]);
+
+  const fetchMoreMessages = useCallback(async () => {
+    if (isLoadingMore || !hasMore) return;
+    setIsLoadingMore(true);
+    setPage((prev) => prev + 1);
+  }, [isLoadingMore, hasMore]);
 
   const [messageToSetReadBatch, setMessageToSetReadBatch] = useState(new Set()); // Batch of messages that is unread and will all have their is_read updated to true
 
@@ -113,16 +159,19 @@ const MessageList = ({ senderId, receiverId }) => {
     }, 300);
   };
 
-  // Resets message list when renderId/receiverId changes
-  useEffect(() => {
-    setMessageList(messageListQuery?.data);
-  }, [messageListQuery?.data]);
+  const containerRef = useRef(null);
 
   // Init socket events
   useEffect(() => {
     socket.on("receivedChatMessage", (message) => {
       if (messageList) {
         setMessageList([message, ...messageList]);
+        // Wrap in setTimeout so that the scroll down happens after the dom finished rendering the new message
+        setTimeout(() => {
+          if (containerRef.current) {
+            containerRef.current.scrollTop = containerRef.current.scrollHeight;
+          }
+        }, 0);
       }
     });
 
@@ -168,6 +217,7 @@ const MessageList = ({ senderId, receiverId }) => {
     <div
       className="grow flex flex-col-reverse overflow-y-auto gap-2 p-2"
       onScroll={handleScroll}
+      ref={containerRef}
     >
       {groupedMessages.map((msgGroup) => (
         <div key={msgGroup.date}>
@@ -175,7 +225,7 @@ const MessageList = ({ senderId, receiverId }) => {
           <div className="flex flex-col-reverse gap-1">
             {msgGroup.messages.map((message) => (
               <Message
-                key={message.id}
+                key={message._id}
                 message={message}
                 sentByUser={message.senderId === senderId}
                 onRead={handleMessageOnRead}
@@ -184,6 +234,11 @@ const MessageList = ({ senderId, receiverId }) => {
           </div>
         </div>
       ))}
+      {hasMore && !isLoadingMore && (
+        <FetchMoreTriggerSkeleton
+          onFetchMore={() => setTimeout(fetchMoreMessages, 300)}
+        />
+      )}
     </div>
   );
 };
