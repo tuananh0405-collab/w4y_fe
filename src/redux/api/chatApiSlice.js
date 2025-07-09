@@ -4,26 +4,25 @@ import { CHAT_URL } from "../constants";
 export const chatApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getChatToken: builder.query({
-      query: ({ senderId }) => ({
-        url: `${CHAT_URL}/chatToken`,
+      query: () => ({
+        url: `${CHAT_URL}/token`,
         method: "GET",
-        params: { senderId },
         credentials: "include",
       }),
     }),
 
-    getChatHistory: builder.query({
+    getMessages: builder.query({
       query: ({ senderId, receiverId, page = 1, limit = 20 }) => ({
-        url: `${CHAT_URL}/chatHistory`,
+        url: `${CHAT_URL}/messages`,
         method: "GET",
         params: { senderId, receiverId, page, limit },
         credentials: "include",
       }),
     }),
 
-    getRecentMessagedUsers: builder.query({
+    getConversations: builder.query({
       query: ({ senderId, query }) => ({
-        url: `${CHAT_URL}/recentMessagedUsers`,
+        url: `${CHAT_URL}/conversations`,
         method: "GET",
         params: { senderId, query },
         credentials: "include",
@@ -32,7 +31,7 @@ export const chatApiSlice = apiSlice.injectEndpoints({
 
     getRecruitersGroupedByApplications: builder.query({
       query: ({ applicantId }) => ({
-        url: `${CHAT_URL}/recruitersGroupedByApplications`,
+        url: `${CHAT_URL}/recruiters-by-applications`,
         method: "GET",
         params: { applicantId },
         credentials: "include",
@@ -41,7 +40,7 @@ export const chatApiSlice = apiSlice.injectEndpoints({
 
     getApplicantsGroupedByApplications: builder.query({
       query: ({ recruiterId }) => ({
-        url: `${CHAT_URL}/applicantsGroupedByApplications`,
+        url: `${CHAT_URL}/applicants-by-applications`,
         method: "GET",
         params: { recruiterId },
         credentials: "include",
@@ -50,8 +49,8 @@ export const chatApiSlice = apiSlice.injectEndpoints({
 
     markMessagesAsRead: builder.mutation({
       query: ({ messageIds, is_read = true }) => ({
-        url: `${CHAT_URL}/markMessagesAsRead`,
-        method: "POST",
+        url: `${CHAT_URL}/mark-read`,
+        method: "PATCH",
         body: { messageIds, is_read },
         credentials: "include",
       }),
@@ -59,7 +58,7 @@ export const chatApiSlice = apiSlice.injectEndpoints({
 
     getUnreadMessageSenders: builder.query({
       query: ({ startDate, endDate } = {}) => ({
-        url: `${CHAT_URL}/unreadMessageSenders`,
+        url: `${CHAT_URL}/unread-messages-senders`,
         method: "GET",
         params: { startDate, endDate },
         credentials: "include",
@@ -70,8 +69,8 @@ export const chatApiSlice = apiSlice.injectEndpoints({
 
 export const {
   useGetChatTokenQuery,
-  useGetChatHistoryQuery,
-  useGetRecentMessagedUsersQuery,
+  useGetMessagesQuery,
+  useGetConversationsQuery,
   useGetRecruitersGroupedByApplicationsQuery,
   useGetApplicantsGroupedByApplicationsQuery,
   useMarkMessagesAsReadMutation,

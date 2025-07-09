@@ -1,6 +1,6 @@
 import { Button, CircularProgress, Typography } from "@mui/material";
 import {
-  useGetChatHistoryQuery,
+  useGetMessagesQuery,
   useMarkMessagesAsReadMutation,
 } from "../../redux/api/chatApiSlice";
 import Message from "./Message";
@@ -35,7 +35,7 @@ const MessageList = ({ senderId, receiverId }) => {
     data: messageListQuery,
     error: fetchError,
     isLoading: isFetchingList,
-  } = useGetChatHistoryQuery({ senderId, receiverId, page, limit: 20 }, {
+  } = useGetMessagesQuery({ senderId, receiverId, page, limit: 20 }, {
     refetchOnMountOrArgChange: true, // Prevent caching
     refetchOnReconnect: true, // Refetch when network connection is regained, because might as well
   });
