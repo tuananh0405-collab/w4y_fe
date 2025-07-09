@@ -76,7 +76,6 @@ const MessageList = ({ senderId, receiverId }) => {
   }, []);
 
   const updateMessageReadBatch = async () => {
-    console.log(`1: ${messageToSetReadBatch.size}`);
     if (messageToSetReadBatch.size > 0) {
       try {
         const results = (await markMessagesAsRead({

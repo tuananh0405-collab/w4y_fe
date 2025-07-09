@@ -13,10 +13,10 @@ export const chatApiSlice = apiSlice.injectEndpoints({
     }),
 
     getChatHistory: builder.query({
-      query: ({ senderId, receiverId }) => ({
+      query: ({ senderId, receiverId, page = 1, limit = 20 }) => ({
         url: `${CHAT_URL}/chatHistory`,
         method: "GET",
-        params: { senderId, receiverId },
+        params: { senderId, receiverId, page, limit },
         credentials: "include",
       }),
     }),

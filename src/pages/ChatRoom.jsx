@@ -140,7 +140,7 @@ const ChatRoom = () => {
           title={receiverProfile?.accountType}
         />
         <MessageList senderId={senderId} receiverId={receiverId} />
-        <MessageComposeBar onSend={handleSend} />
+        {receiverId && <MessageComposeBar onSend={handleSend} />}
       </div>
 
       <div className="w-px bg-black opacity-20" />
