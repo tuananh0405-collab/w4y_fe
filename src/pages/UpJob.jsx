@@ -22,6 +22,8 @@ import CompanyProfileTab from "../components/up-job/CompanyProfileTab";
 import ServicePackageTab from "../components/up-job/ServicePackageTab";
 import SettingsTab from "../components/up-job/SettingsTab";
 import Sidebar from "../components/up-job/Sidebar";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const tabsComponents = [
   DashboardTab,
@@ -89,7 +91,18 @@ const UpJob = () => {
       
       await createJob(jobData); // Call the mutation to create the job
       console.log("Job created successfully");
+      // Optionally, show a success toast:
+      // toast.success("Job created successfully!");
     } catch (error) {
+      // Handle error message extraction (array or string)
+      const errorMsg =
+        Array.isArray(error?.data?.errors)
+          ? error.data.errors.map(e => e.msg).join(', ')
+          : error?.data?.errors?.msg ||
+            error?.data?.message ||
+            error?.error ||
+            "Error creating job. Please try again.";
+      toast.error(errorMsg);
       console.error("Error creating job:", error);
     }
   };
@@ -121,6 +134,7 @@ const UpJob = () => {
         </main>
       </div>
       <Footer />
+      <ToastContainer /> {/* Add this at the root of your page */}
     </div>
   );
 };
