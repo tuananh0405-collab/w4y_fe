@@ -169,7 +169,7 @@ const UserGrowthChart = ({ title = "User Growth" }) => {
   }, [timeRange, selectedYear, endYear, isLoading, monthlyData, quarterlyData, yearlyData]);
 
   const renderDropdown = () => {
-    const years = Array.from({ length: 10 }, (_, i) => currentYear - 9 + i);
+    const years = Array.from({ length: 6 }, (_, i) => currentYear - 5 + i);
 
     return (
       <FormControl size="small" sx={{ minWidth: 160 }}>
