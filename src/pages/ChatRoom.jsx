@@ -1,4 +1,4 @@
-import { CircularProgress, Typography } from "@mui/material";
+import { Button, CircularProgress, Typography } from "@mui/material";
 import ConversationListHeader from "../components/chat-room/ConversationListHeader";
 import ConversationFilterBar from "../components/chat-room/ConversationFilterBar";
 import ConversationList from "../components/chat-room/ConversationList";
@@ -11,6 +11,7 @@ import { socket } from "../socket";
 import { useSelector } from "react-redux";
 import ApplicantSuggestionList from "../components/chat-room/SuggestionList_Applicant";
 import RecruiterSuggestionList from "../components/chat-room/SuggestionList_Recruiter";
+import { Report } from "@mui/icons-material";
 
 // TODO: Get these from an centralized enum file
 const TYPE_APPLICANT = "Ứng Viên";
@@ -28,7 +29,7 @@ const ChatRoom = () => {
     data: chatTokenQuery,
     error: fetchError,
     isLoading: isFetchingToken,
-  } = useGetChatTokenQuery({ senderId });
+  } = useGetChatTokenQuery();
   const { data: chatToken } = chatTokenQuery || { data: null };
   const [receiverId, setReceiverId] = useState(null);
   const [receiverProfile, setReceiverProfile] = useState(null);
@@ -108,9 +109,24 @@ const ChatRoom = () => {
   }
 
   if (fetchError) {
-    <div className="flex flex-row justify-center w-full min-h-screen bg-gray-200">
-      {JSON.stringify(fetchError)}
-    </div>;
+    return (
+      <div className="grow flex flex-col gap-2 p-4 justify-center items-center">
+        <Report sx={{ fontSize: 80, color: "gray" }} />
+        <Typography variant="p" className="text-gray">
+          Hãy đăng nhập trước khi sử dụng tính năng chat!
+        </Typography>
+        <div>
+          <a href="/">
+            <button
+              className="h-full w-full px-3 py-2 rounded-md bg-gray-200 cursor-pointer hover:ring-2 hover:ring-teal-600 hover:ring-offset-2 transition"
+              color="inherit"
+            >
+              Về trang chủ
+            </button>
+          </a>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -140,7 +156,7 @@ const ChatRoom = () => {
           title={receiverProfile?.accountType}
         />
         <MessageList senderId={senderId} receiverId={receiverId} />
-        <MessageComposeBar onSend={handleSend} />
+        {receiverId && <MessageComposeBar onSend={handleSend} />}
       </div>
 
       <div className="w-px bg-black opacity-20" />
