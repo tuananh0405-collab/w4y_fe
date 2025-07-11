@@ -19,7 +19,7 @@ import {
   useGetMonthlyUserGrowthQuery,
   useGetQuarterlyUserGrowthQuery,
   useGetYearlyUserGrowthQuery,
-} from "../../redux/api/userApiSlice";
+} from "../../../../redux/api/userApiSlice";
 
 Chart.register(ChartDataLabels);
 
