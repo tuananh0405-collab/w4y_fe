@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import theme from "../../utils/theme";
-import { useCreateJobMutation } from "../../redux/api/jobApiSlice";
+import { useCreateJobMutation, useGetFilterOptionsQuery, useGetJobCategoriesByParentQuery, useGetJobCategoriesByRecursiveQuery } from "../../redux/api/jobApiSlice";
 import { useNavigate } from "react-router-dom";
+import JobCategorySelector from "../JobCategorySelector";
 
 const technicalOptions = [
   "Công nghệ thông tin / Lập trình",
@@ -29,12 +30,46 @@ const experienceOptions = ["< 1 năm", "1-3 năm", "> 3 năm"];
 
 const CreateJobTab = ({ onBack, onSubmit }) => {
   const navigate = useNavigate()
+
+  const {
+    data: filterOptionsQuery,
+    error: filterOptionsFetchError,
+    isLoading: isFetchingFilterOptions,
+  } = useGetFilterOptionsQuery();
+
+  const {
+    industriesOptions,
+    levelsOptions,
+    experiencesOptions,
+    salaryRangeUnitsOptions,
+  } = useMemo(() => {
+    const results = {
+      industriesOptions: undefined,
+      levelsOptions: undefined,
+      experiencesOptions: undefined,
+      salaryRangeUnitsOptions: undefined,
+    }
+
+    const data = filterOptionsQuery?.data
+    if (data) {
+      results.levelsOptions = data.levels ?? null;
+      results.experiencesOptions = data.experiences ?? null;
+      results.salaryRangeUnitsOptions = data.salaryRangeUnits ?? null;
+
+      results.industriesOptions = data.industries?.map((industry) => ({
+        name: industry.name,
+        value: industry._id,
+      })) ?? null;
+    }
+    return results;
+  }, [filterOptionsQuery])
+
   const [formData, setFormData] = useState({
     title: "",
     quantity: "",
     deliveryTime: "",
     deliveryTimeOther: "", // text tùy chỉnh nếu chọn "Khác"
-    // level: "",
+    level: "",
     industry: "",
     position: "",
     locationType: "",
@@ -45,7 +80,21 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
     requirementsTechnical: [],
     requirementsNonTechnical: [],
     salary: "",
+    categoryId: "",
   });
+
+  const {
+    data: jobCategoriesQuery,
+    error: jobCategoriesFetchError,
+    isLoading: isFetchingJobCategories,
+    isUninitialized: isIndustryUnselected,
+  } = useGetJobCategoriesByRecursiveQuery({ categoryId: formData.industry }, {
+    skip: !formData.industry || !formData.industry.length
+  });
+
+  const jobCategories = useMemo(() => {
+    return jobCategoriesQuery?.data ? jobCategoriesQuery.data.children : []
+  }, [jobCategoriesQuery])
 
   const [errors, setErrors] = useState({});
   const [createJob] = useCreateJobMutation();
@@ -111,6 +160,12 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
     setFormData((prev) => ({ ...prev, [key]: updated }));
   };
 
+  const handleSelectCategory = (checkedArray) => {
+    if (checkedArray) {
+      setFormData((prev) => ({ ...prev, categoryId: checkedArray.length? checkedArray[0] : undefined }));
+    }
+  };
+
   // Xử lý nút chọn địa chỉ Google Maps (hiện dummy)
   const handleSelectFromMaps = () => {
     alert("Mở Google Maps để chọn địa chỉ (chưa cài đặt)");
@@ -130,17 +185,18 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
           formData.deliveryTime === "Khác" ? formData.deliveryTimeOther : formData.deliveryTime,
         priorityLevel: "Thông thường",
         quantity: Number(formData.quantity),
-        // level: formData.level,
+        level: formData.level,
          deadline: formData.applicationDeadline,
         industry: formData.industry,
         position: formData.position,
         location:
           formData.locationType === "Online" ? "Online" : formData.locationAddress,
         experience: formData.experience,
+        categoryId: formData.categoryId,
       };
 
       await createJob(jobData);
-      navigate('/')
+      // navigate('/')
       console.log("Job created successfully");
       if (onSubmit) onSubmit();
     } catch (error) {
@@ -189,6 +245,23 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
             className="border p-2 rounded"
           />
           {errors.title && <p className="text-red-600 mt-1">{errors.title}</p>}
+        </div>
+
+        {/* Chức danh */}
+        <div className="flex flex-col">
+          <label className="text-lg font-medium text-gray-700">
+            Chức danh <span className="text-red-600">*</span>
+          </label>
+          <input
+            type="text"
+            name="position"
+            value={formData.position}
+            onChange={handleInputChange}
+            placeholder="Senior Developer"
+            maxLength={100}
+            className="border p-2 rounded"
+          />
+          {errors.position && <p className="text-red-600 mt-1">{errors.position}</p>}
         </div>
 
         {/* Số lượng & Thời gian làm việc */}
@@ -264,23 +337,43 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
           {errors.applicationDeadline && (
             <p className="text-red-600 mt-1">{errors.applicationDeadline}</p>
           )}
-        </div>
-          <InputField
-            label="Ngành nghề"
-            name="industry"
-            value={formData.industry}
-            onChange={handleInputChange}
-          />
+          </div>
+          <div className="flex flex-col w-full">
+            <label className="text-lg font-medium text-gray-700">Kinh nghiệm</label>
+            <select
+              name="experience"
+              value={formData.experience}
+              onChange={handleInputChange}
+              className="border p-2 rounded"
+            >
+              <option value="">-- Chọn --</option>
+              {experiencesOptions && experiencesOptions.map((opt, index) => (
+                <option key={index} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Chức danh & Địa điểm làm việc */}
         <div className="flex gap-5">
-          <InputField
-            label="Chức danh"
-            name="position"
-            value={formData.position}
-            onChange={handleInputChange}
-          />
+          <div className="flex flex-col w-full">
+            <label className="text-lg font-medium text-gray-700">Cấp bậc</label>
+            <select
+              name="level"
+              value={formData.level}
+              onChange={handleInputChange}
+              className="border p-2 rounded"
+            >
+              <option value="">-- Chọn --</option>
+              {levelsOptions && levelsOptions.map((opt, index) => (
+                <option key={index} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="flex flex-col w-full">
             <label className="text-lg font-medium text-gray-700">
               Địa điểm làm việc <span className="text-red-600">*</span>
@@ -292,8 +385,8 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
               className="border p-2 rounded mb-2"
             >
               <option value="">-- Chọn --</option>
-              {locationOptions.map((opt) => (
-                <option key={opt} value={opt}>
+              {locationOptions.map((opt, index) => (
+                <option key={index} value={opt}>
                   {opt}
                 </option>
               ))}
@@ -326,24 +419,27 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
           </div>
         </div>
 
-        {/* Kinh nghiệm */}
-        <div className="flex gap-5">
+        {/* Danh mục ngành nghề */}
+        <div className="flex flex-col gap-5">
           <div className="flex flex-col w-full">
-            <label className="text-lg font-medium text-gray-700">Kinh nghiệm</label>
+            <label className="text-lg font-medium text-gray-700">Lĩnh vực</label>
             <select
-              name="experience"
-              value={formData.experience}
+              name="industry"
+              value={formData.industry}
               onChange={handleInputChange}
               className="border p-2 rounded"
             >
               <option value="">-- Chọn --</option>
-              {experienceOptions.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
+              {industriesOptions && industriesOptions.map((opt, index) => (
+                <option key={index} value={opt.value}>
+                  {opt.name}
                 </option>
               ))}
             </select>
           </div>
+          {!isIndustryUnselected && <p>
+            <JobCategorySelector categories={jobCategories} multiple={false} onSelect={handleSelectCategory}/>
+          </p>}
         </div>
 
         {/* Mô tả công việc */}

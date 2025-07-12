@@ -1,5 +1,6 @@
 import { apiSlice } from "./apiSlice"; // Import apiSlice
 import { JOB_URL } from "../constants"; // Đảm bảo bạn có JOB_URL trong constants.js
+import convertToStrObject from "../../utils/convertToStrObject";
 
 export const jobApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -21,10 +22,39 @@ export const jobApiSlice = apiSlice.injectEndpoints({
     //   }),
     // }),
     getJobList: builder.query({
-      query: ({ location, position } = {}) => {
-        let queryStr = "";
-        if (location) queryStr += `location=${location}&`;
-        if (position) queryStr += `position=${position}&`;
+      query: ({
+        location,
+        position,
+        industry,
+        experience,
+        level,
+        salaryRangeStart,
+        salaryRangeEnd,
+        salaryRangeUnit,
+        categoryIds,
+        page,
+        limit,
+      } = {}) => {
+        if (!salaryRangeUnit) {
+          salaryRangeStart = undefined;
+          salaryRangeEnd = undefined;
+        }
+
+        const params = convertToStrObject({
+          location,
+          position,
+          industry,
+          experience,
+          level,
+          salaryRangeStart,
+          salaryRangeEnd,
+          salaryRangeUnit,
+          categoryIds,
+          page,
+          limit,
+        });
+        const queryStr = new URLSearchParams(params).toString();
+
         return {
           url: `${JOB_URL}?${queryStr}`,
           method: "GET",
@@ -66,10 +96,24 @@ export const jobApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
+    getJobCategoriesByParent: builder.query({
+      query: ({ parentId }) => ({
+        url: `${JOB_URL}/job-categories/${parentId}`,
+        method: "GET",
+      }),
+    }),
+
+    getJobCategoriesByRecursive: builder.query({
+      query: ({ categoryId }) => ({
+        url: `${JOB_URL}/job-categories-recursive/${categoryId}`,
+        method: "GET",
+      }),
+    }),
+
     getJobsByEmployer: builder.query({
       query: (employerId) => ({
         url: `${JOB_URL}/employer/${employerId}`,
-        method: 'GET',
+        method: "GET",
       }),
     }),
 
@@ -100,7 +144,6 @@ export const jobApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
-
   }),
 });
 
@@ -111,9 +154,11 @@ export const {
   useUpdateJobMutation,
   useDeleteJobMutation,
   useGetFilterOptionsQuery,
+  useGetJobCategoriesByParentQuery,
   useGetJobsByEmployerQuery,
   useGetMonthlyJobStatsQuery,
   useGetQuarterlyJobStatsQuery,
   useGetYearlyJobStatsQuery,
-  useGetJobOverviewQuery
+  useGetJobOverviewQuery,
+  useGetJobCategoriesByRecursiveQuery,
 } = jobApiSlice;

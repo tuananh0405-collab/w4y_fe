@@ -1,4 +1,3 @@
-// TopJobCard.jsx
 import React from "react";
 
 
