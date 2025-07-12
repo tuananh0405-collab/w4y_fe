@@ -179,6 +179,16 @@ const handleDeleteProject = async (projectId) => {
   const resumeFiles = profile.resumeFiles || [];
   const applicationCount = countData?.data?.totalApplications || 0;
 
+  // Calculate average rating and review count
+  const reviewCount = Array.isArray(reviewsData) ? reviewsData.length : 0;
+  const averageRating =
+    reviewCount > 0
+      ? (
+          reviewsData.reduce((sum, r) => sum + (r.rating || 0), 0) /
+          reviewCount
+        ).toFixed(1)
+      : 0;
+
   // const defaultProjects = [
   //   {
   //     id: 1,
@@ -258,13 +268,12 @@ const handleDeleteProject = async (projectId) => {
             <div className="flex items-center gap-2">
               <Rating
                 name="read-only"
-                value={profile.rating || 0}
+                value={Number(averageRating)}
                 precision={0.5}
                 readOnly
               />
-              <span className="text-lg">
-                ({profile.rating?.toFixed(1) || 0})
-              </span>
+              <span className="text-lg font-semibold">{averageRating}</span>
+              <span className="text-gray-500 text-base">({reviewCount} đánh giá)</span>
             </div>
           </div>
 

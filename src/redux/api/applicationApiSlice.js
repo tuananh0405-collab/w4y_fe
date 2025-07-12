@@ -43,10 +43,10 @@ export const applicationApiSlice = apiSlice.injectEndpoints({
 
     // Tạo review mới
     createReview: builder.mutation({
-      query: ({ reviewUserId, rating, comment }) => ({
+      query: ({ reviewUserId, rating, comment, jobId }) => ({
         url: `${REVIEW_URL}/create/${reviewUserId}`,
         method: "POST",
-        body: { rating, comment },
+        body: { rating, comment, jobId },
         credentials: "include",
       }),
     }),
@@ -56,6 +56,15 @@ export const applicationApiSlice = apiSlice.injectEndpoints({
       query: (userId) => ({
         url: `${REVIEW_URL}/list/${userId}`,
         method: "GET",
+      }),
+    }),
+
+    // Lấy danh sách công việc đã ứng tuyển của user
+    getAppliedJobs: builder.query({
+      query: ({ page = 1, limit = 10, search = "" }) => ({
+        url: `${APPLICATION_URL}/applied-jobs?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`,
+        method: "GET",
+        credentials: "include",
       }),
     }),
   }),
@@ -68,4 +77,5 @@ export const {
   useGetApplicationsWithInfoQuery,
   useCreateReviewMutation,
   useGetUserReviewsQuery,
+  useGetAppliedJobsQuery,
 } = applicationApiSlice;

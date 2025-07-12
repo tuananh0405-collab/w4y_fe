@@ -37,35 +37,52 @@ const Header = () => {
     }
   };
 
-  const menu = (
-    <Menu
-      items={[
-        user?.accountType !== "Nhà Tuyển Dụng" && {
-          key: "profile",
-          label: (
-            <span
-              className="font-inter text-[14px] cursor-pointer hover:text-teal-600"
-              onClick={() => navigate("/profile")}
-            >
-              Hồ sơ cá nhân
-            </span>
-          ),
-        },
-        { type: "divider" },
-        {
-          key: "logout",
-          label: (
-            <span
-              className="font-inter text-[14px] text-red-600 cursor-pointer hover:text-red-800"
-              onClick={handleLogout}
-            >
-              Đăng xuất
-            </span>
-          ),
-        },
-      ].filter(Boolean)}
-    />
-  );
+  const menuItems = [];
+  if (user?.user?.accountType !== "Nhà Tuyển Dụng") {
+    menuItems.push(
+      {
+        key: "profile",
+        label: (
+          <span
+            className="font-inter text-[14px] cursor-pointer hover:text-teal-600"
+            onClick={() => navigate("/profile")}
+          >
+            Hồ sơ cá nhân
+          </span>
+        ),
+      },
+      {
+        type: "divider",
+      },
+      {
+        key: "job-applied",
+        label: (
+          <span
+            className="font-inter text-[14px] cursor-pointer hover:text-teal-600"
+            onClick={() => navigate("/job-applied")}
+          >
+            Công việc đã ứng tuyển
+          </span>
+        ),
+      },
+      {
+        type: "divider",
+      }
+    );
+  }
+  menuItems.push({
+    key: "logout",
+    label: (
+      <span
+        className="font-inter text-[14px] text-red-600 cursor-pointer hover:text-red-800"
+        onClick={handleLogout}
+      >
+        Đăng xuất
+      </span>
+    ),
+  });
+
+  const menu = <Menu items={menuItems} />;
 
   return (
     <header className="flex flex-wrap justify-between items-center py-4 px-6 md:px-10 bg-white shadow-md sticky top-0 z-50">
@@ -121,6 +138,7 @@ const Header = () => {
         )}
       </nav>
 
+      {/* User info */}
       {user ? (
         <div className="flex items-center gap-3 mt-4 md:mt-0 w-full md:w-auto">
           <NotificationsDropdownButton />

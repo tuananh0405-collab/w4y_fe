@@ -30,6 +30,7 @@ import W4Uvip from "./pages/W4Uvip.jsx";
 import ChatRoom from "./pages/ChatRoom.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import AdminAuth from "./layouts/AdminAuth.jsx";
+import JobApplied from "./pages/JobApplied.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -61,6 +62,7 @@ const router = createBrowserRouter(
           <Route path="chat" element={<ChatRoom />} />
           <Route path="project-room/:projectId" element={<ProjectRoom />} />
           <Route path="vip" element={<W4Uvip />} />
+          <Route path="/job-applied" element={<JobApplied />} />
         </Route>
       </Route>
 
