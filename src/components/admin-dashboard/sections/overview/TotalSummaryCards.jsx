@@ -15,8 +15,8 @@ import WorkIcon from "@mui/icons-material/Work";
 import {
   useGetTotalUserCountQuery,
   useGetApplicantRecruiterCountQuery,
-} from "../../redux/api/userApiSlice";
-import { useGetJobOverviewQuery } from "../../redux/api/jobApiSlice";
+} from "../../../../redux/api/userApiSlice";
+import { useGetJobOverviewQuery } from "../../../../redux/api/jobApiSlice";
 
 const StatCard = ({ label, value, icon, loading }) => (
   <Paper

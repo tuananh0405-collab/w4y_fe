@@ -1,4 +1,3 @@
-// components/admin-dashboard/charts/TrafficLineChart.jsx
 import { useEffect, useRef, useState } from "react";
 import {
   Paper,
