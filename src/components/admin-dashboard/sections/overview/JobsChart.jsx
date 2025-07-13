@@ -21,7 +21,7 @@ import {
   useGetMonthlyJobStatsQuery,
   useGetQuarterlyJobStatsQuery,
   useGetYearlyJobStatsQuery,
-} from "../../redux/api/jobApiSlice";
+} from "../../../../redux/api/jobApiSlice";
 
 Chart.register(ChartDataLabels);
 
@@ -139,7 +139,7 @@ const JobsChart = ({ title = "Job Posting Stats" }) => {
   }, [timeRange, selectedYear, isLoading, monthlyStats, quarterlyStats, yearlyStats]);
 
   const renderDropdown = () => {
-    const years = Array.from({ length: 10 }, (_, i) => currentYear - i).reverse();
+    const years = Array.from({ length: 5 }, (_, i) => currentYear - i).reverse();
 
     return (
       <FormControl size="small" sx={{ minWidth: 160 }}>

@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { useCreateReviewMutation, useGetApplicationsWithInfoQuery, useUpdateApplicationStatusMutation } from "../../redux/api/applicationApiSlice";
+import {
+  useCreateReviewMutation,
+  useGetApplicationsWithInfoQuery,
+  useUpdateApplicationStatusMutation,
+} from "../../redux/api/applicationApiSlice";
 import { Modal, Spin, Button, message, Rate, Input } from "antd";
 import { BASE_URL } from "../../redux/constants";
 
@@ -28,7 +32,8 @@ const ApplicantsTab = () => {
   );
 
   // Mutation cập nhật trạng thái ứng dụng
-  const [updateApplicationStatus, { isLoading: isUpdating }] = useUpdateApplicationStatusMutation();
+  const [updateApplicationStatus, { isLoading: isUpdating }] =
+    useUpdateApplicationStatusMutation();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
@@ -36,44 +41,45 @@ const ApplicantsTab = () => {
   const [selectedApplication, setSelectedApplication] = useState(null);
 
   const [reviewModalVisible, setReviewModalVisible] = useState(false);
-const [reviewingUser, setReviewingUser] = useState(null);
-const [rating, setRating] = useState(0);
-const [comment, setComment] = useState("");
-const [createReview, { isLoading: isReviewing }] = useCreateReviewMutation();
+  const [reviewingUser, setReviewingUser] = useState(null);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [createReview, { isLoading: isReviewing }] = useCreateReviewMutation();
 
-const openReviewModal = (user) => {
-  setReviewingUser(user);
-  setReviewModalVisible(true);
-};
+  const openReviewModal = (user) => {
+    setReviewingUser(user);
+    setReviewModalVisible(true);
+  };
 
-const closeReviewModal = () => {
-  setReviewModalVisible(false);
-  setReviewingUser(null);
-  setRating(0);
-  setComment("");
-};
+  const closeReviewModal = () => {
+    setReviewModalVisible(false);
+    setReviewingUser(null);
+    setRating(0);
+    setComment("");
+  };
 
-const handleSubmitReview = async () => {
-  if (!rating || !comment.trim()) {
-    message.warning("Vui lòng điền đầy đủ đánh giá và bình luận.");
-    return;
-  }
+  const handleSubmitReview = async () => {
+    if (!rating || !comment.trim()) {
+      message.warning("Vui lòng điền đầy đủ đánh giá và bình luận.");
+      return;
+    }
 
-  try {
-    await createReview({
-      reviewUserId: reviewingUser._id,
-      rating,
-      comment,
-    }).unwrap();
+    try {
+      await createReview({
+        reviewUserId: reviewingUser._id,
+        rating,
+        comment,
+        jobId: selectedApplication?.jobId?._id || selectedApplication?.jobId,
+      }).unwrap();
 
-    message.success("Gửi đánh giá thành công!");
-    closeReviewModal();
-  } catch (err) {
-    console.error(err);
-    message.error("Đánh giá thất bại.");
-  }
-};
-
+      message.success("Gửi đánh giá thành công!");
+      closeReviewModal();
+      refetch();
+    } catch (err) {
+      console.error(err);
+      message.error("Đánh giá thất bại.");
+    }
+  };
 
   if (isLoading) return <div>Đang tải dữ liệu...</div>;
   if (error) return <div>Lỗi tải dữ liệu</div>;
@@ -189,14 +195,18 @@ const handleSubmitReview = async () => {
                         .toUpperCase() || "NA"}
                     </div>
                     <div>
-                      <div className="font-semibold">{app.applicantId?.name}</div>
+                      <div className="font-semibold">
+                        {app.applicantId?.name}
+                      </div>
                       <div className="text-sm text-gray-500">
                         {app.applicantId?.experience || "Không có kinh nghiệm"}
                       </div>
                     </div>
                   </td>
                   <td className="py-4 px-4">{app.jobId?.position || "N/A"}</td>
-                  <td className="py-4 px-4">{formatDate(app.appliedAt || app.jobId?.createdAt)}</td>
+                  <td className="py-4 px-4">
+                    {formatDate(app.appliedAt || app.jobId?.createdAt)}
+                  </td>
                   <td className="py-4 px-4">
                     <span
                       className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
@@ -215,14 +225,20 @@ const handleSubmitReview = async () => {
                     />
                   </td>
                   <td className="py-4 px-4">
-  <button
-    className="text-blue-600 underline hover:text-blue-800"
-    onClick={() => openReviewModal(app.applicantId)}
-  >
-    Review
-  </button>
-</td>
-
+                    {app.reviewedByEmployer ? (
+                      <span className="inline-block px-3 py-1 rounded-full bg-green-200 text-green-800 text-xs font-semibold">Đã đánh giá</span>
+                    ) : (
+                      <button
+                        className="text-blue-600 underline hover:text-blue-800"
+                        onClick={() => {
+                          setSelectedApplication(app);
+                          openReviewModal(app.applicantId);
+                        }}
+                      >
+                        Review
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))
             )}
@@ -270,30 +286,29 @@ const handleSubmitReview = async () => {
       </Modal>
 
       <Modal
-  open={reviewModalVisible}
-  title={`Đánh giá ứng viên: ${reviewingUser?.name}`}
-  onCancel={closeReviewModal}
-  onOk={handleSubmitReview}
-  okText="Gửi"
-  cancelText="Hủy"
-  confirmLoading={isReviewing}
-  centered
->
-  <div className="mb-4">
-    <label className="block mb-2 font-medium">Số sao</label>
-    <Rate value={rating} onChange={setRating} />
-  </div>
-  <div>
-    <label className="block mb-2 font-medium">Bình luận</label>
-    <Input.TextArea
-      value={comment}
-      onChange={(e) => setComment(e.target.value)}
-      rows={4}
-      placeholder="Nhập nhận xét của bạn"
-    />
-  </div>
-</Modal>
-
+        open={reviewModalVisible}
+        title={`Đánh giá ứng viên: ${reviewingUser?.name}`}
+        onCancel={closeReviewModal}
+        onOk={handleSubmitReview}
+        okText="Gửi"
+        cancelText="Hủy"
+        confirmLoading={isReviewing}
+        centered
+      >
+        <div className="mb-4">
+          <label className="block mb-2 font-medium">Số sao</label>
+          <Rate value={rating} onChange={setRating} />
+        </div>
+        <div>
+          <label className="block mb-2 font-medium">Bình luận</label>
+          <Input.TextArea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            rows={4}
+            placeholder="Nhập nhận xét của bạn"
+          />
+        </div>
+      </Modal>
     </div>
   );
 };
