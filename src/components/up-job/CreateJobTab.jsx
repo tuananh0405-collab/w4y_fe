@@ -1,6 +1,11 @@
 import React, { useMemo, useState } from "react";
 import theme from "../../utils/theme";
-import { useCreateJobMutation, useGetFilterOptionsQuery, useGetJobCategoriesByParentQuery, useGetJobCategoriesByRecursiveQuery } from "../../redux/api/jobApiSlice";
+import {
+  useCreateJobMutation,
+  useGetFilterOptionsQuery,
+  useGetJobCategoriesByParentQuery,
+  useGetJobCategoriesByRecursiveQuery,
+} from "../../redux/api/jobApiSlice";
 import { useNavigate } from "react-router-dom";
 import JobCategorySelector from "../JobCategorySelector";
 
@@ -29,7 +34,7 @@ const locationOptions = ["Online", "Offline"];
 const experienceOptions = ["< 1 năm", "1-3 năm", "> 3 năm"];
 
 const CreateJobTab = ({ onBack, onSubmit }) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const {
     data: filterOptionsQuery,
@@ -48,9 +53,9 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
       levelsOptions: undefined,
       experiencesOptions: undefined,
       salaryRangeUnitsOptions: undefined,
-    }
+    };
 
-    const data = filterOptionsQuery?.data
+    const data = filterOptionsQuery?.data;
     if (data) {
       results.levelsOptions = data.levels ?? null;
       results.experiencesOptions = data.experiences ?? null;
@@ -62,7 +67,7 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
       })) ?? null;
     }
     return results;
-  }, [filterOptionsQuery])
+  }, [filterOptionsQuery]);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -74,14 +79,19 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
     position: "",
     locationType: "",
     locationAddress: "",
-     applicationDeadline: "",
+    applicationDeadline: "",
     experience: "",
     description: "",
     requirementsTechnical: [],
     requirementsNonTechnical: [],
     salary: "",
+    salaryRangeStart: "",
+    salaryRangeEnd: "",
+    salaryRangeUnit: "",
     categoryId: "",
   });
+
+  const [useSalaryRange, setUseSalaryRange] = useState(true);
 
   const {
     data: jobCategoriesQuery,
@@ -89,12 +99,12 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
     isLoading: isFetchingJobCategories,
     isUninitialized: isIndustryUnselected,
   } = useGetJobCategoriesByRecursiveQuery({ categoryId: formData.industry }, {
-    skip: !formData.industry || !formData.industry.length
+    skip: !formData.industry || !formData.industry.length,
   });
 
   const jobCategories = useMemo(() => {
-    return jobCategoriesQuery?.data ? jobCategoriesQuery.data.children : []
-  }, [jobCategoriesQuery])
+    return jobCategoriesQuery?.data ? jobCategoriesQuery.data.children : [];
+  }, [jobCategoriesQuery]);
 
   const [errors, setErrors] = useState({});
   const [createJob] = useCreateJobMutation();
@@ -103,25 +113,45 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
     const newErrors = {};
 
     if (!formData.title.trim()) newErrors.title = "Tiêu đề là bắt buộc";
-    else if (formData.title.length > 100)
+    else if (formData.title.length > 100) {
       newErrors.title = "Tiêu đề không được vượt quá 100 ký tự";
+    }
 
-    if (!formData.quantity) newErrors.quantity = "Số lượng tuyển dụng là bắt buộc";
-    else if (isNaN(formData.quantity) || Number(formData.quantity) <= 0)
+    if (!formData.quantity) {
+      newErrors.quantity = "Số lượng tuyển dụng là bắt buộc";
+    } else if (isNaN(formData.quantity) || Number(formData.quantity) <= 0) {
       newErrors.quantity = "Số lượng phải là số nguyên dương";
+    }
 
-    if (!formData.deliveryTime) newErrors.deliveryTime = "Thời gian làm việc là bắt buộc";
-    else if (formData.deliveryTime === "Khác" && !formData.deliveryTimeOther.trim())
+    if (!formData.deliveryTime) {
+      newErrors.deliveryTime = "Thời gian làm việc là bắt buộc";
+    } else if (
+      formData.deliveryTime === "Khác" && !formData.deliveryTimeOther.trim()
+    ) {
       newErrors.deliveryTimeOther = "Vui lòng nhập thời gian làm việc";
+    }
 
-    if (!formData.locationType) newErrors.locationType = "Địa điểm làm việc là bắt buộc";
-    else if (formData.locationType === "Offline" && !formData.locationAddress.trim())
+    if (!formData.locationType) {
+      newErrors.locationType = "Địa điểm làm việc là bắt buộc";
+    } else if (
+      formData.locationType === "Offline" && !formData.locationAddress.trim()
+    ) {
       newErrors.locationAddress = "Vui lòng nhập địa chỉ làm việc";
-   if (!formData.applicationDeadline)
+    }
+    if (!formData.applicationDeadline) {
       newErrors.applicationDeadline = "Thời hạn ứng tuyển là bắt buộc";
-    if (!formData.description.trim()) newErrors.description = "Mô tả công việc là bắt buộc";
+    }
+    if (!formData.description.trim()) {
+      newErrors.description = "Mô tả công việc là bắt buộc";
+    }
 
-    if (!formData.salary.trim()) newErrors.salary = "Lương và phúc lợi là bắt buộc";
+    if (
+      !(formData.salary.trim() ||
+        (formData.salaryRangeStart.trim() && formData.salaryRangeEnd.trim() &&
+          formData.salaryRangeUnit.trim()))
+    ) {
+      newErrors.salary = "Lương và phúc lợi là bắt buộc";
+    }
 
     setErrors(newErrors);
 
@@ -146,7 +176,9 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
   };
 
   const handleCheckboxChange = (type, option) => {
-    const key = type === "technical" ? "requirementsTechnical" : "requirementsNonTechnical";
+    const key = type === "technical"
+      ? "requirementsTechnical"
+      : "requirementsNonTechnical";
     const selected = formData[key];
     let updated;
 
@@ -162,7 +194,10 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
 
   const handleSelectCategory = (checkedArray) => {
     if (checkedArray) {
-      setFormData((prev) => ({ ...prev, categoryId: checkedArray.length? checkedArray[0] : undefined }));
+      setFormData((prev) => ({
+        ...prev,
+        categoryId: checkedArray.length ? checkedArray[0] : undefined,
+      }));
     }
   };
 
@@ -179,21 +214,33 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
       const jobData = {
         title: formData.title,
         description: formData.description,
-        requirements: [...formData.requirementsTechnical, ...formData.requirementsNonTechnical].join(", "),
-        salary: formData.salary,
-        deliveryTime:
-          formData.deliveryTime === "Khác" ? formData.deliveryTimeOther : formData.deliveryTime,
+        requirements: [
+          ...formData.requirementsTechnical,
+          ...formData.requirementsNonTechnical,
+        ].join(", "),
+        deliveryTime: formData.deliveryTime === "Khác"
+          ? formData.deliveryTimeOther
+          : formData.deliveryTime,
         priorityLevel: "Thông thường",
         quantity: Number(formData.quantity),
         level: formData.level,
-         deadline: formData.applicationDeadline,
+        deadline: formData.applicationDeadline,
         industry: formData.industry,
         position: formData.position,
-        location:
-          formData.locationType === "Online" ? "Online" : formData.locationAddress,
+        location: formData.locationType === "Online"
+          ? "Online"
+          : formData.locationAddress,
         experience: formData.experience,
         categoryId: formData.categoryId,
       };
+
+      if (useSalaryRange) {
+        jobData.salaryRangeStart = formData.salaryRangeStart;
+        jobData.salaryRangeEnd = formData.salaryRangeEnd;
+        jobData.salaryRangeUnit = formData.salaryRangeUnit;
+      } else {
+        jobData.salary = formData.salary;
+      }
 
       await createJob(jobData);
       // navigate('/')
@@ -220,10 +267,14 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
         className="mb-6 p-4 bg-lightGray border border-gray-300 rounded-lg"
         style={{ backgroundColor: theme.colors.bgColor }}
       >
-        <h3 className="text-lg font-semibold text-teal-700 mb-2">Mẹo đăng tin hiệu quả 💡</h3>
+        <h3 className="text-lg font-semibold text-teal-700 mb-2">
+          Mẹo đăng tin hiệu quả 💡
+        </h3>
         <ul className="list-disc pl-5 text-sm text-gray-700">
           <li>Tiêu đề việc làm rõ ràng, có chứa tên vị trí và cấp bậc</li>
-          <li>Mô tả công việc và yêu cầu chi tiết, tập trung vào kỹ năng cần thiết</li>
+          <li>
+            Mô tả công việc và yêu cầu chi tiết, tập trung vào kỹ năng cần thiết
+          </li>
           <li>Thông tin về lương và phúc lợi cụ thể để thu hút ứng viên mới</li>
           <li>Sử dụng từ khóa ngành nghề để tối ưu khả năng tìm kiếm</li>
         </ul>
@@ -261,7 +312,9 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
             maxLength={100}
             className="border p-2 rounded"
           />
-          {errors.position && <p className="text-red-600 mt-1">{errors.position}</p>}
+          {errors.position && (
+            <p className="text-red-600 mt-1">{errors.position}</p>
+          )}
         </div>
 
         {/* Số lượng & Thời gian làm việc */}
@@ -279,7 +332,9 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
               className="border p-2 rounded"
               min={1}
             />
-            {errors.quantity && <p className="text-red-600 mt-1">{errors.quantity}</p>}
+            {errors.quantity && (
+              <p className="text-red-600 mt-1">{errors.quantity}</p>
+            )}
           </div>
 
           <div className="flex flex-col w-full">
@@ -299,7 +354,9 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
                 </option>
               ))}
             </select>
-            {errors.deliveryTime && <p className="text-red-600 mt-1">{errors.deliveryTime}</p>}
+            {errors.deliveryTime && (
+              <p className="text-red-600 mt-1">{errors.deliveryTime}</p>
+            )}
 
             {/* Input text nếu chọn Khác */}
             {formData.deliveryTime === "Khác" && (
@@ -313,7 +370,9 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
                   className="border p-2 rounded mt-2"
                 />
                 {errors.deliveryTimeOther && (
-                  <p className="text-red-600 mt-1">{errors.deliveryTimeOther}</p>
+                  <p className="text-red-600 mt-1">
+                    {errors.deliveryTimeOther}
+                  </p>
                 )}
               </>
             )}
@@ -323,23 +382,25 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
         {/* Cấp bậc & Ngành nghề */}
         <div className="flex gap-5">
           <div className="flex flex-col w-full">
-          <label className="text-lg font-medium text-gray-700">
-            Thời hạn ứng tuyển <span className="text-red-600">*</span>
-          </label>
-          <input
-            type="date"
-            name="applicationDeadline"
-            value={formData.applicationDeadline}
-            onChange={handleInputChange}
-            className="border p-2 rounded"
-            min={new Date().toISOString().split("T")[0]} // không cho chọn ngày quá khứ
-          />
-          {errors.applicationDeadline && (
-            <p className="text-red-600 mt-1">{errors.applicationDeadline}</p>
-          )}
+            <label className="text-lg font-medium text-gray-700">
+              Thời hạn ứng tuyển <span className="text-red-600">*</span>
+            </label>
+            <input
+              type="date"
+              name="applicationDeadline"
+              value={formData.applicationDeadline}
+              onChange={handleInputChange}
+              className="border p-2 rounded"
+              min={new Date().toISOString().split("T")[0]} // không cho chọn ngày quá khứ
+            />
+            {errors.applicationDeadline && (
+              <p className="text-red-600 mt-1">{errors.applicationDeadline}</p>
+            )}
           </div>
           <div className="flex flex-col w-full">
-            <label className="text-lg font-medium text-gray-700">Kinh nghiệm</label>
+            <label className="text-lg font-medium text-gray-700">
+              Kinh nghiệm
+            </label>
             <select
               name="experience"
               value={formData.experience}
@@ -347,11 +408,12 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
               className="border p-2 rounded"
             >
               <option value="">-- Chọn --</option>
-              {experiencesOptions && experiencesOptions.map((opt, index) => (
-                <option key={index} value={opt}>
-                  {opt}
-                </option>
-              ))}
+              {experiencesOptions &&
+                experiencesOptions.map((opt, index) => (
+                  <option key={index} value={opt}>
+                    {opt}
+                  </option>
+                ))}
             </select>
           </div>
         </div>
@@ -367,11 +429,12 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
               className="border p-2 rounded"
             >
               <option value="">-- Chọn --</option>
-              {levelsOptions && levelsOptions.map((opt, index) => (
-                <option key={index} value={opt}>
-                  {opt}
-                </option>
-              ))}
+              {levelsOptions &&
+                levelsOptions.map((opt, index) => (
+                  <option key={index} value={opt}>
+                    {opt}
+                  </option>
+                ))}
             </select>
           </div>
           <div className="flex flex-col w-full">
@@ -412,7 +475,9 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
               </>
             )}
 
-            {errors.locationType && <p className="text-red-600 mt-1">{errors.locationType}</p>}
+            {errors.locationType && (
+              <p className="text-red-600 mt-1">{errors.locationType}</p>
+            )}
             {errors.locationAddress && (
               <p className="text-red-600 mt-1">{errors.locationAddress}</p>
             )}
@@ -422,7 +487,9 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
         {/* Danh mục ngành nghề */}
         <div className="flex flex-col gap-5">
           <div className="flex flex-col w-full">
-            <label className="text-lg font-medium text-gray-700">Lĩnh vực</label>
+            <label className="text-lg font-medium text-gray-700">
+              Lĩnh vực
+            </label>
             <select
               name="industry"
               value={formData.industry}
@@ -430,16 +497,34 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
               className="border p-2 rounded"
             >
               <option value="">-- Chọn --</option>
-              {industriesOptions && industriesOptions.map((opt, index) => (
-                <option key={index} value={opt.value}>
-                  {opt.name}
-                </option>
-              ))}
+              {industriesOptions &&
+                industriesOptions.map((opt, index) => (
+                  <option key={index} value={opt.value}>
+                    {opt.name}
+                  </option>
+                ))}
             </select>
           </div>
-          {!isIndustryUnselected && <p>
-            <JobCategorySelector categories={jobCategories} multiple={false} onSelect={handleSelectCategory}/>
-          </p>}
+          <div
+            className={`font-medium ${isIndustryUnselected ? "text-gray-400" : "text-gray-700"
+              }`}
+          >
+            Ngành nghề
+          </div>
+          <div
+            className={`w-full rounded-md ${isIndustryUnselected
+                ? "bg-gray-100/80"
+                : "bg-gray-200/80"
+              } min-h-[100px] max-h-[700px] overflow-auto p-4 mb-2`}
+          >
+            {!isIndustryUnselected && (
+              <JobCategorySelector
+                categories={jobCategories}
+                multiple={false}
+                onSelect={handleSelectCategory}
+              />
+            )}
+          </div>
         </div>
 
         {/* Mô tả công việc */}
@@ -457,7 +542,9 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
 
         {/* Yêu cầu công việc */}
         <div className="flex flex-col">
-          <label className="text-lg font-medium text-gray-700 mb-2">Yêu cầu công việc</label>
+          <label className="text-lg font-medium text-gray-700 mb-2">
+            Yêu cầu công việc
+          </label>
           <div className="flex gap-10">
             {/* Technical */}
             <div className="flex flex-col w-1/2">
@@ -471,10 +558,10 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
                     type="checkbox"
                     checked={formData.requirementsTechnical.includes(option)}
                     onChange={() => handleCheckboxChange("technical", option)}
-                    disabled={
-                      !formData.requirementsTechnical.includes(option) &&
-                      formData.requirementsTechnical.length >= 3
-                    }
+                    disabled={!formData.requirementsTechnical.includes(
+                      option,
+                    ) &&
+                      formData.requirementsTechnical.length >= 3}
                     className="mr-2"
                   />
                   {option}
@@ -493,11 +580,12 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
                   <input
                     type="checkbox"
                     checked={formData.requirementsNonTechnical.includes(option)}
-                    onChange={() => handleCheckboxChange("nonTechnical", option)}
-                    disabled={
-                      !formData.requirementsNonTechnical.includes(option) &&
-                      formData.requirementsNonTechnical.length >= 3
-                    }
+                    onChange={() =>
+                      handleCheckboxChange("nonTechnical", option)}
+                    disabled={!formData.requirementsNonTechnical.includes(
+                      option,
+                    ) &&
+                      formData.requirementsNonTechnical.length >= 3}
                     className="mr-2"
                   />
                   {option}
@@ -510,17 +598,69 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
         {/* Lương */}
         <div className="flex flex-col">
           <label className="text-lg font-medium text-gray-700">
-            Lương và phúc lợi <span className="text-red-600">*</span>
+            Lương <span className="text-red-600">*</span>
           </label>
-          <input
-            type="text"
-            name="salary"
-            value={formData.salary}
-            onChange={handleInputChange}
-            placeholder="Lương"
-            className="border p-2 rounded"
-          />
-          {errors.salary && <p className="text-red-600 mt-1">{errors.salary}</p>}
+          <div>
+            <label className="inline-flex items-center mb-1 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={useSalaryRange}
+                onChange={() => setUseSalaryRange((prev) => !prev)}
+                className="mr-2"
+              />
+              Sử dụng khoảng
+            </label>
+          </div>
+          {useSalaryRange && (
+            <div>
+              <input
+                type="text"
+                name="salaryRangeStart"
+                value={formData.salaryRangeStart}
+                onChange={handleInputChange}
+                placeholder="Lương"
+                className="border p-2 rounded"
+              />
+              -
+              <input
+                type="text"
+                name="salaryRangeEnd"
+                value={formData.salaryRangeEnd}
+                onChange={handleInputChange}
+                placeholder="Lương"
+                className="border p-2 rounded"
+              />
+              <select
+                className="w-full sm:w-auto px-3 py-2 border rounded focus:outline-none focus:ring"
+                name="salaryRangeUnit"
+                value={formData.salaryRangeUnit}
+                onChange={handleInputChange}
+              >
+                <option value="">-- Chọn --</option>
+                {salaryRangeUnitsOptions &&
+                  salaryRangeUnitsOptions.map((opt, index) => (
+                    <option key={index} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          )}
+          {!useSalaryRange && (
+            <input
+              type="text"
+              name="salary"
+              value={formData.salary}
+              onChange={handleInputChange}
+              placeholder="Lương"
+              className="border p-2 rounded"
+            />
+          )}
+          {errors.salary && (
+            <p className="text-red-600 mt-1">
+              {errors.salary}
+            </p>
+          )}
         </div>
 
         {/* Buttons */}

@@ -1,0 +1,15 @@
+.filter-scrollbar::-webkit-scrollbar {
+  width: 12px;
+}
+
+.filter-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.filter-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(92, 125, 122, 0.5);
+  border-radius: 8px;
+  min-height: 60px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
