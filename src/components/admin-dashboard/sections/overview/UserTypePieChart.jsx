@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Paper, Typography, Box, CircularProgress } from "@mui/material";
 import Chart from "chart.js/auto";
-import { useGetApplicantRecruiterCountQuery } from "../../redux/api/userApiSlice";
+import { useGetApplicantRecruiterCountQuery } from "../../../../redux/api/userApiSlice";
 
 const UserTypePieChart = () => {
   const chartRef = useRef(null);
@@ -15,7 +15,7 @@ const UserTypePieChart = () => {
     labels: ["Applicants", "Recruiters"],
     datasets: [
       {
-        label: "User Type",
+        label: "User",
         data: [applicants, recruiters],
         backgroundColor: ["#42a5f5", "#66bb6a"],
         hoverOffset: 8,

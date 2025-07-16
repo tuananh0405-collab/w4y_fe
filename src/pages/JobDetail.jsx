@@ -20,7 +20,7 @@ const colors = {
 const JobDetail = () => {
   const { jobId } = useParams();
   const { data, error, isLoading } = useGetJobDetailQuery(jobId);
- 
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isQuickApplyOpen, setIsQuickApplyOpen] = useState(false);
 
@@ -28,10 +28,9 @@ const JobDetail = () => {
   if (error) return <div>Error loading job details</div>;
 
   const job = data?.data;
-  console.log('====================================');
+  console.log("====================================");
   console.log(job);
-  console.log('====================================');
-
+  console.log("====================================");
 
   return (
     <div className="flex flex-col w-full">
@@ -63,7 +62,9 @@ const JobDetail = () => {
             Ứng viên nộp hồ sơ trực tuyến bằng cách bấm Ứng tuyển ngay dưới đây.
           </p>
 
-          <p className="text-lg mb-8">Hạn nộp hồ sơ: {job?.deadline?.slice(0, 10)}</p>
+          <p className="text-lg mb-8">
+            Hạn nộp hồ sơ: {job?.deadline?.slice(0, 10)}
+          </p>
 
           {/* File CV input */}
           {/* <div className="mb-4">
@@ -77,7 +78,6 @@ const JobDetail = () => {
           </div> */}
 
           <div className="flex gap-4">
-  
             <button
               onClick={() => setIsModalOpen(true)}
               className="text-white px-6 py-3 rounded-lg"
@@ -86,37 +86,40 @@ const JobDetail = () => {
               Ứng tuyển ngay
             </button>
             <button
-  onClick={() => setIsQuickApplyOpen(true)}
-  className="text-white px-6 py-3 rounded-lg"
-  style={{ backgroundColor: colors.darkTeal }}
->
-  Ứng tuyển nhanh
-</button>
+              onClick={() => setIsQuickApplyOpen(true)}
+              className="text-white px-6 py-3 rounded-lg"
+              style={{ backgroundColor: colors.darkTeal }}
+            >
+              Ứng tuyển nhanh
+            </button>
 
-<Modal
-  open={isModalOpen}
-  onCancel={() => setIsModalOpen(false)}
-  footer={null}
-  width={600}
-  centered
-   destroyOnClose={true}
-  modalRender={modal => (
-    <div
-      style={{
-        padding: 24,
-        maxHeight: '90vh',
-        width: '100%',
-        overflow: 'auto',
-        scrollbarWidth: 'none',
-      }}
-    >
-      {modal}
-    </div>
-  )}
->
-  <ApplicationForm jobId={jobId}  jobTitle={job?.title} onClose={() => setIsModalOpen(false)} />
-</Modal>
-
+            <Modal
+              open={isModalOpen}
+              onCancel={() => setIsModalOpen(false)}
+              footer={null}
+              width={600}
+              centered
+              destroyOnClose={true}
+              modalRender={(modal) => (
+                <div
+                  style={{
+                    padding: 24,
+                    maxHeight: "90vh",
+                    width: "100%",
+                    overflow: "auto",
+                    scrollbarWidth: "none",
+                  }}
+                >
+                  {modal}
+                </div>
+              )}
+            >
+              <ApplicationForm
+                jobId={jobId}
+                jobTitle={job?.title}
+                onClose={() => setIsModalOpen(false)}
+              />
+            </Modal>
 
             <button
               className="border px-6 py-3 rounded-lg"
@@ -177,20 +180,19 @@ const JobDetail = () => {
           </div>
         </div>
       </div>
-{isQuickApplyOpen && (
-  <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-50">
-    <div className="bg-white p-6 rounded-lg max-w-4xl w-full overflow-auto max-h-[90vh]">
-      <button
-        onClick={() => setIsQuickApplyOpen(false)}
-        className="ml-auto mb-4 block px-4 py-2 bg-gray-200 rounded"
-      >
-        Đóng
-      </button>
-      <FastApply jobTitle={job?.title} />
-
-    </div>
-  </div>
-)}
+      {isQuickApplyOpen && (
+        <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg max-w-4xl w-full overflow-auto max-h-[90vh]">
+            <button
+              onClick={() => setIsQuickApplyOpen(false)}
+              className="ml-auto mb-4 block px-4 py-2 bg-gray-200 rounded"
+            >
+              Đóng
+            </button>
+            <FastApply jobTitle={job?.title} />
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

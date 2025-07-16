@@ -1,9 +1,9 @@
 import { apiSlice } from "./apiSlice";
-import { USER_URL } from "../constants"; 
+import { USER_URL } from "../constants";
 
 export const userApiSlice = apiSlice.injectEndpoints({
 
-    
+
   endpoints: (builder) => ({
     getTotalUserCount: builder.query({
       query: () => ({
@@ -14,8 +14,8 @@ export const userApiSlice = apiSlice.injectEndpoints({
 
     getApplicantRecruiterCount: builder.query({
       query: () => ({
-          url: `${USER_URL}/stats/role-counts`,
-          method: "GET",
+        url: `${USER_URL}/stats/role-counts`,
+        method: "GET",
       }),
     }),
 
@@ -43,14 +43,48 @@ export const userApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
+    getListOfUsers: builder.query({
+      query: ({ page = 1, pageSize = 10, sortField, sortOrder, filters }) => {
+        const query = new URLSearchParams();
+        query.append("page", page);
+        query.append("pageSize", pageSize);
+        if (sortField) query.append("sortField", sortField);
+        if (sortOrder) query.append("sortOrder", sortOrder);
+        if (filters && filters.length > 0) {
+          query.append("filters", JSON.stringify(filters));
+        }
+
+        return {
+          url: `${USER_URL}/control/list?${query.toString()}`,
+          method: "GET",
+        };
+      },
+    }),
+
+    getTopCities: builder.query({
+      query: () => ({
+        url: `${USER_URL}/stats/topcities`,
+        method: "GET",
+      }),
+    }),
+
+    getAgeGenderPyramid: builder.query({
+      query: () => ({
+        url: `${USER_URL}/stats/age-gender-pyramid`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
 export const {
-    useGetTotalUserCountQuery,
-    useGetApplicantRecruiterCountQuery,
-    useGetMonthlyUserGrowthQuery,
-    useGetQuarterlyUserGrowthQuery,
-    useGetYearlyUserGrowthQuery
+  useGetTotalUserCountQuery,
+  useGetApplicantRecruiterCountQuery,
+  useGetMonthlyUserGrowthQuery,
+  useGetQuarterlyUserGrowthQuery,
+  useGetYearlyUserGrowthQuery,
+  useGetListOfUsersQuery,
+  useGetTopCitiesQuery,
+  useGetAgeGenderPyramidQuery
 
 } = userApiSlice;

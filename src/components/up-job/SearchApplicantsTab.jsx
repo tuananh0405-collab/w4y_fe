@@ -130,7 +130,7 @@ console.log('====================================');
     <div key={index} className="card bg-white p-5 shadow-lg rounded-xl border transition-all hover:shadow-xl hover:bg-gray-50">
       <div className="candidate-card text-center mb-4">
         {/* Candidate Initials */}
-        <div className="candidate-initials text-lg font-bold bg-gray-300 rounded-full w-16 h-16 mx-auto flex items-center justify-center text-white text-xl">
+        <div className="candidate-initials font-bold bg-gray-300 rounded-full w-16 h-16 mx-auto flex items-center justify-center text-white text-xl">
           {applicant.name ? applicant.name.charAt(0) : 'N/A'}
         </div>
 

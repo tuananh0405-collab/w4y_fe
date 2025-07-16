@@ -3,10 +3,10 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./layouts/App.jsx";
 import {
-  Route,
-  RouterProvider,
   createBrowserRouter,
   createRoutesFromElements,
+  Route,
+  RouterProvider,
 } from "react-router-dom";
 import Auth from "./layouts/Auth.jsx";
 import AdminRoute from "./routes/AdminRoute.jsx";
@@ -29,46 +29,53 @@ import ProjectRoom from "./pages/ProjectRoom.jsx";
 import W4Uvip from "./pages/W4Uvip.jsx";
 import ChatRoom from "./pages/ChatRoom.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
+import AdminAuth from "./layouts/AdminAuth.jsx";
+import JobApplied from "./pages/JobApplied.jsx";
+import GoogleAnalytics from "./components/GoogleAnalytics.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
-      {/* AUTH  */}
+      {/* AUTH & STATIC */}
       <Route path="/welcome" element={<Welcome />} />
       <Route path="/auth" element={<Auth />} />
       <Route path="/auth/google/callback" element={<GoogleCallback />} />
-      {/* PRIVATE  */}
-      <Route path="/admin" element={<App />}>
-        <Route path="" element={<AdminRoute />}>
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />  
-        </Route>
-      </Route>
-      {/* PUBLIC  */}
+      <Route path="/admin/auth" element={<AdminAuth />} />
+
+      {/* MAIN */}
       <Route path="/" element={<App />}>
-        <Route path="" element={<UserRoute />}>
-          <Route path="/register-employer" element={<Register_Employer />} />
-          <Route path="/register-employee" element={<Register_Employee />} />
-          <Route path="/" element={<Home />} />
-          <Route path="/up-cv" element={<UpCV />} />
-          <Route path="/up-job" element={<UpJob />} />
-          <Route path="/apply" element={<Apply />} />
-          <Route path="/job-detail/:jobId" element={<JobDetail />} />
-          <Route path="/top-jobs" element={<TopJobs />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/chat" element={<ChatRoom />} />
-          <Route path="/project-room/:projectId" element={<ProjectRoom />} />
-          <Route path="/vip" element={<W4Uvip />} />
-          {/* <Route path="/test" element={< />} /> */}
+        {/* ADMIN */}
+        <Route path="admin" element={<AdminRoute />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
+        </Route>
+
+        {/* USER */}
+        <Route element={<UserRoute />}>
+          <Route index element={<Home />} />
+          <Route path="register-employer" element={<Register_Employer />} />
+          <Route path="register-employee" element={<Register_Employee />} />
+          <Route path="up-cv" element={<UpCV />} />
+          <Route path="up-job" element={<UpJob />} />
+          <Route path="apply" element={<Apply />} />
+          <Route path="job-detail/:jobId" element={<JobDetail />} />
+          <Route path="top-jobs" element={<TopJobs />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="chat" element={<ChatRoom />} />
+          <Route path="project-room/:projectId" element={<ProjectRoom />} />
+          <Route path="vip" element={<W4Uvip />} />
+          <Route path="/job-applied" element={<JobApplied />} />
         </Route>
       </Route>
-      {/* Route 404 cho tất cả các route khác */}
+
+      {/* 404 fallback */}
       <Route path="*" element={<Error404 />} />
-    </>
-  )
+    </>,
+  ),
 );
 
 createRoot(document.getElementById("root")).render(
   <Provider store={store}>
+    <GoogleAnalytics />
     <RouterProvider router={router} />
-  </Provider>
+  </Provider>,
 );

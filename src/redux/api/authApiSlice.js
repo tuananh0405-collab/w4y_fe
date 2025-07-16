@@ -12,29 +12,38 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
+    adminSignIn: builder.mutation({
+      query: (data) => ({
+        url: `${AUTH_URL}/admin/sign-in`,
+        method: "POST",
+        body: data,
+        credentials: "include",
+      }),
+    }),
+
     signUp: builder.mutation({
       query: (data) => ({
-        url: `${AUTH_URL}/sign-up`, // Cập nhật URL cho đăng ký
+        url: `${AUTH_URL}/sign-up`, 
         method: "POST",
-        body: data, // Dữ liệu người dùng gửi khi đăng ký
-        credentials: "include", // Giữ cookie nếu cần
+        body: data, 
+        credentials: "include", 
       }),
     }),
 
     verifyEmail: builder.mutation({
       query: (data) => ({
-        url: `${AUTH_URL}/verify-email`, // Cập nhật URL cho xác minh email
+        url: `${AUTH_URL}/verify-email`, 
         method: "POST",
-        body: data, // Dữ liệu người dùng gửi khi xác minh email
-        credentials: "include", // Giữ cookie nếu cần
+        body: data, 
+        credentials: "include", 
       }),
     }),
 
     signOut: builder.mutation({
       query: () => ({
-        url: `${AUTH_URL}/sign-out`, // URL cho sign-out
-        method: "POST", // Phương thức POST cho đăng xuất
-        credentials: "include", // Giữ cookie khi yêu cầu
+        url: `${AUTH_URL}/sign-out`, 
+        method: "POST", 
+        credentials: "include", 
       }),
     }),
 
@@ -64,4 +73,5 @@ export const {
   useSignOutMutation,
   useGoogleAuthMutation,
   useGoogleCallbackMutation,
+  useAdminSignInMutation
 } = authApiSlice;

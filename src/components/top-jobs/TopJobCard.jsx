@@ -1,16 +1,23 @@
-// TopJobCard.jsx
 import React from "react";
 
 
 import { companyLogoIcon, moneyCalculator24Icon } from "../../assets";
+import { useNavigate } from "react-router-dom";
 
 export const TopJobCard = ({ jobs }) => {
+  const navigate = useNavigate()
+
+  const handleJobClick = (jobId) => {
+    navigate(`/job-detail/${jobId}`);
+  };
+
   return (
     <div className="flex flex-col gap-6">
       {jobs.map((job, idx) => (
         <div
           key={idx}
-          className="bg-[#d7f0e6] rounded-xl shadow-sm p-6 flex items-center gap-6 hover:shadow-md transition-shadow duration-300"
+          className="bg-[#d7f0e6] rounded-xl shadow-sm p-6 flex items-center gap-6 hover:shadow-md transition-shadow duration-300 cursor-pointer"
+          onClick={() => handleJobClick(job.id)}
         >
           <img
             src={companyLogoIcon}
@@ -22,7 +29,11 @@ export const TopJobCard = ({ jobs }) => {
               <h3 className="text-[#034d31] font-semibold text-xl leading-tight">
                 {job.title}
               </h3>
-              <p className="text-[#034d31cc] font-medium text-sm mt-1">{job.company}</p>
+              <p className="text-[#034d31cc] font-medium text-sm mt-1">
+                {job.description.length > 150
+                  ? job.description.slice(0, 147) + "..."
+                  : job.description}
+              </p>
             </div>
             <div className="flex gap-3 mt-4">
               <span className="bg-[#037a50] text-white text-xs rounded px-3 py-1 shadow-sm">
@@ -34,12 +45,14 @@ export const TopJobCard = ({ jobs }) => {
             </div>
           </div>
           <div className="flex flex-col justify-between items-center text-[#034d31] font-semibold text-sm min-h-[112px]">
-            <img
-              src={moneyCalculator24Icon}
-              alt="Salary"
-              className="w-7 h-7 mb-2"
-            />
-            <span>{job.salary}</span>
+            <div className="flex flex-row justify-end items-center gap-2">
+              <span>{job.salary}</span>
+              <img
+                src={moneyCalculator24Icon}
+                alt="Salary"
+                className="w-7 h-7"
+              />
+            </div>
             <span className="text-xs opacity-70 mt-auto">{job.postedTime}</span>
             <div className="flex items-center gap-1 text-green-700">
               <svg
@@ -53,7 +66,7 @@ export const TopJobCard = ({ jobs }) => {
                 <circle cx="12" cy="12" r="10" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
               </svg>
-              <span>Thỏa thuận</span>
+              <span>{job.deliveryTime}</span>
             </div>
           </div>
         </div>

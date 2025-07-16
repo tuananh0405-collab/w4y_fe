@@ -1,0 +1,10 @@
+/* For normal state */
+.ant-select-selector:hover {
+  border-color: #037a50 !important;
+}
+
+/* For focus (active) state */
+.ant-select-focused .ant-select-selector {
+  border-color: #037a50 !important;
+  box-shadow: none; 
+}

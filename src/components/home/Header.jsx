@@ -1,64 +1,31 @@
 import React from "react";
 import Avatar from "@mui/material/Avatar";
 import Chip from "@mui/material/Chip";
-import { userIcon, logoIcon } from "../../assets";
-import { useSelector, useDispatch } from "react-redux";
+import { logoIcon, userIcon } from "../../assets";
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/authSlice";
 import { useNavigate } from "react-router-dom";
 import { Dropdown, Menu } from "antd";
 import { useSignOutMutation } from "../../redux/api/authApiSlice";
 import { useGetApplicantProfileQuery } from "../../redux/api/applicantApiSlice";
 import theme from "../../utils/theme";
-import { Chat, NotificationsActive, SendToMobileOutlined } from "@mui/icons-material";
-
-const items = [
-  {
-    key: '1',
-    label: (
-      <a rel="noopener noreferrer" href="/">
-        1st notification
-      </a>
-    ),
-  },
-  {
-    key: '2',
-    label: (
-      <a rel="noopener noreferrer" href="/">
-        2nd notification
-      </a>
-    ),
-  },
-  {
-    key: '3',
-    label: (
-      <a rel="noopener noreferrer" href="/">
-        3rd notification
-      </a>
-    ),
-  },
-  {
-    key: '4',
-    label: (
-      <a rel="noopener noreferrer" href="/">
-        4th notification
-      </a>
-    ),
-  },
-];
+import { Chat } from "@mui/icons-material";
+import NotificationsDropdownButton from "./NotificationsDropdownButton";
 
 const Header = () => {
-  const user = useSelector((state) => state.auth.userState);
+  const userState = useSelector((state) => state.auth.userState);
+  const user = userState?.user;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [signOut] = useSignOutMutation();
-  const userId = user?.user?.id;
-  const points = user?.user?.points || 0;
 
-  // Fetch user profile data from API
-  const { data, isLoading, error } = useGetApplicantProfileQuery({
+  const userId = user?.id;
+  const points = user?.points || 0;
+
+  const { data: profileData } = useGetApplicantProfileQuery(undefined, {
     skip: !userId,
   });
-  const profile = data?.data || {};
+  const profile = profileData?.data || {};
 
   const handleLogout = async () => {
     try {
@@ -66,41 +33,56 @@ const Header = () => {
       dispatch(logout());
       navigate("/");
     } catch (err) {
-      console.error("Logout failed: ", err);
+      console.error("Logout failed:", err);
     }
   };
 
-  const menu = (
-    <Menu
-      items={[
-        user?.user?.accountType !== "Nhà Tuyển Dụng" && {
-          key: "profile",
-          label: (
-            <span
-              className="font-inter text-[14px] cursor-pointer hover:text-teal-600"
-              onClick={() => navigate("/profile")}
-            >
-              Hồ sơ cá nhân
-            </span>
-          ),
-        },
-        {
-          type: "divider",
-        },
-        {
-          key: "logout",
-          label: (
-            <span
-              className="font-inter text-[14px] text-red-600 cursor-pointer hover:text-red-800"
-              onClick={handleLogout}
-            >
-              Đăng xuất
-            </span>
-          ),
-        },
-      ].filter(Boolean)}
-    />
-  );
+  const menuItems = [];
+  if (user?.user?.accountType !== "Nhà Tuyển Dụng") {
+    menuItems.push(
+      {
+        key: "profile",
+        label: (
+          <span
+            className="font-inter text-[14px] cursor-pointer hover:text-teal-600"
+            onClick={() => navigate("/profile")}
+          >
+            Hồ sơ cá nhân
+          </span>
+        ),
+      },
+      {
+        type: "divider",
+      },
+      {
+        key: "job-applied",
+        label: (
+          <span
+            className="font-inter text-[14px] cursor-pointer hover:text-teal-600"
+            onClick={() => navigate("/job-applied")}
+          >
+            Công việc đã ứng tuyển
+          </span>
+        ),
+      },
+      {
+        type: "divider",
+      }
+    );
+  }
+  menuItems.push({
+    key: "logout",
+    label: (
+      <span
+        className="font-inter text-[14px] text-red-600 cursor-pointer hover:text-red-800"
+        onClick={handleLogout}
+      >
+        Đăng xuất
+      </span>
+    ),
+  });
+
+  const menu = <Menu items={menuItems} />;
 
   return (
     <header className="flex flex-wrap justify-between items-center py-4 px-6 md:px-10 bg-white shadow-md sticky top-0 z-50">
@@ -110,7 +92,9 @@ const Header = () => {
         aria-label="Trang chủ"
       >
         <img src={logoIcon} alt="Logo W4U" className="h-14 w-auto" />
-        <span className="hidden sm:inline text-teal-700 tracking-wide">W4U</span>
+        <span className="hidden sm:inline text-teal-700 tracking-wide">
+          W4U
+        </span>
       </div>
 
       <nav className="flex flex-wrap items-center gap-6 md:gap-10 mt-4 md:mt-0">
@@ -121,7 +105,7 @@ const Header = () => {
           Việc làm
         </a>
 
-        {user && user.user.accountType === "Nhà Tuyển Dụng" ? null : (
+        {user?.accountType !== "Nhà Tuyển Dụng" && (
           <a
             href="/up-cv"
             className="text-lg font-semibold text-gray-800 hover:text-teal-600 transition-colors duration-300"
@@ -130,13 +114,6 @@ const Header = () => {
           </a>
         )}
 
-        {/* <a
-          href="#"
-          className="text-lg font-semibold text-gray-800 hover:text-teal-600 transition-colors duration-300"
-        >
-          Công cụ
-        </a> */}
-
         <a
           href="/vip"
           className="text-lg font-semibold text-gray-800 hover:text-teal-600 transition-colors duration-300"
@@ -144,7 +121,7 @@ const Header = () => {
           W4UVIP
         </a>
 
-        {user && user.user.accountType === "Nhà Tuyển Dụng" ? (
+        {user?.accountType === "Nhà Tuyển Dụng" ? (
           <a
             href="/up-job"
             className="text-lg font-semibold text-white bg-teal-600 rounded-md px-5 py-2 hover:bg-teal-700 active:scale-95 transition-transform duration-200"
@@ -164,24 +141,15 @@ const Header = () => {
       {/* User info */}
       {user ? (
         <div className="flex items-center gap-3 mt-4 md:mt-0 w-full md:w-auto">
-          {/* TODO */}
-          <Dropdown menu={{ items }} trigger={["click"]} placement="bottomRight" arrow>
-            <button
-              className="w-12 h-12 rounded-md cursor-pointer text-teal-600 hover:text-teal-700 bg-transparent hover:bg-gray-200 transition"
-            >
-              <NotificationsActive />
-            </button>
-          </Dropdown>
+          <NotificationsDropdownButton />
           <a href="/chat">
-            <button
-              className="w-12 h-12 rounded-md cursor-pointer text-teal-600 hover:text-teal-700 bg-transparent hover:bg-gray-200 transition"
-            >
+            <button className="w-12 h-12 rounded-md cursor-pointer text-teal-600 hover:text-teal-700 bg-transparent hover:bg-gray-200 transition">
               <Chat />
             </button>
           </a>
           <Dropdown overlay={menu} trigger={["click"]} placement="bottomRight" arrow>
             <Avatar
-              src={profile.avatarUrl || userIcon} // fallback to default if avatarUrl is unavailable
+              src={profile.avatarUrl || userIcon}
               alt="User Avatar"
               className="w-12 h-12 cursor-pointer hover:ring-2 hover:ring-teal-600 hover:ring-offset-2 transition"
               aria-label="Menu người dùng"
@@ -189,10 +157,10 @@ const Header = () => {
           </Dropdown>
           <div className="flex flex-col min-w-[150px]">
             <span className="font-inter text-lg font-semibold text-[#151515] truncate">
-              {user?.user?.name}
+              {user.name}
             </span>
             <span className="font-inter text-xs text-gray-500 tracking-wide truncate">
-              {user?.user?.accountType} ({points} điểm)
+              {user.accountType} ({points} điểm)
             </span>
           </div>
           <Chip

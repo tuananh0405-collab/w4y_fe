@@ -1,48 +1,38 @@
-import { Box, Container, Stack, Toolbar } from "@mui/material";
-import Chart from "chart.js/auto";
-import ChartDataLabels from "chartjs-plugin-datalabels";
+import { Box, Container } from "@mui/material";
+import { useState } from "react";
 
 import AdminSidebar from "../components/admin-dashboard/AdminSidebar";
-import TotalSummaryCards from "../components/admin-dashboard/TotalSummaryCards";
-import JobsChart from "../components/admin-dashboard/JobsChart";
-import UserGrowthChart from "../components/admin-dashboard/UserGrowthChart";
-import TrafficLineChart from "../components/admin-dashboard/TrafficLineChart";
-import UserTypePieChart from "../components/admin-dashboard/UserTypePieChart";
 
-Chart.register(ChartDataLabels);
+import Overview from "../components/admin-dashboard/sections/overview/AdminOverview";
+import AdminUsersManage from "../components/admin-dashboard/sections/users/AdminUsersManage";
+// import Users from "../components/admin-dashboard/sections/Users";
+// import Jobs from "../components/admin-dashboard/sections/Jobs";
+// import Applications from "../components/admin-dashboard/sections/Applications";
 
 const AdminDashboard = () => {
-  // Sample mock totals and chart data can be passed via props or fetched later
-  const stats = {
-    users: 540,
-    applicants: 320,
-    recruiters: 220,
-    traffic: 1840,
+  const [selected, setSelected] = useState("overview");
+
+  const renderContent = () => {
+    switch (selected) {
+      case "overview":
+        return <Overview />;
+      case "users":
+        return <AdminUsersManage/>;
+      case "jobs":
+        // return <Jobs />;
+      case "applications":
+        // return <Applications />;
+      default:
+        return <Overview />;
+    }
   };
 
   return (
     <Box className="bg-teal-50" sx={{ display: "flex", height: "100%", width: "100%" }}>
-        <Toolbar />
-      <AdminSidebar />
-        <Container className="bg-teal-50"  sx={{ flexGrow: 1, p: 3 }}>
-          <Stack spacing={3}>
-            <TotalSummaryCards
-              users={stats.users}
-              applicants={stats.applicants}
-              recruiters={stats.recruiters}
-              traffic={stats.traffic}
-            />
-            <Stack direction={{ xs: "column", md: "column" }} spacing={3}>
-              <JobsChart />
-              <UserGrowthChart />
-            </Stack>
-            <UserTypePieChart
-              applicants={stats.applicants}
-              recruiters={stats.recruiters}
-            />
-            <TrafficLineChart />
-          </Stack>
-        </Container>
+      <AdminSidebar selected={selected} setSelected={setSelected} />
+      <Container className="bg-teal-50"  sx={{ flexGrow: 1, p: 3 }}>
+        {renderContent()}
+      </Container>
     </Box>
   );
 };
