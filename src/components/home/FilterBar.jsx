@@ -3,26 +3,31 @@ import theme from '../../utils/theme';
 import { useGetFilterOptionsQuery } from '../../redux/api/jobApiSlice';
 
 const FilterBar = ({ onFilterChange }) => {
-  const [filterType, setFilterType] = useState('location'); // location hoặc position
+  const [filterType, setFilterType] = useState('location');
   const [selectedOption, setSelectedOption] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Lấy dữ liệu locations và positions từ API
   const { data, error, isLoading } = useGetFilterOptionsQuery();
 
   const optionsFilterType = [
     { id: 'location', label: 'Địa điểm' },
-    { id: 'position', label: 'Vị trí' }
+    { id: 'position', label: 'Vị trí' },
+    { id: 'industry', label: 'Ngành nghề' },
+    { id: 'level', label: 'Cấp độ' }
   ];
 
-  // Nếu đang loading, hiển thị mảng rỗng để tránh lỗi map
   const locations = data?.data?.locations?.map((loc) => ({ id: loc, label: loc })) || [];
   const positions = data?.data?.positions?.map((pos) => ({ id: pos, label: pos })) || [];
+  const industries = data?.data?.industries?.map((ind) => ({ id: ind, label: ind })) || [];
+  const levels = data?.data?.levels?.map((lvl) => ({ id: lvl, label: lvl })) || [];
 
-  const options = filterType === 'location' ? locations : positions;
+  const options =
+    filterType === 'location' ? locations :
+    filterType === 'position' ? positions :
+    filterType === 'industry' ? industries :
+    filterType === 'level' ? levels : [];
 
-  // Đóng dropdown khi click ngoài
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -41,7 +46,6 @@ const FilterBar = ({ onFilterChange }) => {
 
   const handleOptionSelect = (id) => {
     setSelectedOption(id);
-    // Gửi filter lên cha, gồm filterType (location/position) và selectedOption
     onFilterChange({ type: filterType, value: id });
   };
 
@@ -55,7 +59,7 @@ const FilterBar = ({ onFilterChange }) => {
 
   return (
     <div className="flex items-center gap-8 p-4 bg-transparent">
-      
+      {/* Dropdown chọn loại lọc */}
       <div
         ref={dropdownRef}
         className="relative flex items-center p-3 rounded-md gap-2 cursor-pointer"
@@ -63,7 +67,9 @@ const FilterBar = ({ onFilterChange }) => {
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
       >
         <span className="text-black font-semibold select-none">Lọc theo:</span>
-        <span className="text-black font-semibold select-none">{optionsFilterType.find(o => o.id === filterType)?.label}</span>
+        <span className="text-black font-semibold select-none">
+          {optionsFilterType.find(o => o.id === filterType)?.label}
+        </span>
         <svg
           className={`w-4 h-4 text-black transition-transform ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
           fill="none"
@@ -94,7 +100,18 @@ const FilterBar = ({ onFilterChange }) => {
         )}
       </div>
 
-      <div className="flex gap-4">
+      {/* Danh sách các lựa chọn theo loại */}
+      <div className="flex gap-4 flex-wrap">
+        {/* Nút "Ngẫu nhiên" */}
+        <button
+          key="random"
+          className="h-12 px-6 rounded-lg font-semibold bg-transparent border border-gray-300"
+          onClick={() => handleOptionSelect("random")}
+        >
+          Ngẫu nhiên
+        </button>
+
+        {/* Danh sách các options */}
         {options.length === 0 ? (
           <div className="text-gray-500 italic">Không có dữ liệu</div>
         ) : (
