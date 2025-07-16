@@ -159,7 +159,7 @@ export const FilterSidebar = ({ filterObject, setFilterObject }) => {
   );
 
   return (
-    <aside className="w-full p-6 bg-white rounded-lg shadow-lg sticky top-20 max-h-[80vh] overflow-y-auto flex flex-col filter-scrollbar">
+    <aside className="w-full p-6 bg-white rounded-lg shadow-lg ring-1 ring-gray-200 sticky top-30 max-h-[80vh] overflow-y-auto flex flex-col filter-scrollbar">
       <h2 className="flex items-center gap-2 mb-6 text-green-600 font-bold text-xl">
         <img
           src={funnelIcon}

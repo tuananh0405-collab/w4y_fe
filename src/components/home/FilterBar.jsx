@@ -19,7 +19,7 @@ const FilterBar = ({ onFilterChange }) => {
 
   const locations = data?.data?.locations?.map((loc) => ({ id: loc, label: loc })) || [];
   const positions = data?.data?.positions?.map((pos) => ({ id: pos, label: pos })) || [];
-  const industries = data?.data?.industries?.map((ind) => ({ id: ind, label: ind })) || [];
+  const industries = data?.data?.industries?.map((ind) => ({ id: ind._id, label: ind.name })) || [];
   const levels = data?.data?.levels?.map((lvl) => ({ id: lvl, label: lvl })) || [];
 
   const options =

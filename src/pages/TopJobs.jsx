@@ -108,7 +108,7 @@ const TopJobs = () => {
                       </div>
                       <TopJobCard jobs={jobList} />
                       <div className="grow" />
-                      <div className="flex justify-center">
+                      <div className="flex justify-center mt-4">
                         <Pagination
                           count={resultPaginationInfo.totalPages}
                           page={paginationObject.page}

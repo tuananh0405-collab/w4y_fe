@@ -2,14 +2,22 @@ import React from "react";
 
 
 import { companyLogoIcon, moneyCalculator24Icon } from "../../assets";
+import { useNavigate } from "react-router-dom";
 
 export const TopJobCard = ({ jobs }) => {
+  const navigate = useNavigate()
+
+  const handleJobClick = (jobId) => {
+    navigate(`/job-detail/${jobId}`);
+  };
+
   return (
     <div className="flex flex-col gap-6">
       {jobs.map((job, idx) => (
         <div
           key={idx}
-          className="bg-[#d7f0e6] rounded-xl shadow-sm p-6 flex items-center gap-6 hover:shadow-md transition-shadow duration-300"
+          className="bg-[#d7f0e6] rounded-xl shadow-sm p-6 flex items-center gap-6 hover:shadow-md transition-shadow duration-300 cursor-pointer"
+          onClick={() => handleJobClick(job.id)}
         >
           <img
             src={companyLogoIcon}
