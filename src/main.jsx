@@ -3,10 +3,10 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./layouts/App.jsx";
 import {
-  Route,
-  RouterProvider,
   createBrowserRouter,
   createRoutesFromElements,
+  Route,
+  RouterProvider,
 } from "react-router-dom";
 import Auth from "./layouts/Auth.jsx";
 import AdminRoute from "./routes/AdminRoute.jsx";
@@ -31,6 +31,7 @@ import ChatRoom from "./pages/ChatRoom.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import AdminAuth from "./layouts/AdminAuth.jsx";
 import JobApplied from "./pages/JobApplied.jsx";
+import GoogleAnalytics from "./components/GoogleAnalytics.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -68,13 +69,13 @@ const router = createBrowserRouter(
 
       {/* 404 fallback */}
       <Route path="*" element={<Error404 />} />
-    </>
-  )
+    </>,
+  ),
 );
-
 
 createRoot(document.getElementById("root")).render(
   <Provider store={store}>
+    <GoogleAnalytics />
     <RouterProvider router={router} />
-  </Provider>
+  </Provider>,
 );
