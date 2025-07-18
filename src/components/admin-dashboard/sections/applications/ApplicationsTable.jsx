@@ -5,7 +5,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useGetAppliedJobsQuery } from "../../../../redux/api/applicationApiSlice";
+import { useGetAllApplicationsQuery } from "../../../../redux/api/applicationApiSlice";
 
 const statusColors = {
   Pending: "warning",
@@ -18,18 +18,18 @@ const ApplicationsTable = () => {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [sortModel, setSortModel] = useState([]);
   const [filterModel, setFilterModel] = useState({ items: [] });
-  const [search, setSearch] = useState("");
 
   // Build query params for API
   const queryOptions = useMemo(() => {
     return {
       page: paginationModel.page + 1, // API expects 1-based page
       limit: paginationModel.pageSize,
-      search,
+      sortField: sortModel[0]?.field || "appliedAt",
+      sortOrder: sortModel[0]?.sort || "desc",
     };
-  }, [paginationModel, search]);
+  }, [paginationModel, sortModel]);
 
-  const { data, isLoading } = useGetAppliedJobsQuery(queryOptions);
+  const { data, isLoading } = useGetAllApplicationsQuery(queryOptions);
   const rowCountRef = useRef(data?.pagination?.totalApplications || 0);
 
   const rowCount = useMemo(() => {
@@ -54,17 +54,19 @@ const ApplicationsTable = () => {
   };
 
   const columns = [
-    { field: "applicantName", headerName: "Applicant Name", flex: 1 },
-    { field: "jobTitle", headerName: "Job Title", flex: 1 },
+    { field: "applicantName", headerName: "Applicant Name", flex: 1, sortable: true },
+    { field: "applicantEmail", headerName: "Applicant Email", flex: 1, sortable: true },
+    { field: "jobTitle", headerName: "Job Title", flex: 1, sortable: true },
     {
       field: "status",
       headerName: "Status",
       flex: 1,
+      sortable: true,
       renderCell: (params) => (
         <Chip label={params.value} color={statusColors[params.value] || "default"} size="small" />
       ),
     },
-    { field: "appliedAt", headerName: "Applied At", flex: 1, valueGetter: (params) => params && params.row && params.row.appliedAt ? new Date(params.row.appliedAt).toLocaleDateString() : "-" },
+    { field: "appliedAt", headerName: "Applied At", flex: 1, sortable: true, valueGetter: (params) => params && params.row && params.row.appliedAt ? new Date(params.row.appliedAt).toLocaleDateString() : "-" },
     {
       field: "actions",
       type: "actions",
