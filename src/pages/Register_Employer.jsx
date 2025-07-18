@@ -12,7 +12,10 @@ import {
   userIcon,
 } from "../assets";
 import { useNavigate } from "react-router-dom";
-import { useSignUpMutation, useVerifyEmailMutation } from "../redux/api/authApiSlice";
+import {
+  useSignUpMutation,
+  useVerifyEmailMutation,
+} from "../redux/api/authApiSlice";
 import { Modal, Input, Button } from "antd";
 import theme from "../utils/theme";
 import { BASE_URL } from "../redux/constants";
@@ -26,8 +29,10 @@ const Register_Employer = () => {
     gender: "",
     phone: "",
     company: "",
-    city: "",
-    district: "",
+    city: "",      // city name
+    cityCode: "",  // city code
+    district: "",  // district name
+    districtCode: "", // (optional) district code if needed
     agreeToTerms: false,
   });
 
@@ -50,23 +55,23 @@ const Register_Employer = () => {
 
   // Khi chọn tỉnh/thành phố, lấy danh sách huyện tương ứng
   useEffect(() => {
-    if (formData.city) {
+    if (formData.cityCode) {
       axios
-        .get(`https://provinces.open-api.vn/api/p/${formData.city}?depth=2`)
+        .get(`https://provinces.open-api.vn/api/p/${formData.cityCode}?depth=2`)
         .then((res) => {
           setDistricts(res.data.districts || []);
-          setFormData((prev) => ({ ...prev, district: "" })); // reset huyện khi đổi tỉnh
+          setFormData((prev) => ({ ...prev, district: "", districtCode: "" }));
         })
         .catch((err) => {
           console.error("Failed to load districts", err);
           setDistricts([]);
-          setFormData((prev) => ({ ...prev, district: "" }));
+          setFormData((prev) => ({ ...prev, district: "", districtCode: "" }));
         });
     } else {
       setDistricts([]);
-      setFormData((prev) => ({ ...prev, district: "" }));
+      setFormData((prev) => ({ ...prev, district: "", districtCode: "" }));
     }
-  }, [formData.city]);
+  }, [formData.cityCode]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -74,6 +79,7 @@ const Register_Employer = () => {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+    console.log(formData);
   };
 
   const handleSubmit = async (e) => {
@@ -124,7 +130,7 @@ const Register_Employer = () => {
 
   const handleGoogleLogin = () => {
     // Store the account type in localStorage before redirecting
-    localStorage.setItem('googleAuthType', 'Nhà Tuyển Dụng');
+    localStorage.setItem("googleAuthType", "Nhà Tuyển Dụng");
     window.location.href = `${BASE_URL}/api/v1/auth/google?accountType=Nhà Tuyển Dụng`;
   };
 
@@ -151,7 +157,11 @@ const Register_Employer = () => {
               style={{ backgroundColor: theme.colors.darkTeal }}
               onClick={handleGoogleLogin}
             >
-              <img src={deviconGoogleIcon} alt="Google" className="w-9 h-9 mr-2" />
+              <img
+                src={deviconGoogleIcon}
+                alt="Google"
+                className="w-9 h-9 mr-2"
+              />
               Đăng ký bằng Google
             </button>
 
@@ -163,9 +173,15 @@ const Register_Employer = () => {
 
             {/* Email */}
             <div className="w-full mb-5">
-              <label className="block text-lg font-medium text-gray-900 mb-2">Email đăng nhập*</label>
+              <label className="block text-lg font-medium text-gray-900 mb-2">
+                Email đăng nhập*
+              </label>
               <div className="relative">
-                <img src={emailIcon} alt="Email" className="absolute left-3 top-3 w-6 h-6" />
+                <img
+                  src={emailIcon}
+                  alt="Email"
+                  className="absolute left-3 top-3 w-6 h-6"
+                />
                 <input
                   type="email"
                   name="email"
@@ -179,9 +195,15 @@ const Register_Employer = () => {
 
             {/* Mật khẩu */}
             <div className="w-full mb-5">
-              <label className="block text-lg font-medium text-gray-900 mb-2">Mật khẩu*</label>
+              <label className="block text-lg font-medium text-gray-900 mb-2">
+                Mật khẩu*
+              </label>
               <div className="relative">
-                <img src={keyPasswordIcon} alt="Password" className="absolute left-3 top-3 w-6 h-6" />
+                <img
+                  src={keyPasswordIcon}
+                  alt="Password"
+                  className="absolute left-3 top-3 w-6 h-6"
+                />
                 <input
                   type="password"
                   name="password"
@@ -195,7 +217,9 @@ const Register_Employer = () => {
 
             {/* Nhập lại mật khẩu */}
             <div className="w-full mb-5">
-              <label className="block text-lg font-medium text-gray-900 mb-2">Nhập lại mật khẩu*</label>
+              <label className="block text-lg font-medium text-gray-900 mb-2">
+                Nhập lại mật khẩu*
+              </label>
               <div className="relative">
                 <img
                   src={passwordCheckIcon}
@@ -214,13 +238,21 @@ const Register_Employer = () => {
             </div>
 
             {/* Thông tin nhà tuyển dụng */}
-            <h2 className="w-full text-xl font-bold text-gray-900 mb-5">Thông tin nhà tuyển dụng</h2>
+            <h2 className="w-full text-xl font-bold text-gray-900 mb-5">
+              Thông tin nhà tuyển dụng
+            </h2>
 
             {/* Họ và tên */}
             <div className="w-full mb-5">
-              <label className="block text-lg font-medium text-gray-900 mb-2">Họ và tên*</label>
+              <label className="block text-lg font-medium text-gray-900 mb-2">
+                Họ và tên*
+              </label>
               <div className="relative">
-                <img src={userIcon} alt="Name" className="absolute left-3 top-3 w-6 h-6" />
+                <img
+                  src={userIcon}
+                  alt="Name"
+                  className="absolute left-3 top-3 w-6 h-6"
+                />
                 <input
                   type="text"
                   name="name"
@@ -234,7 +266,9 @@ const Register_Employer = () => {
 
             {/* Giới tính */}
             <div className="w-full mb-5">
-              <label className="block text-lg font-medium text-gray-900 mb-2">Giới tính*</label>
+              <label className="block text-lg font-medium text-gray-900 mb-2">
+                Giới tính*
+              </label>
               <div className="flex items-center gap-5">
                 <label className="flex items-center">
                   <input
@@ -263,9 +297,15 @@ const Register_Employer = () => {
 
             {/* Số điện thoại */}
             <div className="w-full mb-5">
-              <label className="block text-lg font-medium text-gray-900 mb-2">Số điện thoại cá nhân*</label>
+              <label className="block text-lg font-medium text-gray-900 mb-2">
+                Số điện thoại cá nhân*
+              </label>
               <div className="relative">
-                <img src={phoneIcon} alt="Phone" className="absolute left-3 top-3 w-6 h-6" />
+                <img
+                  src={phoneIcon}
+                  alt="Phone"
+                  className="absolute left-3 top-3 w-6 h-6"
+                />
                 <input
                   type="tel"
                   name="phone"
@@ -279,9 +319,15 @@ const Register_Employer = () => {
 
             {/* Công ty */}
             <div className="w-full mb-5">
-              <label className="block text-lg font-medium text-gray-900 mb-2">Công ty (quán nước, nhà hàng ...)*</label>
+              <label className="block text-lg font-medium text-gray-900 mb-2">
+                Công ty (quán nước, nhà hàng ...)*
+              </label>
               <div className="relative">
-                <img src={companyIcon} alt="Company" className="absolute left-3 top-3 w-6 h-6" />
+                <img
+                  src={companyIcon}
+                  alt="Company"
+                  className="absolute left-3 top-3 w-6 h-6"
+                />
                 <input
                   type="text"
                   name="company"
@@ -295,13 +341,29 @@ const Register_Employer = () => {
 
             {/* Tỉnh/Thành phố */}
             <div className="w-full mb-5">
-              <label className="block text-lg font-medium text-gray-900 mb-2">Tỉnh/Thành phố*</label>
+              <label className="block text-lg font-medium text-gray-900 mb-2">
+                Tỉnh/Thành phố*
+              </label>
               <div className="relative">
-                <img src={cityIcon} alt="City" className="absolute left-3 top-3 w-6 h-6" />
+                <img
+                  src={cityIcon}
+                  alt="City"
+                  className="absolute left-3 top-3 w-6 h-6"
+                />
                 <select
-                  name="city"
-                  value={formData.city}
-                  onChange={handleInputChange}
+                  name="cityCode"
+                  value={formData.cityCode}
+                  onChange={e => {
+                    const selectedCode = e.target.value;
+                    const selectedProvince = provinces.find(p => String(p.code) === selectedCode);
+                    setFormData(prev => ({
+                      ...prev,
+                      cityCode: selectedCode,
+                      city: selectedProvince ? selectedProvince.name : "",
+                      district: "",
+                      districtCode: ""
+                    }));
+                  }}
                   className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   <option value="">-- Chọn Tỉnh/Thành phố --</option>
@@ -316,19 +378,33 @@ const Register_Employer = () => {
 
             {/* Quận/Huyện */}
             <div className="w-full mb-5">
-              <label className="block text-lg font-medium text-gray-900 mb-2">Quận/Huyện*</label>
+              <label className="block text-lg font-medium text-gray-900 mb-2">
+                Quận/Huyện*
+              </label>
               <div className="relative">
-                <img src={cityIcon} alt="District" className="absolute left-3 top-3 w-6 h-6" />
+                <img
+                  src={cityIcon}
+                  alt="District"
+                  className="absolute left-3 top-3 w-6 h-6"
+                />
                 <select
-                  name="district"
-                  value={formData.district}
-                  onChange={handleInputChange}
-                  disabled={!formData.city}
+                  name="districtCode"
+                  value={formData.districtCode}
+                  onChange={e => {
+                    const selectedCode = e.target.value;
+                    const selectedDistrict = districts.find(d => String(d.code) === selectedCode);
+                    setFormData(prev => ({
+                      ...prev,
+                      districtCode: selectedCode,
+                      district: selectedDistrict ? selectedDistrict.name : ""
+                    }));
+                  }}
+                  disabled={!formData.cityCode}
                   className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   <option value="">-- Chọn Quận/Huyện --</option>
                   {districts.map((district) => (
-                    <option key={district.code} value={district.name}>
+                    <option key={district.code} value={district.code}>
                       {district.name}
                     </option>
                   ))}
@@ -346,7 +422,8 @@ const Register_Employer = () => {
                 className="w-5 h-5"
               />
               <label className="text-sm text-gray-900">
-                Tôi đã đọc và đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của W4U.
+                Tôi đã đọc và đồng ý với Điều khoản dịch vụ và Chính sách bảo
+                mật của W4U.
               </label>
             </div>
 
@@ -367,7 +444,9 @@ const Register_Employer = () => {
               footer={null}
             >
               <div>
-                <label className="block text-lg font-medium text-gray-900 mb-2">Mã xác minh</label>
+                <label className="block text-lg font-medium text-gray-900 mb-2">
+                  Mã xác minh
+                </label>
                 <Input
                   type="text"
                   value={verificationCode}
@@ -375,15 +454,22 @@ const Register_Employer = () => {
                   placeholder="Nhập mã xác minh"
                   className="w-full py-3 border border-gray-300 rounded-lg"
                   style={{ borderColor: theme.colors.tealGreen }}
-                  onFocus={(e) => (e.target.style.borderColor = theme.colors.darkTeal)}
-                  onBlur={(e) => (e.target.style.borderColor = theme.colors.tealGreen)}
+                  onFocus={(e) =>
+                    (e.target.style.borderColor = theme.colors.darkTeal)
+                  }
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = theme.colors.tealGreen)
+                  }
                 />
                 <div className="mt-4 flex justify-end">
                   <Button
                     type="primary"
                     onClick={handleVerifyEmail}
                     disabled={isVerifying || verificationCode.length === 0}
-                    style={{ backgroundColor: theme.colors.darkTeal, borderColor: theme.colors.darkTeal }}
+                    style={{
+                      backgroundColor: theme.colors.darkTeal,
+                      borderColor: theme.colors.darkTeal,
+                    }}
                   >
                     Xác minh
                   </Button>
