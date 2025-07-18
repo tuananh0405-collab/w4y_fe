@@ -14,8 +14,9 @@ import { useSignOutMutation } from "../../redux/api/authApiSlice";
 const menuItems = [
   { text: "Overview", icon: <DashboardIcon />, path: "overview" },
   { text: "Users", icon: <PeopleIcon />, path: "users" },
+  { text: "Applicants", icon: <PeopleIcon />, path: "applicants" },
   { text: "Jobs", icon: <WorkIcon />, path: "jobs" },
-  { text: "Application Activities", icon: <BusinessIcon />, path: "applications" },
+  { text: "Applications", icon: <WorkIcon />, path: "applications" },
 ];
 
 const AdminSidebar = ({ selected, setSelected }) => {
