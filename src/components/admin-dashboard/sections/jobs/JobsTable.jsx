@@ -25,7 +25,7 @@ const JobsTable = () => {
   const queryOptions = useMemo(() => {
     return {
       page: paginationModel.page + 1, // API expects 1-based page
-      limit: paginationModel.pageSize,
+      pageSize: paginationModel.pageSize,
       sortField: sortModel[0]?.field || "createdAt",
       sortOrder: sortModel[0]?.sort || "desc",
       // You can add more filter logic here if needed
@@ -57,20 +57,21 @@ const JobsTable = () => {
   };
 
   const columns = [
-    { field: "title", headerName: "Title", flex: 1 },
-    { field: "employerName", headerName: "Employer", flex: 1 },
+    { field: "title", headerName: "Title", flex: 1, sortable: true },
+    { field: "employerName", headerName: "Employer", flex: 1, sortable: true },
     {
       field: "status",
       headerName: "Status",
       flex: 1,
+      sortable: true,
       renderCell: (params) => (
         <Chip label={params.value} color={statusColors[params.value] || "default"} size="small" />
       ),
     },
-    { field: "createdAt", headerName: "Created At", flex: 1, valueGetter: (params) => params && params.row && params.row.createdAt ? new Date(params.row.createdAt).toLocaleDateString() : "-" },
-    { field: "deadline", headerName: "Deadline", flex: 1, valueGetter: (params) => params && params.row && params.row.deadline ? new Date(params.row.deadline).toLocaleDateString() : "-" },
-    { field: "views", headerName: "Views", flex: 1 },
-    { field: "industry", headerName: "Category", flex: 1 },
+    { field: "createdAt", headerName: "Created At", flex: 1, sortable: true, valueGetter: (params) => params && params.row && params.row.createdAt ? new Date(params.row.createdAt).toLocaleDateString() : "-" },
+    { field: "deadline", headerName: "Deadline", flex: 1, sortable: true, valueGetter: (params) => params && params.row && params.row.deadline ? new Date(params.row.deadline).toLocaleDateString() : "-" },
+    { field: "views", headerName: "Views", flex: 1, sortable: true },
+    { field: "industry", headerName: "Category", flex: 1, sortable: true },
     {
       field: "actions",
       type: "actions",

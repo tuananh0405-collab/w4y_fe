@@ -144,6 +144,28 @@ export const jobApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+
+    getJobStatusDistribution: builder.query({
+      query: () => ({
+        url: `${JOB_URL}/stats/status-distribution`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
+    getJobsByCategory: builder.query({
+      query: () => ({
+        url: `${JOB_URL}/stats/by-category`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
+    getJobsPostedOverTime: builder.query({
+      query: () => ({
+        url: `${JOB_URL}/stats/posted-over-time`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -161,4 +183,7 @@ export const {
   useGetYearlyJobStatsQuery,
   useGetJobOverviewQuery,
   useGetJobCategoriesByRecursiveQuery,
+  useGetJobStatusDistributionQuery,
+  useGetJobsByCategoryQuery,
+  useGetJobsPostedOverTimeQuery,
 } = jobApiSlice;

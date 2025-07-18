@@ -1,35 +1,32 @@
 import { useEffect, useRef } from "react";
 import { Paper, Typography, Box, CircularProgress } from "@mui/material";
 import Chart from "chart.js/auto";
+import { useGetJobStatusDistributionQuery } from "../../../../redux/api/jobApiSlice";
+
+const statusLabels = ["active", "pending", "approved", "rejected", "hidden"];
+const statusColors = ["#42a5f5", "#ffb300", "#66bb6a", "#ef5350", "#bdbdbd"];
 
 const JobStatusPieChart = () => {
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
+  const { data, isLoading, error } = useGetJobStatusDistributionQuery();
 
-  // Placeholder data
-  const isLoading = false;
-  const data = {
-    active: 120,
-    pending: 30,
-    approved: 50,
-    rejected: 10,
-    hidden: 15,
-  };
+  const chartData = statusLabels.map((status) => (data?.data?.[status] || 0));
 
   const getChartData = () => ({
-    labels: ["Active", "Pending", "Approved", "Rejected", "Hidden"],
+    labels: statusLabels.map((s) => s.charAt(0).toUpperCase() + s.slice(1)),
     datasets: [
       {
         label: "Jobs",
-        data: [data.active, data.pending, data.approved, data.rejected, data.hidden],
-        backgroundColor: ["#42a5f5", "#ffb300", "#66bb6a", "#ef5350", "#bdbdbd"],
+        data: chartData,
+        backgroundColor: statusColors,
         hoverOffset: 8,
       },
     ],
   });
 
   useEffect(() => {
-    if (!chartRef.current || isLoading) return;
+    if (!chartRef.current || isLoading || error) return;
     if (chartInstance.current) chartInstance.current.destroy();
     const ctx = chartRef.current.getContext("2d");
     chartInstance.current = new Chart(ctx, {
@@ -44,7 +41,7 @@ const JobStatusPieChart = () => {
       },
     });
     return () => chartInstance.current?.destroy();
-  }, [isLoading]);
+  }, [isLoading, error, data]);
 
   return (
     <Paper sx={{ p: 3 }}>
@@ -55,6 +52,11 @@ const JobStatusPieChart = () => {
         {isLoading && (
           <Box sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", zIndex: 2 }}>
             <CircularProgress />
+          </Box>
+        )}
+        {error && (
+          <Box sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", zIndex: 2, color: "red" }}>
+            Error loading data
           </Box>
         )}
         <canvas ref={chartRef} style={{ opacity: isLoading ? 0.3 : 1 }} />
