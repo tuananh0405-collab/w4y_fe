@@ -3,11 +3,10 @@ import theme from "../../utils/theme";
 import {
   useCreateJobMutation,
   useGetFilterOptionsQuery,
-  useGetJobCategoriesByParentQuery,
-  useGetJobCategoriesByRecursiveQuery,
 } from "../../redux/api/jobApiSlice";
 import { useNavigate } from "react-router-dom";
 import JobCategorySelector from "../JobCategorySelector";
+import { useGetJobCategoriesByRecursiveQuery } from "../../redux/api/jobCategoryApiSlice";
 
 const technicalOptions = [
   "Công nghệ thông tin / Lập trình",
@@ -243,7 +242,7 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
       }
 
       await createJob(jobData);
-      // navigate('/')
+      navigate('/')
       console.log("Job created successfully");
       if (onSubmit) onSubmit();
     } catch (error) {
