@@ -8,6 +8,8 @@ export const jobCategoryApiSlice = apiSlice.injectEndpoints({
         url: `${JOB_CATEGORY_URL}/${parentId}`,
         method: "GET",
       }),
+      providesTags: ["JobCategory"],
+      keepUnusedDataFor: 10, // Remove cache after 10 secs of component unmounting
     }),
 
     getJobCategoriesByRecursive: builder.query({
@@ -15,6 +17,7 @@ export const jobCategoryApiSlice = apiSlice.injectEndpoints({
         url: `${JOB_CATEGORY_URL}/recursive/${categoryId}`,
         method: "GET",
       }),
+      invalidatesTags: ["JobCategory"],
     }),
   }),
 });

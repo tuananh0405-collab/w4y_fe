@@ -8,7 +8,7 @@ import { useGetJobListQuery } from "../redux/api/jobApiSlice";
 import { Pagination, Typography } from "@mui/material";
 import { Inventory } from "@mui/icons-material";
 
-const TopJobs = () => {
+const RecommendedJobs = () => {
   const [filterObject, setFilterObject] = useState({
     industry: "",
     experience: "",
@@ -122,13 +122,13 @@ const TopJobs = () => {
                   {!resultPaginationInfo.totalJobs && (
                     <div className="grow flex flex-col gap-2 p-4 justify-center items-center rounded-md">
                       <div className="bg-gray-300 rounded-md flex flex-col justify-center items-center p-4 gap-2 color-white">
-                      <Inventory sx={{ fontSize: 80, color: "gray" }} />
-                      <Typography variant="p" className="text-gray-500">
-                        Tất cả công việc đều bị ẩn bởi bộ lọc
-                      </Typography>
-                      <Typography variant="p" className="text-gray-500">
-                        Hãy chỉnh hoặc loại bỏ bộ lọc
-                      </Typography>
+                        <Inventory sx={{ fontSize: 80, color: "gray" }} />
+                        <Typography variant="p" className="text-gray-500">
+                          Tất cả công việc đều bị ẩn bởi bộ lọc
+                        </Typography>
+                        <Typography variant="p" className="text-gray-500">
+                          Hãy chỉnh hoặc loại bỏ bộ lọc
+                        </Typography>
                       </div>
                     </div>
 
@@ -143,4 +143,4 @@ const TopJobs = () => {
   );
 };
 
-export default TopJobs;
+export default RecommendedJobs;

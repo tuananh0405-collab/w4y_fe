@@ -7,6 +7,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import JobCategorySelector from "../JobCategorySelector";
 import { useGetJobCategoriesByRecursiveQuery } from "../../redux/api/jobCategoryApiSlice";
+import { useGetJobSkillsQuery } from "../../redux/api/jobSkillApiSlice";
 
 const technicalOptions = [
   "Công nghệ thông tin / Lập trình",
@@ -88,9 +89,11 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
     salaryRangeEnd: "",
     salaryRangeUnit: "",
     categoryId: "",
+    skills: [],
   });
 
   const [useSalaryRange, setUseSalaryRange] = useState(true);
+  const [skillQuery, setSkillQuery] = useState("");
 
   const {
     data: jobCategoriesQuery,
@@ -100,6 +103,12 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
   } = useGetJobCategoriesByRecursiveQuery({ categoryId: formData.industry }, {
     skip: !formData.industry || !formData.industry.length,
   });
+
+  const {
+    data: jobSkillsQuery,
+    error: jobSkillsFetchError,
+    isLoading: isFetchingJobSkills,
+  } = useGetJobSkillsQuery({ name: skillQuery });
 
   const jobCategories = useMemo(() => {
     return jobCategoriesQuery?.data ? jobCategoriesQuery.data.children : [];
@@ -512,8 +521,8 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
           </div>
           <div
             className={`w-full rounded-md ${isIndustryUnselected
-                ? "bg-gray-100/80"
-                : "bg-gray-200/80"
+              ? "bg-gray-100/80"
+              : "bg-gray-200/80"
               } min-h-[100px] max-h-[700px] overflow-auto p-4 mb-2`}
           >
             {!isIndustryUnselected && (
@@ -661,6 +670,8 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
             </p>
           )}
         </div>
+
+        {JSON.stringify(jobSkillsQuery)}
 
         {/* Buttons */}
         <div className="flex justify-between mt-5">
