@@ -6,8 +6,9 @@ import Footer from "../components/home/Footer";
 import Header from "../components/home/Header";
 import theme from "../utils/theme";
 import ApplicationForm from "../components/up-job/ApplicationForm";
-import { Modal } from "antd";
+import { Modal, Tooltip } from "antd";
 import { FastApply } from "../components/FastApply ";
+import check from "check-types";
 
 const colors = {
   lightGray: "#A8BBB4",
@@ -67,7 +68,8 @@ const JobDetail = () => {
           </p>
 
           {/* File CV input */}
-          {/* <div className="mb-4">
+          {
+            /* <div className="mb-4">
             <input
               type="file"
               accept=".pdf,.doc,.docx"
@@ -75,7 +77,8 @@ const JobDetail = () => {
               className="border p-2 rounded"
               style={{ borderColor: colors.tealGreen }}
             />
-          </div> */}
+          </div> */
+          }
 
           <div className="flex gap-4">
             <button
@@ -160,6 +163,22 @@ const JobDetail = () => {
               <span className="text-gray-500">Cấp bậc:</span>{" "}
               {job?.priorityLevel}
             </div>
+            {check.nonEmptyArray(job?.skills) && (
+              <div className="mb-2">
+                <span className="text-gray-500">Kỹ năng:</span>{" "}
+                <div className="flex gap-2">
+                {job.skills.map((skill) => (
+                  <Tooltip title={skill.description} key={skill._id}>
+                    <div
+                      className={"flex items-center px-3 py-1 rounded-full select-none bg-gray-200"}
+                    >
+                      {skill.name}
+                    </div>
+                  </Tooltip>
+                ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div>

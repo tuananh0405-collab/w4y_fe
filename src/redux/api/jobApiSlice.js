@@ -130,6 +130,24 @@ export const jobApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+
+    getRecommendedJobs: builder.query({
+      query: () => ({
+        url: `${JOB_URL}/recommended`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["RecommendedJobs"],
+    }),
+
+    getAIRecommendedJobs: builder.query({
+      query: () => ({
+        url: `${JOB_URL}/ai-recommended`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["RecommendedJobs"],
+    }),
   }),
 });
 
@@ -145,4 +163,6 @@ export const {
   useGetQuarterlyJobStatsQuery,
   useGetYearlyJobStatsQuery,
   useGetJobOverviewQuery,
+  useGetRecommendedJobsQuery,
+  useGetAIRecommendedJobsQuery,
 } = jobApiSlice;

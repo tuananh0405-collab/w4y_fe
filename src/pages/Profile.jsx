@@ -32,6 +32,7 @@ import {
 } from "../redux/api/jobSkillApiSlice";
 import { Skeleton, Typography } from "@mui/material";
 import { ReportProblem } from "@mui/icons-material";
+import check from "check-types";
 
 const QUERY_DELAY_MS = 500;
 
@@ -133,7 +134,7 @@ const Profile = () => {
   const [editMode, setEditMode] = useState(false);
 
   const [jobTitle, setJobTitle] = useState("");
-  const [skills, setSkills] = useState([]);
+  const [skillIds, setSkillIds] = useState([]);
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
@@ -143,7 +144,7 @@ const Profile = () => {
     if (data?.data) {
       const profile = data.data;
       setJobTitle(profile.jobTitle || "");
-      setSkills(profile.skills || []);
+      setSkillIds(profile.skillIds || []);
       setEmail(profile.email || "");
       setPhone(profile.phone || "");
       setCity(profile.city || "");
@@ -155,7 +156,9 @@ const Profile = () => {
     data: userSkillsQuery,
     isLoading: isLoadingUserSkills,
     error: errorLoadingUserSkills,
-  } = useGetJobSkillsByIdsQuery({ ids: skills });
+  } = useGetJobSkillsByIdsQuery({ ids: skillIds }, {
+    skip: !check.nonEmptyArray(skillIds),
+  });
 
   const userSkillsDocs = useMemo(() => {
     return userSkillsQuery?.data ?? [];
@@ -165,19 +168,21 @@ const Profile = () => {
     data: skillListQuery,
     isLoading: isLoadingSkillListQuery,
     error: errorLoadingSkillListQuery,
-  } = useGetJobSkillsQuery({ name: skillNameQuery, page: 1, limit: 20 });
+  } = useGetJobSkillsQuery({ name: skillNameQuery, page: 1, limit: 20 }, {
+    skip: !skillNameQuery,
+  });
 
   const skillSearchResults = useMemo(() => {
     return skillListQuery?.data?.filter(
-      (skill) => !skills.includes(skill._id),
+      (skill) => !skillIds.includes(skill._id),
     ) ?? [];
-  }, [skillListQuery, skills]);
+  }, [skillListQuery, skillIds]);
 
   const handleAddSkill = useCallback((skillId) => {
-    if (!skills.includes(skillId)) {
-      setSkills([...skills, skillId]);
+    if (!skillIds.includes(skillId)) {
+      setSkillIds([...skillIds, skillId]);
     }
-  }, [skills]);
+  }, [skillIds]);
 
   // Used to render the skill search bar
   const skillSearchResultsItems = useMemo(() => {
@@ -250,14 +255,14 @@ const Profile = () => {
     }
   };
   const handleRemoveSkill = (skillId) => {
-    setSkills(skills.filter((id) => id !== skillId));
+    setSkillIds(skillIds.filter((id) => id !== skillId));
   };
 
   const handleSave = async () => {
     try {
       await updateUserProfile({
         jobTitle,
-        skills,
+        skillIds,
         email,
         phone,
         city,
