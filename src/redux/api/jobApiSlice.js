@@ -96,20 +96,6 @@ export const jobApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
-    getJobCategoriesByParent: builder.query({
-      query: ({ parentId }) => ({
-        url: `${JOB_URL}/job-categories/${parentId}`,
-        method: "GET",
-      }),
-    }),
-
-    getJobCategoriesByRecursive: builder.query({
-      query: ({ categoryId }) => ({
-        url: `${JOB_URL}/job-categories-recursive/${categoryId}`,
-        method: "GET",
-      }),
-    }),
-
     getJobsByEmployer: builder.query({
       query: (employerId) => ({
         url: `${JOB_URL}/employer/${employerId}`,
@@ -145,6 +131,24 @@ export const jobApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
+    getRecommendedJobs: builder.query({
+      query: () => ({
+        url: `${JOB_URL}/recommended`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["RecommendedJobs"],
+    }),
+
+    getAIRecommendedJobs: builder.query({
+      query: () => ({
+        url: `${JOB_URL}/ai-recommended`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["RecommendedJobs"],
+    }),
+
     getJobStatusDistribution: builder.query({
       query: () => ({
         url: `${JOB_URL}/stats/status-distribution`,
@@ -176,13 +180,13 @@ export const {
   useUpdateJobMutation,
   useDeleteJobMutation,
   useGetFilterOptionsQuery,
-  useGetJobCategoriesByParentQuery,
   useGetJobsByEmployerQuery,
   useGetMonthlyJobStatsQuery,
   useGetQuarterlyJobStatsQuery,
   useGetYearlyJobStatsQuery,
   useGetJobOverviewQuery,
-  useGetJobCategoriesByRecursiveQuery,
+  useGetRecommendedJobsQuery,
+  useGetAIRecommendedJobsQuery,
   useGetJobStatusDistributionQuery,
   useGetJobsByCategoryQuery,
   useGetJobsPostedOverTimeQuery,

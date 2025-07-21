@@ -30,7 +30,7 @@ const TopJobs = () => {
     isLoading: isFetchingJobCategories,
   } = useGetJobListQuery({
     ...filterObject,
-    industry: filterObject.industry, // industry is a deprecated field. Industries are now represented as job categories with parentId == null. It is still a free string, so there's probably somes way it can be used.
+    industry: filterObject.industry,
     salaryRangeStart: filterObject.salaryRangeStart.toString().length
       ? filterObject.salaryRangeStart
       : undefined,

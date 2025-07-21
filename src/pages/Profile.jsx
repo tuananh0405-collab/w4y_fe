@@ -1,4 +1,10 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Footer from "../components/home/Footer";
 import Header from "../components/home/Header";
 import Avatar from "@mui/material/Avatar";
@@ -9,20 +15,28 @@ import { useSelector } from "react-redux";
 import {
   useCountApplicationsQuery,
   useCreateProjectMutation,
+  useDeleteProjectMutation,
   useGetApplicantProfileQuery,
   useGetMyProjectsQuery,
   useUpdateUserProfileMutation,
   useUploadAvatarMutation,
-  useDeleteProjectMutation,
 } from "../redux/api/applicantApiSlice";
 import theme from "../utils/theme";
 import { useGetUserReviewsQuery } from "../redux/api/applicationApiSlice";
 import { useNavigate } from "react-router-dom";
 import CreateProjectForm from "../components/profile/CreateProjectForm";
-import { message } from "antd";
+import { Dropdown, Input, message, Tooltip } from "antd";
+import {
+  useGetJobSkillsByIdsQuery,
+  useGetJobSkillsQuery,
+} from "../redux/api/jobSkillApiSlice";
+import { Skeleton, Typography } from "@mui/material";
+import { ReportProblem } from "@mui/icons-material";
+import check from "check-types";
+
+const QUERY_DELAY_MS = 500;
 
 const Profile = () => {
-
   const user = useSelector((state) => state.auth.userState);
   const userId = user?.user?.id;
   const {
@@ -51,9 +65,9 @@ const Profile = () => {
     useUpdateUserProfileMutation();
   const { data: countData, isLoading: isCountLoading } =
     useCountApplicationsQuery(undefined, { skip: !userId });
-      const [createProject, { isLoading: isCreating }] = useCreateProjectMutation();
+  const [createProject, { isLoading: isCreating }] = useCreateProjectMutation();
 
-     const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(false);
 
   // Show form to add a new project
   const showForm = () => {
@@ -66,36 +80,61 @@ const Profile = () => {
   };
 
   // Handle form submission for creating a new project
-const handleCreateProject = async (values) => {
-  try {
-    await createProject(values).unwrap();
-    alert("Dự án đã được tạo thành công");
-    refetchProjects(); // Refetch projects to update the list
-    setIsFormVisible(false);
-  } catch (error) {
-    alert("Lỗi khi tạo dự án mới");
-    console.error(error);
-  }
-};
-
-const [deleteProject, { isLoading: isDeleting }] = useDeleteProjectMutation();
-
-const handleDeleteProject = async (projectId) => {
-  if (window.confirm("Bạn có chắc chắn muốn xoá dự án này?")) {
+  const handleCreateProject = async (values) => {
     try {
-      await deleteProject(projectId).unwrap();
-      message.success("Dự án đã được xoá thành công");
+      await createProject(values).unwrap();
+      alert("Dự án đã được tạo thành công");
       refetchProjects(); // Refetch projects to update the list
+      setIsFormVisible(false);
     } catch (error) {
-      message.error("Xoá dự án không thành công");
+      alert("Lỗi khi tạo dự án mới");
       console.error(error);
     }
-  }
-};
+  };
+
+  const [deleteProject, { isLoading: isDeleting }] = useDeleteProjectMutation();
+
+  const handleDeleteProject = async (projectId) => {
+    if (window.confirm("Bạn có chắc chắn muốn xoá dự án này?")) {
+      try {
+        await deleteProject(projectId).unwrap();
+        message.success("Dự án đã được xoá thành công");
+        refetchProjects(); // Refetch projects to update the list
+      } catch (error) {
+        message.error("Xoá dự án không thành công");
+        console.error(error);
+      }
+    }
+  };
+
+  const [skillNameQuery_Display, setSkillNameQuery_Display] = useState(""); // The query that will be displayed on the skill search bar
+  const [skillNameQuery, setSkillNameQuery] = useState(""); // Actual query that will be used to fetch skills
+  const [isChangingSkillQuery, setIsChangingSkillQuery] = useState(false);
+
+  // Debouncing skill searches
+  useEffect(() => {
+    setIsChangingSkillQuery(true);
+    const timeout = setTimeout(() => {
+      setSkillNameQuery(skillNameQuery_Display);
+
+      // Ensure that loading state is disabled only after skillNameQuery has been flushed
+      requestAnimationFrame(() => {
+        setIsChangingSkillQuery(false);
+      });
+    }, QUERY_DELAY_MS);
+
+    return () => clearTimeout(timeout);
+  }, [skillNameQuery_Display]);
+
+  const handleChangeSkillQueryInput = useCallback((value) => {
+    // conosle.log(value)
+    setSkillNameQuery_Display(value);
+  }, []);
 
   const [editMode, setEditMode] = useState(false);
+
   const [jobTitle, setJobTitle] = useState("");
-  const [skills, setSkills] = useState([]);
+  const [skillIds, setSkillIds] = useState([]);
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
@@ -105,7 +144,7 @@ const handleDeleteProject = async (projectId) => {
     if (data?.data) {
       const profile = data.data;
       setJobTitle(profile.jobTitle || "");
-      setSkills(profile.skills || []);
+      setSkillIds(profile.skillIds || []);
       setEmail(profile.email || "");
       setPhone(profile.phone || "");
       setCity(profile.city || "");
@@ -113,31 +152,93 @@ const handleDeleteProject = async (projectId) => {
     }
   }, [data]);
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <span>Đang tải hồ sơ...</span>
-      </div>
-    );
-  }
+  const {
+    data: userSkillsQuery,
+    isLoading: isLoadingUserSkills,
+    error: errorLoadingUserSkills,
+  } = useGetJobSkillsByIdsQuery({ ids: skillIds }, {
+    skip: !check.nonEmptyArray(skillIds),
+  });
 
-  if (error) {
-    return (
-      <div className="flex justify-center items-center h-screen text-red-600">
-        <span>Lỗi tải hồ sơ</span>
-      </div>
-    );
-  }
+  const userSkillsDocs = useMemo(() => {
+    return userSkillsQuery?.data ?? [];
+  }, [userSkillsQuery]);
 
-  const handleAddSkill = (e) => {
-    if (e.key === "Enter" && e.target.value.trim()) {
-      e.preventDefault();
-      if (!skills.includes(e.target.value.trim())) {
-        setSkills([...skills, e.target.value.trim()]);
-      }
-      e.target.value = "";
+  const {
+    data: skillListQuery,
+    isLoading: isLoadingSkillListQuery,
+    error: errorLoadingSkillListQuery,
+  } = useGetJobSkillsQuery({ name: skillNameQuery, page: 1, limit: 20 }, {
+    skip: !skillNameQuery,
+  });
+
+  const skillSearchResults = useMemo(() => {
+    return skillListQuery?.data?.filter(
+      (skill) => !skillIds.includes(skill._id),
+    ) ?? [];
+  }, [skillListQuery, skillIds]);
+
+  const handleAddSkill = useCallback((skillId) => {
+    if (!skillIds.includes(skillId)) {
+      setSkillIds([...skillIds, skillId]);
     }
-  };
+  }, [skillIds]);
+
+  // Used to render the skill search bar
+  const skillSearchResultsItems = useMemo(() => {
+    if (isLoadingSkillListQuery || isChangingSkillQuery) {
+      return [
+        {
+          key: "loading",
+          label: (
+            <Skeleton
+              variant="rectangular"
+              width="100%"
+              height={22}
+              sx={{ my: "3px" }}
+            />
+          ),
+          disabled: true,
+        },
+      ];
+    }
+
+    if (errorLoadingSkillListQuery) {
+      return [
+        {
+          key: "error",
+          label: (
+            <div className="flex items-center text-red-600">
+              <ReportProblem sx={{ fontSize: 16, mr: 1 }} />
+              <Typography variant="body2">Lỗi khi tìm kỹ năng</Typography>
+            </div>
+          ),
+          disabled: true,
+        },
+      ];
+    }
+
+    return skillSearchResults.map((result) => ({
+      key: result._id,
+      label: (
+        <Tooltip title={result.description}>
+          <div
+            className="font-inter text-[14px] cursor-pointer"
+            onClick={() => handleAddSkill(result._id)}
+          >
+            {result.name}
+          </div>
+        </Tooltip>
+      ),
+    }));
+  }, [
+    isChangingSkillQuery,
+    skillSearchResults,
+    isLoadingSkillListQuery,
+    errorLoadingSkillListQuery,
+    handleAddSkill,
+  ]);
+
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -153,15 +254,15 @@ const handleDeleteProject = async (projectId) => {
       console.error("Lỗi khi upload avatar:", error);
     }
   };
-  const handleRemoveSkill = (skill) => {
-    setSkills(skills.filter((s) => s !== skill));
+  const handleRemoveSkill = (skillId) => {
+    setSkillIds(skillIds.filter((id) => id !== skillId));
   };
 
   const handleSave = async () => {
     try {
       await updateUserProfile({
         jobTitle,
-        skills,
+        skillIds,
         email,
         phone,
         city,
@@ -181,13 +282,12 @@ const handleDeleteProject = async (projectId) => {
 
   // Calculate average rating and review count
   const reviewCount = Array.isArray(reviewsData) ? reviewsData.length : 0;
-  const averageRating =
-    reviewCount > 0
-      ? (
-          reviewsData.reduce((sum, r) => sum + (r.rating || 0), 0) /
-          reviewCount
-        ).toFixed(1)
-      : 0;
+  const averageRating = reviewCount > 0
+    ? (
+      reviewsData.reduce((sum, r) => sum + (r.rating || 0), 0) /
+      reviewCount
+    ).toFixed(1)
+    : 0;
 
   // const defaultProjects = [
   //   {
@@ -207,8 +307,24 @@ const handleDeleteProject = async (projectId) => {
   //       "https://dashboard.codeparrot.ai/api/image/Z9zBKSppvFKitUlc/rectangl-2.png",
   //   },
   // ];
-  console.log("projectData", projectData);
+  // console.log("projectData", projectData);
   const projects = projectData?.data || [];
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <span>Đang tải hồ sơ...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen text-red-600">
+        <span>Lỗi tải hồ sơ</span>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#F8FDFC]">
@@ -251,19 +367,21 @@ const handleDeleteProject = async (projectId) => {
               </h1>
 
               {/* Job Title */}
-              {editMode ? (
-                <input
-                  type="text"
-                  value={jobTitle}
-                  onChange={(e) => setJobTitle(e.target.value)}
-                  placeholder="Chức danh"
-                  className="mt-2 px-3 py-2 border rounded w-full max-w-md text-center"
-                />
-              ) : (
-                <h2 className="text-lg text-gray-500">
-                  {jobTitle || "Chưa có chức danh"}
-                </h2>
-              )}
+              {editMode
+                ? (
+                  <input
+                    type="text"
+                    value={jobTitle}
+                    onChange={(e) => setJobTitle(e.target.value)}
+                    placeholder="Chức danh"
+                    className="mt-2 px-3 py-2 border rounded w-full max-w-md text-center"
+                  />
+                )
+                : (
+                  <h2 className="text-lg text-gray-500">
+                    {jobTitle || "Chưa có chức danh"}
+                  </h2>
+                )}
             </div>
             <div className="flex items-center gap-2">
               <Rating
@@ -273,7 +391,9 @@ const handleDeleteProject = async (projectId) => {
                 readOnly
               />
               <span className="text-lg font-semibold">{averageRating}</span>
-              <span className="text-gray-500 text-base">({reviewCount} đánh giá)</span>
+              <span className="text-gray-500 text-base">
+                ({reviewCount} đánh giá)
+              </span>
             </div>
           </div>
 
@@ -282,28 +402,76 @@ const handleDeleteProject = async (projectId) => {
             <h3 className="text-lg font-semibold mb-2">Kỹ Năng</h3>
             <div className="h-px bg-gray-300 my-4"></div>
             <div className="flex flex-wrap gap-2">
-              {skills.map((skill, index) => (
-                <div
-                  key={index}
-                  className={`flex items-center px-3 py-1 rounded-full cursor-pointer select-none ${
-                    editMode ? "bg-green-200" : "bg-gray-200"
-                  }`}
-                  onClick={() => editMode && handleRemoveSkill(skill)}
-                  title={editMode ? "Click để xoá" : ""}
-                >
-                  {skill}
-                  {editMode && <span className="ml-1 font-bold">×</span>}
-                </div>
-              ))}
+              {isLoadingUserSkills
+                ? (
+                  <>
+                    <Skeleton
+                      variant="rectangular"
+                      width={80}
+                      height={30}
+                      sx={{ borderRadius: 16 }}
+                    />
+                    <Skeleton
+                      variant="rectangular"
+                      width={120}
+                      height={30}
+                      sx={{ borderRadius: 16 }}
+                    />
+                    <Skeleton
+                      variant="rectangular"
+                      width={100}
+                      height={30}
+                      sx={{ borderRadius: 16 }}
+                    />
+                  </>
+                )
+                : errorLoadingUserSkills
+                  ? (
+                    <div className="grow flex flex-col gap-2 p-4 justify-center items-center bg-red-200/80 rounded-md w-full">
+                      <ReportProblem sx={{ fontSize: 80, color: "gray" }} />
+                      <Typography variant="p" color="gray">
+                        Có lỗi xảy ra khi tải các kỹ năng!
+                      </Typography>
+                    </div>
+                  )
+                  : (
+                    userSkillsDocs.map((skillDoc) => (
+                      <Tooltip title={skillDoc.description} key={skillDoc._id}>
+                        <div
+                          className={`flex items-center px-3 py-1 rounded-full select-none ${editMode
+                              ? "bg-green-200 cursor-pointer "
+                              : "bg-gray-200"
+                            }`}
+                          onClick={() =>
+                            editMode && handleRemoveSkill(skillDoc._id)}
+                          title={editMode ? "Click để xoá" : ""}
+                        >
+                          {skillDoc.name}
+                          {editMode && <span className="ml-1 font-bold">×</span>}
+                        </div>
+                      </Tooltip>
+                    ))
+                  )}
+            </div>
+            <div className="mt-4">
               {editMode && (
-                <input
-                  type="text"
-                  placeholder="Nhập kỹ năng rồi nhấn Enter"
-                  onKeyDown={handleAddSkill}
-                  className="border p-2 rounded w-full max-w-sm"
-                />
+                <Dropdown
+                  menu={{ items: skillSearchResultsItems }}
+                  open={skillNameQuery_Display.length > 0 &&
+                    !isLoadingSkillListQuery}
+                  placement="bottomRight"
+                  getPopupContainer={(triggerNode) => triggerNode.parentNode}
+                >
+                  <Input
+                    placeholder="Tìm và thêm kỹ năng"
+                    value={skillNameQuery_Display}
+                    onChange={(e) =>
+                      handleChangeSkillQueryInput(e.target.value)}
+                    className="border p-2 rounded w-full max-w-sm"
+                  />
+                </Dropdown>
               )}
-              {!editMode && skills.length === 0 && (
+              {!editMode && userSkillsDocs.length === 0 && (
                 <p className="text-gray-500 mt-2">Chưa có kỹ năng</p>
               )}
             </div>
@@ -317,92 +485,102 @@ const handleDeleteProject = async (projectId) => {
             <div className="flex flex-col gap-6">
               <label className="flex flex-col text-gray-700 font-semibold">
                 Email
-                {editMode ? (
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="mt-2 border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
-                    placeholder="Email"
-                  />
-                ) : (
-                  <span className="mt-2 block bg-gray-50 p-3 rounded text-gray-900">
-                    {email || "Chưa có email"}
-                  </span>
-                )}
+                {editMode
+                  ? (
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="mt-2 border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
+                      placeholder="Email"
+                    />
+                  )
+                  : (
+                    <span className="mt-2 block bg-gray-50 p-3 rounded text-gray-900">
+                      {email || "Chưa có email"}
+                    </span>
+                  )}
               </label>
 
               <label className="flex flex-col text-gray-700 font-semibold">
                 Điện thoại
-                {editMode ? (
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="mt-2 border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
-                    placeholder="Số điện thoại"
-                  />
-                ) : (
-                  <span className="mt-2 block bg-gray-50 p-3 rounded text-gray-900">
-                    {phone || "Chưa có số điện thoại"}
-                  </span>
-                )}
+                {editMode
+                  ? (
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="mt-2 border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
+                      placeholder="Số điện thoại"
+                    />
+                  )
+                  : (
+                    <span className="mt-2 block bg-gray-50 p-3 rounded text-gray-900">
+                      {phone || "Chưa có số điện thoại"}
+                    </span>
+                  )}
               </label>
 
               <label className="flex flex-col text-gray-700 font-semibold">
                 Tỉnh/Thành phố
-                {editMode ? (
-                  <input
-                    type="text"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    className="mt-2 border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
-                    placeholder="Tỉnh/Thành phố"
-                  />
-                ) : (
-                  <span className="mt-2 block bg-gray-50 p-3 rounded text-gray-900">
-                    {city || "Chưa có địa điểm"}
-                  </span>
-                )}
+                {editMode
+                  ? (
+                    <input
+                      type="text"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className="mt-2 border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
+                      placeholder="Tỉnh/Thành phố"
+                    />
+                  )
+                  : (
+                    <span className="mt-2 block bg-gray-50 p-3 rounded text-gray-900">
+                      {city || "Chưa có địa điểm"}
+                    </span>
+                  )}
               </label>
 
               <label className="flex flex-col text-gray-700 font-semibold">
                 Quận/Huyện
-                {editMode ? (
-                  <input
-                    type="text"
-                    value={district}
-                    onChange={(e) => setDistrict(e.target.value)}
-                    className="mt-2 border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
-                    placeholder="Quận/Huyện"
-                  />
-                ) : (
-                  <span className="mt-2 block bg-gray-50 p-3 rounded text-gray-900">
-                    {district || "Chưa có địa điểm"}
-                  </span>
-                )}
+                {editMode
+                  ? (
+                    <input
+                      type="text"
+                      value={district}
+                      onChange={(e) => setDistrict(e.target.value)}
+                      className="mt-2 border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
+                      placeholder="Quận/Huyện"
+                    />
+                  )
+                  : (
+                    <span className="mt-2 block bg-gray-50 p-3 rounded text-gray-900">
+                      {district || "Chưa có địa điểm"}
+                    </span>
+                  )}
               </label>
             </div>
           </div>
 
           {/* Buttons Edit / Save */}
           <div className="mt-8 flex justify-center ">
-            {editMode ? (
-              <button
-                onClick={handleSave}
-                disabled={isUpdating}
-                className="px-8 py-3 rounded bg-teal-600 text-white font-semibold hover:bg-teal-700 cursor-pointer"
-              >
-                {isUpdating ? "Đang lưu..." : "Lưu thay đổi"}
-              </button>
-            ) : (
-              <button
-                onClick={() => setEditMode(true)}
-                className="px-8 py-3 rounded border border-teal-600 text-teal-600 font-semibold hover:bg-teal-100 cursor-pointer"
-              >
-                Chỉnh sửa
-              </button>
-            )}
+            {editMode
+              ? (
+                <button
+                  onClick={handleSave}
+                  disabled={isUpdating}
+                  className="px-8 py-3 rounded bg-teal-600 text-white font-semibold hover:bg-teal-700 cursor-pointer"
+                >
+                  {isUpdating ? "Đang lưu..." : "Lưu thay đổi"}
+                </button>
+              )
+              : (
+                <button
+                  onClick={() => setEditMode(true)}
+                  className="px-8 py-3 rounded border border-teal-600 text-teal-600 font-semibold hover:bg-teal-100 cursor-pointer"
+                >
+                  Chỉnh sửa
+                </button>
+              )}
           </div>
         </div>
 
@@ -437,7 +615,8 @@ const handleDeleteProject = async (projectId) => {
           <div className="bg-white rounded-xl p-6 shadow-md">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-xl font-bold">Các dự án tiêu biểu của bạn</h2>
-              <button  onClick={showForm}
+              <button
+                onClick={showForm}
                 className="text-white px-4 py-2 rounded-lg"
                 style={{ backgroundColor: theme.colors.tealGreen }}
               >
@@ -445,14 +624,14 @@ const handleDeleteProject = async (projectId) => {
               </button>
             </div>
             <div className="h-px bg-black mb-8"></div>
- {/* Show CreateProjectForm when isFormVisible is true */}
-      {isFormVisible && (
-        <CreateProjectForm
-          onCancel={handleCancel}
-          onCreate={handleCreateProject}
-          loading={isCreating}
-        />
-      )}
+            {/* Show CreateProjectForm when isFormVisible is true */}
+            {isFormVisible && (
+              <CreateProjectForm
+                onCancel={handleCancel}
+                onCreate={handleCreateProject}
+                loading={isCreating}
+              />
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {projects.map((project) => (
                 <div
@@ -460,7 +639,9 @@ const handleDeleteProject = async (projectId) => {
                   className="border border-gray-400 rounded-lg overflow-hidden"
                 >
                   <img
-                    src={project.media[0].type === "image" ? project.media[0].url : "https://img.freepik.com/premium-vector/man-working-laptop-flat-character-illustration_648489-379.jpg?semt=ais_items_boosted&w=740"}
+                    src={project.media[0].type === "image"
+                      ? project.media[0].url
+                      : "https://img.freepik.com/premium-vector/man-working-laptop-flat-character-illustration_648489-379.jpg?semt=ais_items_boosted&w=740"}
                     alt={project.title}
                     className="w-full h-52 object-cover bg-gray-300"
                   />
@@ -498,7 +679,7 @@ const handleDeleteProject = async (projectId) => {
                       </button>
 
                       <button
-                      onClick={() => handleDeleteProject(project._id)}
+                        onClick={() => handleDeleteProject(project._id)}
                         className="text-white px-4 py-2 rounded-lg cursor-pointer"
                         style={{ backgroundColor: theme.colors.tealGreen }}
                       >
@@ -522,27 +703,25 @@ const handleDeleteProject = async (projectId) => {
           className="w-full h-px bg-gray-400 mb-8"
         />
         <div className="flex flex-col gap-8 w-full">
-          {isReviewLoading ? (
-            <p>Đang tải đánh giá...</p>
-          ) : reviewError ? (
-            <p className="text-red-600">Lỗi khi tải đánh giá</p>
-          ) : reviewsData?.length === 0 ? (
-            <p className="text-gray-500">Chưa có đánh giá nào</p>
-          ) : (
-            reviewsData.map((review, index) => (
-              <TestimonialCard
-                key={index}
-                name={review.reviewer?.name || "Ẩn danh"}
-                designation={"Nhà tuyển dụng"}
-                rating={review.rating}
-                description={review.comment || "Không có nhận xét"}
-                avatarSrc={
-                  review.reviewer?.avatarUrl ||
-                  "https://dashboard.codeparrot.ai/api/image/Z9zDwZIdzXb5Olpw/ellipse.png"
-                }
-              />
-            ))
-          )}
+          {isReviewLoading
+            ? <p>Đang tải đánh giá...</p>
+            : reviewError
+              ? <p className="text-red-600">Lỗi khi tải đánh giá</p>
+              : reviewsData?.length === 0
+                ? <p className="text-gray-500">Chưa có đánh giá nào</p>
+                : (
+                  reviewsData.map((review, index) => (
+                    <TestimonialCard
+                      key={index}
+                      name={review.reviewer?.name || "Ẩn danh"}
+                      designation={"Nhà tuyển dụng"}
+                      rating={review.rating}
+                      description={review.comment || "Không có nhận xét"}
+                      avatarSrc={review.reviewer?.avatarUrl ||
+                        "https://dashboard.codeparrot.ai/api/image/Z9zDwZIdzXb5Olpw/ellipse.png"}
+                    />
+                  ))
+                )}
         </div>
       </div>
 
