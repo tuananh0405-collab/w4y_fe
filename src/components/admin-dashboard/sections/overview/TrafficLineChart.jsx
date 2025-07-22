@@ -1,18 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  Paper,
-  Typography,
-  Tabs,
-  Tab,
   Box,
   Chip,
-  Select,
-  MenuItem,
-  InputLabel,
+  CircularProgress,
   FormControl,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Tab,
+  Tabs,
+  Typography,
 } from "@mui/material";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import Chart from "chart.js/auto";
+import { useGetWebTrafficReportMutation } from "../../../../redux/api/analyticsApiSlice";
+import { toast } from "react-toastify";
 
 const TrafficLineChart = () => {
   const chartRef = useRef(null);
@@ -26,105 +29,171 @@ const TrafficLineChart = () => {
   const currentDay = today.getDate();
   const currentHour = today.getHours();
 
-  const [selectedDate, setSelectedDate] = useState(today.toISOString().split("T")[0]); // for hourly
-  const [selectedMonth, setSelectedMonth] = useState(`${currentYear}-${String(currentMonth + 1).padStart(2, "0")}`); // for daily
+  const [selectedDate, setSelectedDate] = useState(
+    today.toISOString().split("T")[0],
+  ); // for hourly
+  const [selectedMonth, setSelectedMonth] = useState(
+    `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}`,
+  ); // for daily
   const [selectedYear, setSelectedYear] = useState(currentYear); // for monthly
+
+  const [chartData, setChartData] = useState(null);
+  const [getWebTrafficReport, { isLoading }] = useGetWebTrafficReportMutation();
 
   const handleTimeChange = (e, newValue) => setTimeRange(newValue);
 
-  const getLabels = () => {
-    if (timeRange === "hourly") {
-      return Array.from({ length: 24 }, (_, i) => `${i}:00`);
-    }
-    if (timeRange === "daily") {
-      const [year, month] = selectedMonth.split("-");
-      const daysInMonth = new Date(year, month, 0).getDate();
-      return Array.from({ length: daysInMonth }, (_, i) => `${i + 1}`);
-    }
-    if (timeRange === "monthly") {
-      return [
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-      ];
-    }
-    return [];
-  };
-
-  const getChartData = () => {
-    const labels = getLabels();
-    const now = new Date();
-    const data = labels.map((label, index) => {
-      let isFuture = false;
-
-      if (timeRange === "hourly") {
-        const hourDate = new Date(selectedDate);
-        hourDate.setHours(index);
-        isFuture = hourDate > now;
-      }
-
-      if (timeRange === "daily") {
-        const [year, month] = selectedMonth.split("-");
-        const dayDate = new Date(year, month - 1, index + 1);
-        isFuture = dayDate > now;
-      }
-
+  useEffect(() => {
+    const fetchTrafficData = async () => {
+      const reportQueryObject = { dateRanges: [], granularity: "daily" };
       if (timeRange === "monthly") {
-        const pointDate = new Date(selectedYear, index, 1);
-        isFuture = pointDate > now;
+        reportQueryObject.dateRanges.push({
+          startDate: `${selectedYear}-01-01`,
+          endDate: `${selectedYear}-12-31`,
+        });
+      } else if (timeRange === "daily") {
+        const [year, month] = selectedMonth.split("-");
+        const daysInMonth = new Date(year, month, 0).getDate();
+        reportQueryObject.dateRanges.push({
+          startDate: `${selectedMonth}-01`,
+          endDate: `${selectedMonth}-${String(daysInMonth).padStart(2, "0")}`,
+        });
+      } else if (timeRange === "hourly") {
+        reportQueryObject.dateRanges.push({
+          startDate: selectedDate,
+          endDate: selectedDate,
+        });
+        reportQueryObject.granularity = "hourly";
       }
 
-      return isFuture ? null : Math.floor(Math.random() * 1000 + 100);
-    });
+      try {
+        const result = await getWebTrafficReport(reportQueryObject).unwrap();
+        const report = result.data;
+        const rows = report.rows || [];
 
-    const visibleIndex = data.findIndex(d => d === null);
-    const trimmedLabels = labels.slice(0, visibleIndex === -1 ? labels.length : visibleIndex);
-    const trimmedData = data.filter(d => d !== null);
+        let labels = [];
+        let data = [];
 
-    return {
-      labels: trimmedLabels,
-      datasets: [
-        {
-          label: "Page Views",
-          data: trimmedData,
-          fill: false,
-          borderColor: "rgba(153, 102, 255, 1)",
-          backgroundColor: "rgba(153, 102, 255, 0.3)",
-          tension: 0.4,
-        },
-      ],
+        if (timeRange === "monthly") {
+          labels = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+          const monthlyData = Array(12).fill(0);
+          rows.forEach((row) => {
+            const monthIndex =
+              parseInt(row.dimensionValues[0].value.substring(4, 6), 10) - 1;
+            monthlyData[monthIndex] += parseInt(row.metricValues[0].value, 10);
+          });
+          data = monthlyData;
+        } else if (timeRange === "daily") {
+          const [year, month] = selectedMonth.split("-");
+          const daysInMonth = new Date(year, month, 0).getDate();
+          labels = Array.from({ length: daysInMonth }, (_, i) => String(i + 1));
+          const dailyData = Array(daysInMonth).fill(0);
+          rows.forEach((row) => {
+            const dayIndex =
+              parseInt(row.dimensionValues[0].value.substring(6, 8), 10) - 1;
+            dailyData[dayIndex] = parseInt(row.metricValues[0].value, 10);
+          });
+          data = dailyData;
+        } else { // Hourly
+          labels = Array.from(
+            { length: 24 },
+            (_, i) => `${String(i).padStart(2, "0")}:00`,
+          );
+          const hourlyData = Array(24).fill(0);
+          rows.forEach((row) => {
+            // [1] because hour is the second dimension value
+            const hourIndex = parseInt(row.dimensionValues[1].value, 10);
+            hourlyData[hourIndex] = parseInt(row.metricValues[0].value, 10);
+          });
+          data = hourlyData;
+        }
+
+        setChartData({
+          labels,
+          datasets: [
+            {
+              label: "Sessions",
+              data,
+              fill: false,
+              borderColor: "rgba(153, 102, 255, 1)",
+              backgroundColor: "rgba(153, 102, 255, 0.3)",
+              tension: 0.4,
+            },
+          ],
+        });
+      } catch (error) {
+        toast.error("Failed to fetch web traffic data.");
+        console.error("Failed to fetch web traffic data:", error);
+      }
     };
-  };
+
+    fetchTrafficData();
+  }, [
+    timeRange,
+    selectedDate,
+    selectedMonth,
+    selectedYear,
+    getWebTrafficReport,
+  ]);
 
   useEffect(() => {
-    if (chartRef.current) {
-      if (chartInstance.current) chartInstance.current.destroy();
-
+    if (chartInstance.current) {
+      chartInstance.current.destroy();
+    }
+    if (chartRef.current && chartData) {
       const ctx = chartRef.current.getContext("2d");
       chartInstance.current = new Chart(ctx, {
         type: "line",
-        data: getChartData(),
+        data: chartData,
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true,
+          scales: { y: { beginAtZero: true } },
+          plugins: {
+            legend: { position: "bottom" },
+            datalabels: {
+              display: (context) => {
+                // Only display labels for values > 0 to avoid clutter
+                return context.dataset.data[context.dataIndex] > 0;
+              },
+              anchor: "end", // Anchor the label to the data point
+              align: "top", // Position the label above the data point
+              offset: 2, // Add 8px of space above the point
+              color: "#555",
+              font: {
+                weight: "bold",
+              },
+              // backgroundColor: "rgba(255, 255, 255, 0.75)",
+              borderRadius: 4,
+              padding: 4,
             },
           },
-          plugins: {
-            datalabels: {
-              display: false
-            },
-            legend: {
-              position: "bottom",
+          layout: {
+            padding: {
+              top: 30,
             },
           },
         },
       });
     }
-
-    return () => chartInstance.current?.destroy();
-  }, [timeRange, selectedDate, selectedMonth, selectedYear]);
+    return () => {
+      if (chartInstance.current) {
+        chartInstance.current.destroy();
+      }
+    };
+  }, [chartData]);
 
   const renderDropdown = () => {
     if (timeRange === "hourly") {
@@ -203,7 +272,14 @@ const TrafficLineChart = () => {
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
         <Typography variant="h6">Website Traffic</Typography>
       </Box>
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
         <Tabs value={timeRange} onChange={handleTimeChange}>
           <Tab label="Hourly" value="hourly" />
           <Tab label="Daily" value="daily" />
@@ -211,8 +287,23 @@ const TrafficLineChart = () => {
         </Tabs>
         {renderDropdown()}
       </Box>
-      <Box sx={{ height: 300 }}>
+      <Box sx={{ height: 300, position: "relative" }}>
+        {isLoading && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        )}
         <canvas ref={chartRef}></canvas>
+        {!isLoading && !chartData && (
+          <Typography>No data available for this period.</Typography>
+        )}
       </Box>
     </Paper>
   );
