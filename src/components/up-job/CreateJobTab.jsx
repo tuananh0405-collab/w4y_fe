@@ -93,7 +93,11 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
     requirementsTechnical: [],
     requirementsNonTechnical: [],
     salary: "",
-    salaryRangeStart: "",
+    salaryRange: {
+      start: "",
+      end: "",
+    },
+    salaryRangeStart: "", // Dep
     salaryRangeEnd: "",
     salaryRangeUnit: "",
     categoryId: "",
@@ -205,12 +209,25 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
       newErrors.description = "Mô tả công việc là bắt buộc";
     }
 
-    if (
-      !(formData.salary.trim() ||
-        (formData.salaryRangeStart.trim() && formData.salaryRangeEnd.trim() &&
-          formData.salaryRangeUnit.trim()))
-    ) {
-      newErrors.salary = "Lương và phúc lợi là bắt buộc";
+    if (useSalaryRange) {
+      if (
+        !check.all(
+          check.map(formData, {
+            salaryRange: (range) =>
+              check.map(range, {
+                start: check.nonEmptyString,
+                end: check.nonEmptyString,
+              }),
+            salaryRangeUnit: check.nonEmptyString,
+          }),
+        )
+      ) {
+        newErrors.salary = "Lương và phúc lợi là bắt buộc";
+      }
+    } else {
+      if (!check.nonEmptyString(formData.salary)) {
+        newErrors.salary = "Lương và phúc lợi là bắt buộc";
+      }
     }
 
     setErrors(newErrors);
@@ -282,6 +299,16 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
     setSkillNameQuery_Display(value);
   }, []);
 
+  const handleChangeSalaryRange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      salaryRange: {
+        ...prev.salaryRange,
+        [field]: value,
+      },
+    }));
+  };
+
   // Xử lý nút chọn địa chỉ Google Maps (hiện dummy)
   const handleSelectFromMaps = () => {
     alert("Mở Google Maps để chọn địa chỉ (chưa cài đặt)");
@@ -320,15 +347,14 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
       };
 
       if (useSalaryRange) {
-        jobData.salaryRangeStart = formData.salaryRangeStart;
-        jobData.salaryRangeEnd = formData.salaryRangeEnd;
+        jobData.salaryRange = formData.salaryRange;
         jobData.salaryRangeUnit = formData.salaryRangeUnit;
       } else {
         jobData.salary = formData.salary;
       }
 
       await createJob(jobData);
-      navigate("/");
+      // navigate("/");
       console.log("Job created successfully");
       if (onSubmit) onSubmit();
     } catch (error) {
@@ -783,8 +809,9 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
               <input
                 type="text"
                 name="salaryRangeStart"
-                value={formData.salaryRangeStart}
-                onChange={handleInputChange}
+                value={formData.salaryRange.start}
+                onChange={(v) =>
+                  handleChangeSalaryRange("start", v.target.value)}
                 placeholder="Lương"
                 className="border p-2 rounded"
               />
@@ -792,8 +819,8 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
               <input
                 type="text"
                 name="salaryRangeEnd"
-                value={formData.salaryRangeEnd}
-                onChange={handleInputChange}
+                value={formData.salaryRange.end}
+                onChange={(v) => handleChangeSalaryRange("end", v.target.value)}
                 placeholder="Lương"
                 className="border p-2 rounded"
               />
