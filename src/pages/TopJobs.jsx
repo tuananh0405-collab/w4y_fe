@@ -7,6 +7,7 @@ import { TopJobCard } from "../components/top-jobs/TopJobCard";
 import { useGetJobListQuery } from "../redux/api/jobApiSlice";
 import { Pagination, Typography } from "@mui/material";
 import { Inventory } from "@mui/icons-material";
+import check from "check-types";
 
 const TopJobs = () => {
   const [filterObject, setFilterObject] = useState({
@@ -69,6 +70,11 @@ const TopJobs = () => {
     }
   }, [resultPaginationInfo.currentPage, resultPaginationInfo.totalPages]);
 
+  const shouldHightlightRanged =
+    (check.nonEmptyString(filterObject.salaryRangeStart) ||
+      check.nonEmptyString(filterObject.salaryRangeEnd)) &&
+    check.nonEmptyString(filterObject.salaryRangeUnit);
+
   return (
     <div className="flex flex-col w-full bg-[#fff]">
       <Header />
@@ -95,9 +101,7 @@ const TopJobs = () => {
                 <main className="flex flex-col">
                   {!!resultPaginationInfo.totalJobs && (
                     <>
-                      <div
-                        className="p-2 bg-teal-100/50 border-l-4 border-teal-500 mb-4 text-gray-700"
-                      >
+                      <div className="p-2 bg-teal-100/50 border-l-4 border-teal-500 mb-4 text-gray-700">
                         <h1 className="text-lg">
                           Đã tìm thấy{" "}
                           <span className="font-bold text-teal-600">
@@ -106,7 +110,10 @@ const TopJobs = () => {
                           đăng tuyển phù hợp
                         </h1>
                       </div>
-                      <TopJobCard jobs={jobList} />
+                      <TopJobCard
+                        jobs={jobList}
+                        hightlightRanged={shouldHightlightRanged}
+                      />
                       <div className="grow" />
                       <div className="flex justify-center mt-4">
                         <Pagination
@@ -122,16 +129,15 @@ const TopJobs = () => {
                   {!resultPaginationInfo.totalJobs && (
                     <div className="grow flex flex-col gap-2 p-4 justify-center items-center rounded-md">
                       <div className="bg-gray-300 rounded-md flex flex-col justify-center items-center p-4 gap-2 color-white">
-                      <Inventory sx={{ fontSize: 80, color: "gray" }} />
-                      <Typography variant="p" className="text-gray-500">
-                        Tất cả công việc đều bị ẩn bởi bộ lọc
-                      </Typography>
-                      <Typography variant="p" className="text-gray-500">
-                        Hãy chỉnh hoặc loại bỏ bộ lọc
-                      </Typography>
+                        <Inventory sx={{ fontSize: 80, color: "gray" }} />
+                        <Typography variant="p" className="text-gray-500">
+                          Tất cả công việc đều bị ẩn bởi bộ lọc
+                        </Typography>
+                        <Typography variant="p" className="text-gray-500">
+                          Hãy chỉnh hoặc loại bỏ bộ lọc
+                        </Typography>
                       </div>
                     </div>
-
                   )}
                 </main>
               </>
