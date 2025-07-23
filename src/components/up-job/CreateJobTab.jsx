@@ -1,13 +1,19 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import theme from "../../utils/theme";
 import {
   useCreateJobMutation,
   useGetFilterOptionsQuery,
-  useGetJobCategoriesByParentQuery,
-  useGetJobCategoriesByRecursiveQuery,
 } from "../../redux/api/jobApiSlice";
 import { useNavigate } from "react-router-dom";
 import JobCategorySelector from "../JobCategorySelector";
+import { useGetJobCategoriesByRecursiveQuery } from "../../redux/api/jobCategoryApiSlice";
+import {
+  useGetJobSkillsByIdsQuery,
+  useGetJobSkillsQuery,
+} from "../../redux/api/jobSkillApiSlice";
+import check from "check-types";
+import { Tooltip } from "antd";
+import { InfoOutlined } from "@mui/icons-material";
 
 const technicalOptions = [
   "Công nghệ thông tin / Lập trình",
@@ -32,6 +38,8 @@ const nonTechnicalOptions = [
 const deliveryTimeOptions = ["Thoả thuận", "Theo dự án", "Khác"];
 const locationOptions = ["Online", "Offline"];
 const experienceOptions = ["< 1 năm", "1-3 năm", "> 3 năm"];
+
+const QUERY_DELAY_MS = 500;
 
 const CreateJobTab = ({ onBack, onSubmit }) => {
   const navigate = useNavigate();
@@ -85,13 +93,22 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
     requirementsTechnical: [],
     requirementsNonTechnical: [],
     salary: "",
-    salaryRangeStart: "",
+    salaryRange: {
+      start: "",
+      end: "",
+    },
+    salaryRangeStart: "", // Dep
     salaryRangeEnd: "",
     salaryRangeUnit: "",
     categoryId: "",
+    skillIds: [],
   });
 
   const [useSalaryRange, setUseSalaryRange] = useState(true);
+
+  /*
+   * Handle job categories list and pick
+   */
 
   const {
     data: jobCategoriesQuery,
@@ -106,6 +123,53 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
     return jobCategoriesQuery?.data ? jobCategoriesQuery.data.children : [];
   }, [jobCategoriesQuery]);
 
+  /*
+   * Handle job skills search, list, and pick
+   */
+  const [skillNameQuery_Display, setSkillNameQuery_Display] = useState(""); // The query that will be displayed on the skill search bar
+  const [skillNameQuery, setSkillNameQuery] = useState(""); // Actual query that will be used to fetch skills
+  const [isChangingSkillQuery, setIsChangingSkillQuery] = useState(false);
+
+  useEffect(() => {
+    setIsChangingSkillQuery(true);
+    const timeout = setTimeout(() => {
+      setSkillNameQuery(skillNameQuery_Display);
+      requestAnimationFrame(() => {
+        setIsChangingSkillQuery(false);
+      });
+    }, QUERY_DELAY_MS);
+
+    return () => clearTimeout(timeout);
+  }, [skillNameQuery_Display]);
+
+  const {
+    data: skillListQuery,
+    isLoading: isLoadingSkillListQuery,
+    error: errorLoadingSkillListQuery,
+  } = useGetJobSkillsQuery({ name: skillNameQuery, page: 1, limit: 10 }, {
+    skip: !skillNameQuery,
+  });
+
+  const {
+    data: selectedSkillsQuery,
+    isLoading: isLoadingUserSkills,
+  } = useGetJobSkillsByIdsQuery({ ids: formData.skillIds }, {
+    skip: !check.nonEmptyArray(formData.skillIds),
+  });
+
+  const selectedSkillsDocs = useMemo(() => {
+    return selectedSkillsQuery?.data ?? [];
+  }, [selectedSkillsQuery]);
+
+  const skillSearchResults = useMemo(() => {
+    return skillListQuery?.data?.filter(
+      (skill) => !formData.skillIds.includes(skill._id),
+    ) ?? [];
+  }, [skillListQuery, formData.skillIds]);
+
+  /*
+   * Form validation and inputs
+   */
   const [errors, setErrors] = useState({});
   const [createJob] = useCreateJobMutation();
 
@@ -145,12 +209,25 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
       newErrors.description = "Mô tả công việc là bắt buộc";
     }
 
-    if (
-      !(formData.salary.trim() ||
-        (formData.salaryRangeStart.trim() && formData.salaryRangeEnd.trim() &&
-          formData.salaryRangeUnit.trim()))
-    ) {
-      newErrors.salary = "Lương và phúc lợi là bắt buộc";
+    if (useSalaryRange) {
+      if (
+        !check.all(
+          check.map(formData, {
+            salaryRange: (range) =>
+              check.map(range, {
+                start: check.nonEmptyString,
+                end: check.nonEmptyString,
+              }),
+            salaryRangeUnit: check.nonEmptyString,
+          }),
+        )
+      ) {
+        newErrors.salary = "Lương và phúc lợi là bắt buộc";
+      }
+    } else {
+      if (!check.nonEmptyString(formData.salary)) {
+        newErrors.salary = "Lương và phúc lợi là bắt buộc";
+      }
     }
 
     setErrors(newErrors);
@@ -201,12 +278,46 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
     }
   };
 
+  const handleAddSkill = useCallback((skillId) => {
+    if (!formData.skillIds.includes(skillId) && formData.skillIds.length < 5) {
+      setFormData((prev) => ({
+        ...prev,
+        skillIds: [...prev.skillIds, skillId],
+      }));
+      setSkillNameQuery_Display(""); // Clear input after selection
+    }
+  }, [formData.skillIds]);
+
+  const handleRemoveSkill = (skillId) => {
+    setFormData((prev) => ({
+      ...prev,
+      skillIds: prev.skillIds.filter((id) => id !== skillId),
+    }));
+  };
+
+  const handleChangeSkillQueryInput = useCallback((value) => {
+    setSkillNameQuery_Display(value);
+  }, []);
+
+  const handleChangeSalaryRange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      salaryRange: {
+        ...prev.salaryRange,
+        [field]: value,
+      },
+    }));
+  };
+
   // Xử lý nút chọn địa chỉ Google Maps (hiện dummy)
   const handleSelectFromMaps = () => {
     alert("Mở Google Maps để chọn địa chỉ (chưa cài đặt)");
     // TODO: Mở popup chọn địa chỉ, lấy tọa độ, cập nhật locationAddress
   };
 
+  /*
+   * Form submit
+   */
   const handleSubmit = async () => {
     if (!validate()) return;
 
@@ -231,19 +342,19 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
           ? "Online"
           : formData.locationAddress,
         experience: formData.experience,
+        skillIds: formData.skillIds,
         categoryId: formData.categoryId,
       };
 
       if (useSalaryRange) {
-        jobData.salaryRangeStart = formData.salaryRangeStart;
-        jobData.salaryRangeEnd = formData.salaryRangeEnd;
+        jobData.salaryRange = formData.salaryRange;
         jobData.salaryRangeUnit = formData.salaryRangeUnit;
       } else {
         jobData.salary = formData.salary;
       }
 
       await createJob(jobData);
-      // navigate('/')
+      // navigate("/");
       console.log("Job created successfully");
       if (onSubmit) onSubmit();
     } catch (error) {
@@ -505,16 +616,21 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
                 ))}
             </select>
           </div>
-          <div
-            className={`font-medium ${isIndustryUnselected ? "text-gray-400" : "text-gray-700"
-              }`}
-          >
-            Ngành nghề
+          <div className="flex items-center gap-2">
+            <div
+              className={`font-medium ${isIndustryUnselected ? "text-gray-400" : "text-gray-700"
+                }`}
+            >
+              Ngành nghề
+            </div>
+            {isIndustryUnselected && (
+              <Tooltip title="Vui lòng chọn lĩnh vực trước khi chọn ngành nghề">
+                <InfoOutlined style={{ color: "gray", fontSize: "16px" }} />
+              </Tooltip>
+            )}
           </div>
           <div
-            className={`w-full rounded-md ${isIndustryUnselected
-                ? "bg-gray-100/80"
-                : "bg-gray-200/80"
+            className={`w-full rounded-md ${isIndustryUnselected ? "bg-gray-100/80" : "bg-gray-200/80"
               } min-h-[100px] max-h-[700px] overflow-auto p-4 mb-2`}
           >
             {!isIndustryUnselected && (
@@ -525,6 +641,83 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
               />
             )}
           </div>
+        </div>
+
+        {/* Kỹ năng */}
+        <div className="flex flex-col gap-2">
+          <label className="text-lg font-medium text-gray-700">
+            Kỹ năng (tối đa 5)
+          </label>
+          <div className="flex flex-wrap gap-2 p-2 rounded-md min-h-[40px] bg-gray-200/80">
+            {isLoadingUserSkills
+              ? (
+                <p className="text-gray-500 text-sm">
+                  Đang tải kỹ năng đã chọn...
+                </p>
+              )
+              : (
+                selectedSkillsDocs.map((skill) => (
+                  <div
+                    key={skill._id}
+                    className="flex items-center bg-teal-100 text-teal-800 text-sm font-medium px-3 py-1 rounded-full"
+                  >
+                    {skill.name}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSkill(skill._id)}
+                      className="ml-2 font-bold text-teal-600 hover:text-teal-800"
+                      aria-label={`Remove ${skill.name}`}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))
+              )}
+          </div>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Tìm và thêm kỹ năng..."
+              value={skillNameQuery_Display}
+              onChange={(e) => handleChangeSkillQueryInput(e.target.value)}
+              className="border p-2 rounded w-full"
+              disabled={formData.skillIds.length >= 5}
+            />
+            {skillNameQuery_Display.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                {isLoadingSkillListQuery || isChangingSkillQuery
+                  ? <div className="px-4 py-2 text-gray-500">Đang tìm...</div>
+                  : errorLoadingSkillListQuery
+                    ? (
+                      <div className="px-4 py-2 text-red-500">
+                        Lỗi khi tìm kỹ năng.
+                      </div>
+                    )
+                    : skillSearchResults.length > 0
+                      ? (
+                        skillSearchResults.map((skill) => (
+                          <div
+                            key={skill._id}
+                            onClick={() => handleAddSkill(skill._id)}
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                          >
+                            {skill.name}
+                          </div>
+                        ))
+                      )
+                      : (
+                        <div className="px-4 py-2 text-gray-500">
+                          Không tìm thấy kỹ năng.
+                        </div>
+                      )}
+              </div>
+            )}
+          </div>
+          {formData.skillIds.length >= 5 && (
+            <p className="text-sm text-gray-600 mt-1">
+              Bạn đã chọn tối đa 5 kỹ năng.
+            </p>
+          )}
         </div>
 
         {/* Mô tả công việc */}
@@ -612,12 +805,13 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
             </label>
           </div>
           {useSalaryRange && (
-            <div>
+            <div className="flex gap-2 items-center">
               <input
                 type="text"
                 name="salaryRangeStart"
-                value={formData.salaryRangeStart}
-                onChange={handleInputChange}
+                value={formData.salaryRange.start}
+                onChange={(v) =>
+                  handleChangeSalaryRange("start", v.target.value)}
                 placeholder="Lương"
                 className="border p-2 rounded"
               />
@@ -625,8 +819,8 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
               <input
                 type="text"
                 name="salaryRangeEnd"
-                value={formData.salaryRangeEnd}
-                onChange={handleInputChange}
+                value={formData.salaryRange.end}
+                onChange={(v) => handleChangeSalaryRange("end", v.target.value)}
                 placeholder="Lương"
                 className="border p-2 rounded"
               />

@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -12,14 +13,17 @@ import CreateProjectForm from "../components/profile/CreateProjectForm";
 import {
   useCountApplicationsQuery,
   useCreateProjectMutation,
+  useDeleteProjectMutation,
   useGetApplicantProfileQuery,
   useGetMyProjectsQuery,
   useUpdateProfileMutation,
   useUploadAvatarMutation,
   useDeleteProjectMutation,
   useUpdateUserProfileMutation
+
 } from "../redux/api/applicantApiSlice";
 import { useGetUserReviewsQuery } from "../redux/api/applicationApiSlice";
+
 import theme from "../utils/theme";
 import dayjs from "dayjs";
 import { PlusOutlined } from "@ant-design/icons";
@@ -386,28 +390,26 @@ const Profile = () => {
       message.success("Dự án đã được xoá thành công");
       refetchProjects();
     } catch (error) {
-      message.error("Xoá dự án không thành công");
+      alert("Lỗi khi tạo dự án mới");
       console.error(error);
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <span>Đang tải hồ sơ...</span>
-      </div>
-    );
-  }
+  const {
+    data: userSkillsQuery,
+    isLoading: isLoadingUserSkills,
+    error: errorLoadingUserSkills,
+  } = useGetJobSkillsByIdsQuery({ ids: skillIds }, {
+    skip: !check.nonEmptyArray(skillIds),
+  });
 
-  if (error) {
-    return (
-      <div className="flex justify-center items-center h-screen text-red-600">
-        <span>Lỗi tải hồ sơ</span>
-      </div>
-    );
-  }
+  const userSkillsDocs = useMemo(() => {
+    return userSkillsQuery?.data ?? [];
+  }, [userSkillsQuery]);
+
 
   const profile = data?.data || {};
+
   const resumeFiles = profile.resumeFiles || [];
   const applicationCount = countData?.data?.totalApplications || 0;
   const projects = projectData?.data || [];
@@ -416,6 +418,7 @@ const Profile = () => {
     reviewCount > 0
       ? (reviewsData.reduce((sum, r) => sum + (r.rating || 0), 0) / reviewCount).toFixed(1)
       : 0;
+
 
   return (
     <div className="bg-[#F8FDFC]">
@@ -585,6 +588,7 @@ const Profile = () => {
             >
               Chỉnh sửa
             </button>
+
           </div>
         </div>
 

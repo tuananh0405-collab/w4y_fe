@@ -32,6 +32,7 @@ import AdminDashboard from "./pages/AdminDashboard.jsx";
 import AdminAuth from "./layouts/AdminAuth.jsx";
 import JobApplied from "./pages/JobApplied.jsx";
 import GoogleAnalytics from "./components/GoogleAnalytics.jsx";
+import RecommendedJobs from "./pages/RecommendedJobs.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -59,6 +60,7 @@ const router = createBrowserRouter(
           <Route path="apply" element={<Apply />} />
           <Route path="job-detail/:jobId" element={<JobDetail />} />
           <Route path="top-jobs" element={<TopJobs />} />
+          <Route path="recommended-jobs" element={<RecommendedJobs />} />
           <Route path="profile" element={<Profile />} />
           <Route path="chat" element={<ChatRoom />} />
           <Route path="project-room/:projectId" element={<ProjectRoom />} />
