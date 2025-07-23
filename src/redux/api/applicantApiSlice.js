@@ -168,8 +168,15 @@ updateProfile: builder.mutation({
     },
   }),
   invalidatesTags: [{ type: "ApplicantProfile", id: "LIST" }],
-  })
+  }),
+  getProfile: builder.query({
+    query: () => ({
+      url: `${APPLICANT_URL}/get-profile/${userId}`,
+      method: "GET",
+      credentials: "include",
+    }),
 })
+  })
 });
 
 export const {
@@ -180,14 +187,15 @@ export const {
   useCountApplicationsQuery,
   useForgotPasswordMutation,
   useResetPasswordMutation,
-    useSearchApplicantsQuery,
+  useSearchApplicantsQuery,
   useUploadAvatarMutation,
   useGetUploadedCVsQuery,
   useDeleteUploadedCVMutation,
-    useCreateProjectMutation,
+  useCreateProjectMutation,
   useGetMyProjectsQuery,
   useUpdateProjectMutation,
   useDeleteProjectMutation,
-    useUpdateProfileMutation
+  useUpdateProfileMutation,
+
 
 } = applicantApiSlice;
