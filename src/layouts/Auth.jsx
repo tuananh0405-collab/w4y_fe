@@ -29,7 +29,12 @@ const Auth = () => {
     try {
       const userData = await signIn({ email, password }).unwrap(); 
       dispatch(setCredentials(userData)); 
-      navigate('/');
+     if(userData.user.accountType == "Nhà Tuyển Dụng"){
+      navigate('/up-job')
+     }else{
+
+       navigate('/');
+     }
       console.log(userData);
     } catch (err) {
       console.error("Login failed: ", err); 

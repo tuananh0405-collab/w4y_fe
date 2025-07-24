@@ -413,7 +413,7 @@ const Register_Employer = () => {
             </div>
 
             {/* Điều khoản */}
-            <div className="flex items-center gap-3 mb-5">
+            {/* <div className="flex items-center gap-3 mb-5">
               <input
                 type="checkbox"
                 name="agreeToTerms"
@@ -425,7 +425,7 @@ const Register_Employer = () => {
                 Tôi đã đọc và đồng ý với Điều khoản dịch vụ và Chính sách bảo
                 mật của W4U.
               </label>
-            </div>
+            </div> */}
 
             <button
               type="submit"

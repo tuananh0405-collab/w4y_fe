@@ -18,7 +18,7 @@ import {
   useGetMyProjectsQuery,
   useUpdateProfileMutation,
   useUploadAvatarMutation,
-  useDeleteProjectMutation,
+  
   useUpdateUserProfileMutation
 
 } from "../redux/api/applicantApiSlice";

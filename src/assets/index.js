@@ -53,3 +53,4 @@ export { default as employeeImage } from './images/employee.png';
 export { default as employerImage } from './images/employer.png';
 export { default as heroImage } from './images/hero.svg';
 export { default as fsoftImage } from './images/fsoft.png';
+export { default as tiktokImage } from './images/tik-tok.png';
