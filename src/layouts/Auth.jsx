@@ -29,7 +29,7 @@ const Auth = () => {
     try {
       const userData = await signIn({ email, password }).unwrap(); 
       dispatch(setCredentials(userData)); 
-      navigate('/');
+       navigate('/');
       console.log(userData);
     } catch (err) {
       console.error("Login failed: ", err); 

@@ -2,7 +2,6 @@ import React, { useCallback, useMemo } from "react";
 import { funnelIcon } from "../../assets";
 import {
   useGetFilterOptionsQuery,
-  useGetJobCategoriesByRecursiveQuery,
 } from "../../redux/api/jobApiSlice";
 import JobCategorySelector from "../JobCategorySelector";
 import {
@@ -19,6 +18,7 @@ import { InputNumber, Select } from "antd";
 import "./SelectStyle.css";
 import "./ScrollBar.css";
 import { Report, ReportProblem } from "@mui/icons-material";
+import { useGetJobCategoriesByRecursiveQuery } from "../../redux/api/jobCategoryApiSlice";
 
 const RadioSx = {
   color: "#00796b",

@@ -96,20 +96,6 @@ export const jobApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
-    getJobCategoriesByParent: builder.query({
-      query: ({ parentId }) => ({
-        url: `${JOB_URL}/job-categories/${parentId}`,
-        method: "GET",
-      }),
-    }),
-
-    getJobCategoriesByRecursive: builder.query({
-      query: ({ categoryId }) => ({
-        url: `${JOB_URL}/job-categories-recursive/${categoryId}`,
-        method: "GET",
-      }),
-    }),
-
     getJobsByEmployer: builder.query({
       query: (employerId) => ({
         url: `${JOB_URL}/employer/${employerId}`,
@@ -144,6 +130,46 @@ export const jobApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+
+    getRecommendedJobs: builder.query({
+      query: () => ({
+        url: `${JOB_URL}/recommended`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["RecommendedJobs"],
+    }),
+
+    getAIRecommendedJobs: builder.query({
+      query: () => ({
+        url: `${JOB_URL}/ai-recommended`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["RecommendedJobs"],
+    }),
+
+    getJobStatusDistribution: builder.query({
+      query: () => ({
+        url: `${JOB_URL}/stats/status-distribution`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
+    getJobsByCategory: builder.query({
+      query: ({ limit = 4 } = {}) => ({
+        url: `${JOB_URL}/stats/by-category?limit=${limit}`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
+    getJobsPostedOverTime: builder.query({
+      query: () => ({
+        url: `${JOB_URL}/stats/posted-over-time`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -154,11 +180,14 @@ export const {
   useUpdateJobMutation,
   useDeleteJobMutation,
   useGetFilterOptionsQuery,
-  useGetJobCategoriesByParentQuery,
   useGetJobsByEmployerQuery,
   useGetMonthlyJobStatsQuery,
   useGetQuarterlyJobStatsQuery,
   useGetYearlyJobStatsQuery,
   useGetJobOverviewQuery,
-  useGetJobCategoriesByRecursiveQuery,
+  useGetRecommendedJobsQuery,
+  useGetAIRecommendedJobsQuery,
+  useGetJobStatusDistributionQuery,
+  useGetJobsByCategoryQuery,
+  useGetJobsPostedOverTimeQuery,
 } = jobApiSlice;

@@ -1,22 +1,37 @@
-import React from "react";
-
+import React, { useMemo } from "react";
 
 import { companyLogoIcon, moneyCalculator24Icon } from "../../assets";
 import { useNavigate } from "react-router-dom";
+import check from "check-types";
+import { formatCurrencyRange } from "../../utils/currencyUtils";
 
-export const TopJobCard = ({ jobs }) => {
-  const navigate = useNavigate()
+export const TopJobCard = ({ jobs, hightlightRanged }) => {
+  const navigate = useNavigate();
 
   const handleJobClick = (jobId) => {
     navigate(`/job-detail/${jobId}`);
   };
 
+  const mappedJobs = useMemo(() => {
+    return jobs.map((job) => ({
+      ...job,
+      hasValidSalaryString: check.nonEmptyString(job.salary),
+      hasValidSalaryRange: check.all(check.map(job.salaryRange, {
+        start: check.number,
+        end: check.number,
+      })) && check.nonEmptyString(job.salaryRangeUnit),
+    }));
+  }, [jobs]);
+
   return (
     <div className="flex flex-col gap-6">
-      {jobs.map((job, idx) => (
+      {mappedJobs.map((job, idx) => (
         <div
           key={idx}
-          className="bg-[#d7f0e6] rounded-xl shadow-sm p-6 flex items-center gap-6 hover:shadow-md transition-shadow duration-300 cursor-pointer"
+          className={`rounded-xl shadow-sm p-6 flex items-center justify-between gap-6 hover:shadow-md transition-shadow duration-300 cursor-pointer ${hightlightRanged && job.hasValidSalaryRange
+              ? "bg-[#fffbeb]"
+              : "bg-[#eafaf1]"
+            }`}
           onClick={() => handleJobClick(job.id)}
         >
           <img
@@ -44,16 +59,29 @@ export const TopJobCard = ({ jobs }) => {
               </span>
             </div>
           </div>
-          <div className="flex flex-col justify-between items-center text-[#034d31] font-semibold text-sm min-h-[112px]">
+          <div className="flex flex-col justify-between items-end text-[#034d31] font-semibold text-sm min-h-[112px]">
             <div className="flex flex-row justify-end items-center gap-2">
-              <span>{job.salary}</span>
-              <img
-                src={moneyCalculator24Icon}
-                alt="Salary"
-                className="w-7 h-7"
-              />
+              {(job.hasValidSalaryString || job.hasValidSalaryRange) && (
+                <>
+                  <span>
+                    {job.hasValidSalaryRange
+                      ? `${formatCurrencyRange(
+                        job.salaryRange.start,
+                        job.salaryRange.end,
+                      )
+                      } ${job.salaryRangeUnit}`
+                      : job.salary}
+                  </span>
+                  <img
+                    src={moneyCalculator24Icon}
+                    alt="Salary"
+                    className="w-7 h-7"
+                  />
+                </>
+              )}
             </div>
             <span className="text-xs opacity-70 mt-auto">{job.postedTime}</span>
+            {/*
             <div className="flex items-center gap-1 text-green-700">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -64,10 +92,15 @@ export const TopJobCard = ({ jobs }) => {
                 strokeWidth={2}
               >
                 <circle cx="12" cy="12" r="10" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 12l2 2 4-4"
+                />
               </svg>
               <span>{job.deliveryTime}</span>
             </div>
+            */}
           </div>
         </div>
       ))}

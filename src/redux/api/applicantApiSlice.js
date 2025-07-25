@@ -157,8 +157,26 @@ deleteProject: builder.mutation({
   invalidatesTags: ["MyProjects"],
 }),
 
-
+updateProfile: builder.mutation({
+  query: (profileData) => ({
+    url: `${APPLICANT_URL}/update-profile`,
+    method: "PUT",
+    body: profileData,
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
   }),
+  invalidatesTags: [{ type: "ApplicantProfile", id: "LIST" }],
+  }),
+  getProfile: builder.query({
+    query: () => ({
+      url: `${APPLICANT_URL}/get-profile/${userId}`,
+      method: "GET",
+      credentials: "include",
+    }),
+})
+  })
 });
 
 export const {
@@ -169,13 +187,15 @@ export const {
   useCountApplicationsQuery,
   useForgotPasswordMutation,
   useResetPasswordMutation,
-    useSearchApplicantsQuery,
+  useSearchApplicantsQuery,
   useUploadAvatarMutation,
   useGetUploadedCVsQuery,
   useDeleteUploadedCVMutation,
-    useCreateProjectMutation,
+  useCreateProjectMutation,
   useGetMyProjectsQuery,
   useUpdateProjectMutation,
   useDeleteProjectMutation,
+  useUpdateProfileMutation,
+
 
 } = applicantApiSlice;

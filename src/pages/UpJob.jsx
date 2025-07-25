@@ -31,9 +31,9 @@ const tabsComponents = [
   PostedJobsTab,
   ApplicantsTab,
   SearchApplicantsTab,
-  CompanyProfileTab,
+  // CompanyProfileTab,
   ServicePackageTab,
-  SettingsTab,
+  // SettingsTab,
 ];
 
 const UpJob = () => {
@@ -43,9 +43,9 @@ const UpJob = () => {
     { text: "Tin đã đăng", icon: lightPostIcon },
     { text: "Ứng viên đã ứng tuyển", icon: peopleFillIcon },
     { text: "Tìm kiếm ứng viên", icon: searchFilledIcon },
-    { text: "Hồ sơ công ty", icon: codexFileIcon },
-    { text: "Gói dịch vụ", icon: packageIcon },
-    { text: "Cài đặt", icon: settingIcon },
+    // { text: "Hồ sơ công ty", icon: codexFileIcon },
+    // { text: "Gói dịch vụ", icon: packageIcon },
+    // { text: "Cài đặt", icon: settingIcon },
   ];
 
   const [formData, setFormData] = useState({
@@ -109,7 +109,7 @@ const UpJob = () => {
 
 
 
- const [activeIndex, setActiveIndex] = useState(1);
+ const [activeIndex, setActiveIndex] = useState(0);
 // Hàm xử lý chung chuyển tab
   const handleSelectTab = (index) => {
     setActiveIndex(index);

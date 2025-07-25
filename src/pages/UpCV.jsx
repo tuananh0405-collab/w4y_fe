@@ -23,8 +23,8 @@ const UpCV = () => {
         {/* <StepperNavigation currentStep={1} /> */}
         <UploadCVSection />
         <CVUploadedList />
-        <CreateNewCVSection />
-        <CVTemplateSelection />
+        {/* <CreateNewCVSection />
+        <CVTemplateSelection /> */}
         {/* <PreviewSection /> */}
       </div>
       <Footer />

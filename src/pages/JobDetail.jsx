@@ -6,8 +6,10 @@ import Footer from "../components/home/Footer";
 import Header from "../components/home/Header";
 import theme from "../utils/theme";
 import ApplicationForm from "../components/up-job/ApplicationForm";
-import { Modal } from "antd";
+import { Modal, Tooltip } from "antd";
 import { FastApply } from "../components/FastApply ";
+import check from "check-types";
+import { formatCurrencyRange } from "../utils/currencyUtils";
 
 const colors = {
   lightGray: "#A8BBB4",
@@ -28,9 +30,12 @@ const JobDetail = () => {
   if (error) return <div>Error loading job details</div>;
 
   const job = data?.data;
-  console.log("====================================");
-  console.log(job);
-  console.log("====================================");
+
+  const hasValidSalaryString = check.nonEmptyString(job?.salary);
+  const hasValidSalaryRange = check.all(check.map(job?.salaryRange, {
+    start: check.number,
+    end: check.number,
+  })) && check.nonEmptyString(job.salaryRangeUnit);
 
   return (
     <div className="flex flex-col w-full">
@@ -67,7 +72,8 @@ const JobDetail = () => {
           </p>
 
           {/* File CV input */}
-          {/* <div className="mb-4">
+          {
+            /* <div className="mb-4">
             <input
               type="file"
               accept=".pdf,.doc,.docx"
@@ -75,7 +81,8 @@ const JobDetail = () => {
               className="border p-2 rounded"
               style={{ borderColor: colors.tealGreen }}
             />
-          </div> */}
+          </div> */
+          }
 
           <div className="flex gap-4">
             <button
@@ -85,13 +92,13 @@ const JobDetail = () => {
             >
               Ứng tuyển ngay
             </button>
-            <button
+            {/* <button
               onClick={() => setIsQuickApplyOpen(true)}
               className="text-white px-6 py-3 rounded-lg"
               style={{ backgroundColor: colors.darkTeal }}
             >
               Ứng tuyển nhanh
-            </button>
+            </button> */}
 
             <Modal
               open={isModalOpen}
@@ -121,12 +128,12 @@ const JobDetail = () => {
               />
             </Modal>
 
-            <button
+            {/* <button
               className="border px-6 py-3 rounded-lg"
               style={{ borderColor: colors.tealGreen, color: colors.tealGreen }}
             >
               Lưu tin
-            </button>
+            </button> */}
           </div>
         </div>
 
@@ -150,7 +157,23 @@ const JobDetail = () => {
               {new Date(job?.createdAt).toLocaleDateString()}
             </div>
             <div className="mb-2">
-              <span className="text-gray-500">Lương:</span> {job?.salary}
+              <span className="text-gray-500">Lương:</span> {hasValidSalaryRange
+                ? (
+                  `${formatCurrencyRange(
+                    job.salaryRange.start,
+                    job.salaryRange.end,
+                  )
+                  } ${job.salaryRangeUnit}`
+                )
+                : hasValidSalaryString
+                  ? (
+                    job.salary
+                  )
+                  : (
+                    <span className="text-gray-400 italic">
+                      Không có thông tin
+                    </span>
+                  )}
             </div>
             <div className="mb-2">
               <span className="text-gray-500">Thời gian làm việc:</span>{" "}
@@ -160,6 +183,22 @@ const JobDetail = () => {
               <span className="text-gray-500">Cấp bậc:</span>{" "}
               {job?.priorityLevel}
             </div>
+            {check.nonEmptyArray(job?.skills) && (
+              <div className="mb-2">
+                <span className="text-gray-500">Kỹ năng:</span>{" "}
+                <div className="flex gap-2">
+                  {job.skills.map((skill) => (
+                    <Tooltip title={skill.description} key={skill._id}>
+                      <div
+                        className={"flex items-center px-3 py-1 rounded-full select-none bg-gray-200"}
+                      >
+                        {skill.name}
+                      </div>
+                    </Tooltip>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div>
