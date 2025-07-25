@@ -6,7 +6,7 @@ import AdminSidebar from "../components/admin-dashboard/AdminSidebar";
 import Overview from "../components/admin-dashboard/sections/overview/AdminOverview";
 import AdminUsersManage from "../components/admin-dashboard/sections/users/AdminUsersManage";
 import AdminJobsManage from "../components/admin-dashboard/sections/jobs/AdminJobsManage";
-import AdminApplicantsManage from "../components/admin-dashboard/sections/applicants/AdminApplicantsManage";
+// import AdminApplicantsManage from "../components/admin-dashboard/sections/applicants/AdminApplicantsManage";
 import AdminApplicationsManage from "../components/admin-dashboard/sections/applications/AdminApplicationsManage";
 // import Applications from "../components/admin-dashboard/sections/Applications";
 
@@ -19,8 +19,8 @@ const AdminDashboard = () => {
         return <Overview />;
       case "users":
         return <AdminUsersManage />;
-      case "applicants":
-        return <AdminApplicantsManage />;
+      // case "applicants":
+      //   return <AdminApplicantsManage />;
       case "jobs":
         return <AdminJobsManage />;
       case "applications":

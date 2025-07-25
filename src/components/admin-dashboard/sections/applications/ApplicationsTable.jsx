@@ -15,7 +15,10 @@ const statusColors = {
 };
 
 const ApplicationsTable = () => {
-  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10,
+  });
   const [sortModel, setSortModel] = useState([]);
   const [filterModel, setFilterModel] = useState({ items: [] });
 
@@ -33,7 +36,8 @@ const ApplicationsTable = () => {
   const rowCountRef = useRef(data?.pagination?.totalApplications || 0);
 
   const rowCount = useMemo(() => {
-    if (data?.pagination?.totalApplications !== undefined) rowCountRef.current = data.pagination.totalApplications;
+    if (data?.pagination?.totalApplications !== undefined)
+      rowCountRef.current = data.pagination.totalApplications;
     return rowCountRef.current;
   }, [data?.pagination?.totalApplications]);
 
@@ -53,9 +57,26 @@ const ApplicationsTable = () => {
     console.log("Delete application", id);
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    const datePart = dateString.split("T")[0];
+    const [year, month, day] = datePart.split("-");
+    return `${day}/${month}/${year}`;
+  };
+
   const columns = [
-    { field: "applicantName", headerName: "Applicant Name", flex: 1, sortable: true },
-    { field: "applicantEmail", headerName: "Applicant Email", flex: 1, sortable: true },
+    {
+      field: "applicantName",
+      headerName: "Applicant Name",
+      flex: 1,
+      sortable: true,
+    },
+    {
+      field: "applicantEmail",
+      headerName: "Applicant Email",
+      flex: 1,
+      sortable: true,
+    },
     { field: "jobTitle", headerName: "Job Title", flex: 1, sortable: true },
     {
       field: "status",
@@ -63,10 +84,20 @@ const ApplicationsTable = () => {
       flex: 1,
       sortable: true,
       renderCell: (params) => (
-        <Chip label={params.value} color={statusColors[params.value] || "default"} size="small" />
+        <Chip
+          label={params.value}
+          color={statusColors[params.value] || "default"}
+          size="small"
+        />
       ),
     },
-    { field: "appliedAt", headerName: "Applied At", flex: 1, sortable: true, valueGetter: (params) => params && params.row && params.row.appliedAt ? new Date(params.row.appliedAt).toLocaleDateString() : "-" },
+    {
+      field: "appliedAt",
+      headerName: "Applied At",
+      flex: 1,
+      sortable: true,
+      renderCell: (params) => <span>{formatDate(params.value)}</span>,
+    },
     {
       field: "actions",
       type: "actions",
@@ -137,4 +168,4 @@ const ApplicationsTable = () => {
   );
 };
 
-export default ApplicationsTable; 
+export default ApplicationsTable;

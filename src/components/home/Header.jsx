@@ -39,7 +39,7 @@ const Header = () => {
   };
 
   const menuItems = [];
-  if (user?.user?.accountType !== "Nhà Tuyển Dụng") {
+  if (user?.accountType !== "Nhà Tuyển Dụng") {
     menuItems.push(
       {
         key: "profile",
