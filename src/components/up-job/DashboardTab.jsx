@@ -65,10 +65,10 @@ const DashboardTab = ({ onSelectTab }) => {
           <p className="text-base font-normal mb-2">Tin tuyển dụng hiện tại</p>
           <p className="text-4xl font-bold">{jobs.length}</p>
         </div>
-        <div className="flex-1 border-2 border-gray-400 rounded-md p-4 text-center">
+        {/*<div className="flex-1 border-2 border-gray-400 rounded-md p-4 text-center">
           <p className="text-base font-normal mb-2">Lượt xem tin tuyển dụng</p>
           <p className="text-4xl font-bold">125</p>
-        </div>
+        </div>*/}
         <div className="flex-1 border-2 border-gray-400 rounded-md p-4 text-center cursor-pointer"   onClick={() => onSelectTab(3)}>
           <p className="text-base font-normal mb-2">Ứng viên ứng tuyển</p>
           <p className="text-4xl font-bold">{applications.length}</p>

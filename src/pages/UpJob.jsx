@@ -44,7 +44,7 @@ const UpJob = () => {
     { text: "Ứng viên đã ứng tuyển", icon: peopleFillIcon },
     { text: "Tìm kiếm ứng viên", icon: searchFilledIcon },
     // { text: "Hồ sơ công ty", icon: codexFileIcon },
-    { text: "Gói dịch vụ", icon: packageIcon },
+    // { text: "Gói dịch vụ", icon: packageIcon },
     // { text: "Cài đặt", icon: settingIcon },
   ];
 

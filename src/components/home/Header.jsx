@@ -45,9 +45,7 @@ const Header = () => {
         key: "profile",
         label: (
           <a href="/profile">
-            <span
-              className="font-inter text-[14px] cursor-pointer hover:text-teal-600"
-            >
+            <span className="font-inter text-[14px] cursor-pointer hover:text-teal-600">
               Hồ sơ cá nhân
             </span>
           </a>
@@ -60,9 +58,7 @@ const Header = () => {
         key: "job-applied",
         label: (
           <a href="/job-applied">
-            <span
-              className="font-inter text-[14px] cursor-pointer hover:text-teal-600"
-            >
+            <span className="font-inter text-[14px] cursor-pointer hover:text-teal-600">
               Công việc đã ứng tuyển
             </span>
           </a>
@@ -77,9 +73,7 @@ const Header = () => {
     key: "logout",
     label: (
       <a onClick={handleLogout}>
-        <span
-          className="font-inter text-[14px] text-red-600 cursor-pointer hover:text-red-800"
-        >
+        <span className="font-inter text-[14px] text-red-600 cursor-pointer hover:text-red-800">
           Đăng xuất
         </span>
       </a>
@@ -100,16 +94,8 @@ const Header = () => {
       </div>
 
       <nav className="flex flex-wrap items-center gap-6 md:gap-10 mt-4 md:mt-0">
-        {user?.accountType === "Nhà Tuyển Dụng"
-          ? (
-            <a
-              href="/up-job"
-              className="text-lg font-semibold text-white bg-teal-600 rounded-md px-5 py-2 hover:bg-teal-700 active:scale-95 transition-transform duration-200"
-            >
-              Quản lý đăng tuyển 
-            </a>
-          )
-          : (
+        {user?.accountType === "Ứng Viên" &&
+          (
             <>
               <FindJobsDropdownButton />
               <a
@@ -120,13 +106,6 @@ const Header = () => {
               </a>
             </>
           )}
-
-        <a
-          href="/vip"
-          className="text-lg font-semibold text-gray-800 hover:text-teal-600 transition-colors duration-300"
-        >
-          W4UVIP
-        </a>
       </nav>
 
       {/* User info */}

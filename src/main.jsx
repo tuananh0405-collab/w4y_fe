@@ -33,6 +33,7 @@ import AdminAuth from "./layouts/AdminAuth.jsx";
 import JobApplied from "./pages/JobApplied.jsx";
 import GoogleAnalytics from "./components/GoogleAnalytics.jsx";
 import RecommendedJobs from "./pages/RecommendedJobs.jsx";
+import ApplicantRoute from "./routes/ApplicantRoute.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -52,7 +53,9 @@ const router = createBrowserRouter(
 
         {/* USER */}
         <Route element={<UserRoute />}>
-          <Route index element={<Home />} />
+          <Route path="/" element={<ApplicantRoute redirect="up-job" />}>
+            <Route index element={<Home />} />
+          </Route>
           <Route path="register-employer" element={<Register_Employer />} />
           <Route path="register-employee" element={<Register_Employee />} />
           <Route path="up-cv" element={<UpCV />} />

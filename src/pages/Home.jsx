@@ -161,7 +161,7 @@ useEffect(() => {
         onPageChange={handlePageChange}
       />
 
-      <TopIndustries />
+      {/*<TopIndustries />*/}
       <Footer />
     </div>
   );
