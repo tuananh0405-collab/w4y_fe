@@ -354,8 +354,8 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
       }
 
       await createJob(jobData);
-      // navigate("/");
-      console.log("Job created successfully");
+      navigate("/");
+      // console.log("Job created successfully");
       if (onSubmit) onSubmit();
     } catch (error) {
       console.error("Error creating job:", error);

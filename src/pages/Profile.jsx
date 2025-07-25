@@ -18,8 +18,7 @@ import {
   useGetMyProjectsQuery,
   useUpdateProfileMutation,
   useUploadAvatarMutation,
-  useUpdateUserProfileMutation,
-
+  useUpdateUserProfileMutation
 } from "../redux/api/applicantApiSlice";
 import { useGetUserReviewsQuery } from "../redux/api/applicationApiSlice";
 import { useGetJobSkillsByIdsQuery } from "../redux/api/jobSkillApiSlice";
