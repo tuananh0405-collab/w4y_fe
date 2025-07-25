@@ -17,7 +17,10 @@ const statusColors = {
 };
 
 const JobsTable = () => {
-  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10,
+  });
   const [sortModel, setSortModel] = useState([]);
   const [filterModel, setFilterModel] = useState({ items: [] });
 
@@ -36,7 +39,8 @@ const JobsTable = () => {
   const rowCountRef = useRef(data?.pagination?.totalJobs || 0);
 
   const rowCount = useMemo(() => {
-    if (data?.pagination?.totalJobs !== undefined) rowCountRef.current = data.pagination.totalJobs;
+    if (data?.pagination?.totalJobs !== undefined)
+      rowCountRef.current = data.pagination.totalJobs;
     return rowCountRef.current;
   }, [data?.pagination?.totalJobs]);
 
@@ -56,6 +60,13 @@ const JobsTable = () => {
     console.log("Delete job", id);
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    const datePart = dateString.split("T")[0];
+    const [year, month, day] = datePart.split("-");
+    return `${day}/${month}/${year}`;
+  };
+
   const columns = [
     { field: "title", headerName: "Title", flex: 1, sortable: true },
     { field: "employerName", headerName: "Employer", flex: 1, sortable: true },
@@ -65,11 +76,21 @@ const JobsTable = () => {
       flex: 1,
       sortable: true,
       renderCell: (params) => (
-        <Chip label={params.value} color={statusColors[params.value] || "default"} size="small" />
+        <Chip
+          label={params.value}
+          color={statusColors[params.value] || "default"}
+          size="small"
+        />
       ),
     },
-    { field: "createdAt", headerName: "Created At", flex: 1, sortable: true, valueGetter: (params) => params && params.row && params.row.createdAt ? new Date(params.row.createdAt).toLocaleDateString() : "-" },
-    { field: "deadline", headerName: "Deadline", flex: 1, sortable: true, valueGetter: (params) => params && params.row && params.row.deadline ? new Date(params.row.deadline).toLocaleDateString() : "-" },
+    {
+      field: "createdAt",
+      headerName: "Created At",
+      flex: 1,
+      sortable: true,
+      renderCell: (params) => <span>{formatDate(params.value)}</span>,
+    },
+    { field: "salary", headerName: "Salary", flex: 1, sortable: true },
     { field: "views", headerName: "Views", flex: 1, sortable: true },
     { field: "industry", headerName: "Category", flex: 1, sortable: true },
     {
@@ -142,4 +163,4 @@ const JobsTable = () => {
   );
 };
 
-export default JobsTable; 
+export default JobsTable;

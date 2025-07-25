@@ -62,7 +62,9 @@ export const applicationApiSlice = apiSlice.injectEndpoints({
     // Lấy danh sách công việc đã ứng tuyển của user
     getAppliedJobs: builder.query({
       query: ({ page = 1, limit = 10, search = "" }) => ({
-        url: `${APPLICATION_URL}/applied-jobs?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`,
+        url: `${APPLICATION_URL}/applied-jobs?page=${page}&limit=${limit}&search=${encodeURIComponent(
+          search
+        )}`,
         method: "GET",
         credentials: "include",
       }),
@@ -76,8 +78,8 @@ export const applicationApiSlice = apiSlice.injectEndpoints({
       }),
     }),
     getApplicationsByJob: builder.query({
-      query: () => ({
-        url: `${APPLICATION_URL}/stats/by-job`,
+      query: ({ limit = 4 } = {}) => ({
+        url: `${APPLICATION_URL}/stats/by-job?limit=${limit}`,
         method: "GET",
         credentials: "include",
       }),
@@ -90,7 +92,12 @@ export const applicationApiSlice = apiSlice.injectEndpoints({
       }),
     }),
     getAllApplications: builder.query({
-      query: ({ page = 1, limit = 10, sortField = "appliedAt", sortOrder = "desc" } = {}) => ({
+      query: ({
+        page = 1,
+        limit = 10,
+        sortField = "appliedAt",
+        sortOrder = "desc",
+      } = {}) => ({
         url: `${APPLICATION_URL}/all-applications?page=${page}&limit=${limit}&sortField=${sortField}&sortOrder=${sortOrder}`,
         method: "GET",
         credentials: "include",
