@@ -1,5 +1,5 @@
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Divider, message, Modal, Form, Input, Select, Button, Popconfirm, DatePicker } from "antd";
@@ -18,12 +18,11 @@ import {
   useGetMyProjectsQuery,
   useUpdateProfileMutation,
   useUploadAvatarMutation,
-  useDeleteProjectMutation,
-  useUpdateUserProfileMutation
+  useUpdateUserProfileMutation,
 
 } from "../redux/api/applicantApiSlice";
 import { useGetUserReviewsQuery } from "../redux/api/applicationApiSlice";
-
+import { useGetJobSkillsByIdsQuery } from "../redux/api/jobSkillApiSlice";
 import theme from "../utils/theme";
 import dayjs from "dayjs";
 import { PlusOutlined } from "@ant-design/icons";
@@ -395,6 +394,10 @@ const Profile = () => {
     }
   };
 
+  const skillIds = user?.skills?.map(skill => skill.id) || [];
+  const check = {
+  nonEmptyArray: (arr) => Array.isArray(arr) && arr.length > 0,
+};
   const {
     data: userSkillsQuery,
     isLoading: isLoadingUserSkills,
@@ -402,6 +405,7 @@ const Profile = () => {
   } = useGetJobSkillsByIdsQuery({ ids: skillIds }, {
     skip: !check.nonEmptyArray(skillIds),
   });
+
 
   const userSkillsDocs = useMemo(() => {
     return userSkillsQuery?.data ?? [];
