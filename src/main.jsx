@@ -53,7 +53,7 @@ const router = createBrowserRouter(
 
         {/* USER */}
         <Route element={<UserRoute />}>
-          <Route path="/" element={<ApplicantRoute redirect="up-job" />}>
+          <Route path="/" element={<ApplicantRoute redirect="up-job" allowGuest />}>
             <Route index element={<Home />} />
           </Route>
           <Route path="register-employer" element={<Register_Employer />} />
