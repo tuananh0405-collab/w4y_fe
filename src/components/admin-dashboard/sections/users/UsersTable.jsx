@@ -28,18 +28,6 @@ const UsersTable = () => {
     return rowCountRef.current;
   }, [data?.total]);
 
-  const handleView = (id) => {
-    console.log("View user", id);
-  };
-
-  const handleSuspend = (id) => {
-    console.log("Suspend user", id);
-  };
-
-  const handleDelete = (id) => {
-    console.log("Delete user", id);
-  };
-
   const columns = [
     { field: "name", headerName: "Name", flex: 1 },
     { field: "email", headerName: "Email", flex: 1 },
@@ -67,42 +55,6 @@ const UsersTable = () => {
       type: "singleSelect",
       valueOptions: ["Nhà Tuyển Dụng", "Ứng Viên"],
       filterable: false,
-    },
-
-    {
-      field: "actions",
-      type: "actions",
-      headerName: "Actions",
-      width: 120,
-      getActions: (params) => [
-        <GridActionsCellItem
-          icon={
-            <Tooltip title="View">
-              <VisibilityIcon />
-            </Tooltip>
-          }
-          label="View"
-          onClick={() => handleView(params.row.id)}
-        />,
-        <GridActionsCellItem
-          icon={
-            <Tooltip title="Suspend">
-              <BlockIcon />
-            </Tooltip>
-          }
-          label="Suspend"
-          onClick={() => handleSuspend(params.row.id)}
-        />,
-        <GridActionsCellItem
-          icon={
-            <Tooltip title="Delete">
-              <DeleteIcon />
-            </Tooltip>
-          }
-          label="Delete"
-          onClick={() => handleDelete(params.row.id)}
-        />,
-      ],
     },
 
   ];
