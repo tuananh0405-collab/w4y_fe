@@ -106,7 +106,7 @@ const Header = () => {
               href="/up-job"
               className="text-lg font-semibold text-white bg-teal-600 rounded-md px-5 py-2 hover:bg-teal-700 active:scale-95 transition-transform duration-200"
             >
-              Đăng tuyển ngay
+              Quản lý đăng tuyển 
             </a>
           )
           : (

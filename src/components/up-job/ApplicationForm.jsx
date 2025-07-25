@@ -3,18 +3,22 @@ import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import { fileIcon, editNoteIcon } from "../../assets";
 import { useApplyJobMutation } from "../../redux/api/applicationApiSlice";
+import { Snackbar, Alert } from "@mui/material"; // Import Snackbar and Alert from MUI
 
 const ApplicationForm = ({ jobId, jobTitle, onClose }) => {
   const [uploadFromComputer, setUploadFromComputer] = useState(true);
   const [file, setFile] = useState(null);
   const [applyJob, { isLoading }] = useApplyJobMutation();
 
-  // Checkbox logic (hiện tại chỉ cho chọn upload từ máy tính)
+  // Snackbar state
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // "success", "error", "warning", "info"
+
   const handleUploadFromComputerChange = () => {
     setUploadFromComputer(true);
   };
 
-  // Xử lý chọn file
   const handleFileInput = (e) => {
     if (e.target.files.length > 0) {
       setFile(e.target.files[0]);
@@ -23,10 +27,11 @@ const ApplicationForm = ({ jobId, jobTitle, onClose }) => {
     }
   };
 
-  // Xử lý nộp đơn
   const handleSubmit = async () => {
     if (uploadFromComputer && !file) {
-      alert("Vui lòng chọn file CV trước khi nộp.");
+      setSnackbarMessage("Vui lòng chọn file CV trước khi nộp.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
       return;
     }
 
@@ -37,11 +42,15 @@ const ApplicationForm = ({ jobId, jobTitle, onClose }) => {
 
     try {
       await applyJob({ jobId, formData }).unwrap();
-      alert("Ứng tuyển thành công!");
+      setSnackbarMessage("Ứng tuyển thành công!");
+      setSnackbarSeverity("success");
+      setOpenSnackbar(true);
       onClose();
     } catch (err) {
       console.error(err);
-      alert("Có lỗi xảy ra khi nộp đơn");
+      setSnackbarMessage("Có lỗi xảy ra khi nộp đơn");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
     }
   };
 
@@ -234,6 +243,17 @@ const ApplicationForm = ({ jobId, jobTitle, onClose }) => {
           </Button>
         </footer>
       </section>
+
+      {/* Snackbar for success or error messages */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000} // Hide after 6 seconds
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </main>
   );
 };

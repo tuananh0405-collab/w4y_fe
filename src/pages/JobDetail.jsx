@@ -92,13 +92,13 @@ const JobDetail = () => {
             >
               Ứng tuyển ngay
             </button>
-            <button
+            {/* <button
               onClick={() => setIsQuickApplyOpen(true)}
               className="text-white px-6 py-3 rounded-lg"
               style={{ backgroundColor: colors.darkTeal }}
             >
               Ứng tuyển nhanh
-            </button>
+            </button> */}
 
             <Modal
               open={isModalOpen}
@@ -128,12 +128,12 @@ const JobDetail = () => {
               />
             </Modal>
 
-            <button
+            {/* <button
               className="border px-6 py-3 rounded-lg"
               style={{ borderColor: colors.tealGreen, color: colors.tealGreen }}
             >
               Lưu tin
-            </button>
+            </button> */}
           </div>
         </div>
 
