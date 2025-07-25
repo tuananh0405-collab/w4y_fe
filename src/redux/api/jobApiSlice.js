@@ -157,8 +157,8 @@ export const jobApiSlice = apiSlice.injectEndpoints({
       }),
     }),
     getJobsByCategory: builder.query({
-      query: () => ({
-        url: `${JOB_URL}/stats/by-category`,
+      query: ({ limit = 4 } = {}) => ({
+        url: `${JOB_URL}/stats/by-category?limit=${limit}`,
         method: "GET",
         credentials: "include",
       }),
