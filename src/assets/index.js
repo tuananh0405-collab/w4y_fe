@@ -11,7 +11,7 @@ export { default as deviconGoogleIcon } from './icons/devicon_google.svg';
 export { default as emailIcon } from './icons/email.svg';
 export { default as facebookIcon } from './icons/facebook.svg';
 export { default as fileIcon } from './icons/file.svg';
-export { default as googleBlackIcon } from './icons/google_black.svg';
+export { default as googleBlackIcon } from './icons/google-icon-logo-svgrepo-com.svg';
 // export { default as cityOutlineIcon } from './icons/icon-park-outline-city-1.svg';
 export { default as instagramIcon } from './icons/instagram.svg';
 export { default as keyPasswordIcon } from './icons/key_password.svg';

@@ -46,10 +46,10 @@ const Auth = () => {
   };
 
  const menuItems = [
-    { label: "Việc làm", path: "/" },
-    { label: "Hồ sơ & CV", path: "/up-cv" },
-    { label: "Công cụ", path: "/" },
-    { label: "W4UVIP", path: "/" },
+    { label: "Trang chủ", path: "/" },
+    // { label: "Hồ sơ & CV", path: "/up-cv" },
+    // { label: "Công cụ", path: "/" },
+    // { label: "W4UVIP", path: "/" },
   ];
   const handleModalClose = () => {
     setIsModalVisible(false);
@@ -293,6 +293,19 @@ const Auth = () => {
             <img src={googleBlackIcon} alt="Google" className="w-8 h-8" />
             <span>Đăng nhập bằng Google</span>
           </button>
+
+          {/* Register link */}
+          <div className="text-center mt-4">
+            <span className="text-gray-600">Chưa có tài khoản? </span>
+            <button
+              type="button"
+              onClick={() => navigate("/welcome")}
+              className="font-semibold hover:underline cursor-pointer"
+              style={{ color: theme.colors.tealGreen }}
+            >
+              Đăng ký ngay
+            </button>
+          </div>
         </form></>
       )}
 
