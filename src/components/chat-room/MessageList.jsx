@@ -26,7 +26,7 @@ const parseTime = (val) => {
 };
 
 // Display a range of message in the current conversation
-const MessageList = ({ senderId, receiverId }) => {
+const MessageList = ({ senderId, receiverId, listOnSendRef }) => {
   const [page, setPage] = useState(1);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -158,6 +158,10 @@ const MessageList = ({ senderId, receiverId }) => {
       updateMessageReadBatch();
     }, 300);
   };
+
+  if (listOnSendRef) {
+    listOnSendRef.current = updateMessageReadBatch
+  }
 
   const containerRef = useRef(null);
 

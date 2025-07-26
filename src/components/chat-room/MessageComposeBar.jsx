@@ -4,7 +4,7 @@ import EmojiPicker from "emoji-picker-react";
 import { useState } from "react";
 
 // The bar right below message list that allows typing and sending message
-const MessageComposeBar = ({ onSend }) => {
+const MessageComposeBar = ({ onSend, listOnSendRef }) => {
   const [message, setMessage] = useState("");
 
   const [emojiAnchorEl, setEmojiAnchorEl] = useState(null);
@@ -26,6 +26,14 @@ const MessageComposeBar = ({ onSend }) => {
     if (message.trim() !== "") {
       onSend(message);
       setMessage("");
+    }
+    if (listOnSendRef && listOnSendRef.current) {
+      try {
+        listOnSendRef.current()
+      }
+      catch (e) {
+        console.error(e)
+      }
     }
   };
 
