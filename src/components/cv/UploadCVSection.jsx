@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Button from "@mui/material/Button";
 import { useUploadCVMutation } from "../../redux/api/applicantApiSlice"; // Đảm bảo bạn đã import hook
 import { fileIcon } from "../../assets";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const UploadCVSection = () => {
   const [isDragging, setIsDragging] = useState(false);
@@ -36,12 +38,12 @@ const UploadCVSection = () => {
   const handleFile = (file) => {
     const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     if (!validTypes.includes(file.type)) {
-      alert('Please upload PDF, DOC, or DOCX files only');
+      toast.error("Please upload PDF, DOC, or DOCX files only.");
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('File size should not exceed 5MB');
+      toast.error("File size should not exceed 5MB");
       return;
     }
 
@@ -50,7 +52,7 @@ const UploadCVSection = () => {
 
   const handleUpload = async () => {
     if (!file) {
-      alert('Please select a file first');
+      toast.error("Please select a file first");
       return;
     }
   
@@ -63,13 +65,13 @@ const UploadCVSection = () => {
       const response = await uploadCV(formData).unwrap();
       
       if (response?.success) {
-        alert('File uploaded successfully');
+        toast.success("File uploaded successfully");
       } else {
-        alert('Error uploading CV');
+        toast.error("Error uploading CV");
       }
     } catch (err) {
       console.error(err);
-      alert('Error uploading CV');
+      toast.error("Error uploading CV");
     }
   };
   
@@ -129,6 +131,7 @@ const UploadCVSection = () => {
       {error && (
         <div className="mt-4 text-red-500">Có lỗi xảy ra khi tải lên CV</div>
       )}
+      <ToastContainer/>
     </div>
   );
 };

@@ -3,6 +3,17 @@ import { APPLICATION_URL, REVIEW_URL } from "../constants"; // Đảm bảo bạ
 
 export const applicationApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    applyJobLibrary: builder.mutation({
+      query: ({ jobId, resumeId, coverLetter }) => ({
+        url: `${APPLICATION_URL}/apply-library/${jobId}`, // API để đăng ký ứng tuyển
+        method: "POST",
+        body: { resumeId, coverLetter }, // Gửi ID CV và thư xin việc
+        headers: {
+          "Content-Type": "application/json", // Đảm bảo gửi dữ liệu dưới dạng JSON
+        },
+        credentials: "include", // Nếu cần gửi cookie/Authorization header
+      }),
+    }),
     // Đăng ký đơn ứng tuyển
     applyJob: builder.mutation({
       query: ({ jobId, formData }) => ({
@@ -107,6 +118,7 @@ export const applicationApiSlice = apiSlice.injectEndpoints({
 });
 
 export const {
+  useApplyJobLibraryMutation,
   useApplyJobMutation,
   useUpdateApplicationStatusMutation,
   useViewApplicationStatusQuery,

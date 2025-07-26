@@ -50,6 +50,7 @@ const Register_Employee = () => {
       // Gửi request đăng ký
       const response = await signUp(updatedFormData).unwrap();
       console.log("Registration successful", response);
+      toast.success("Registration successful! Please check your email for verification.");
 
       // Hiển thị Modal yêu cầu nhập verification code
       setIsModalVisible(true);
@@ -83,6 +84,7 @@ const Register_Employee = () => {
 
       // Sau khi xác minh thành công, điều hướng về trang đăng nhập
       navigate("/auth");
+      toast.success("Email verified successfully!");
     } catch (error) {
       const errorMsg =
         Array.isArray(error?.data?.errors)

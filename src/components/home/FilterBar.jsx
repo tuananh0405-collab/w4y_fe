@@ -6,6 +6,7 @@ const FilterBar = ({ onFilterChange }) => {
   const [filterType, setFilterType] = useState('location');
   const [selectedOption, setSelectedOption] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [showAllItems, setShowAllItems] = useState(false);
   const dropdownRef = useRef(null);
 
   const { data, error, isLoading } = useGetFilterOptionsQuery();
@@ -42,12 +43,22 @@ const FilterBar = ({ onFilterChange }) => {
     setFilterType(id);
     setSelectedOption('');
     setIsDropdownOpen(false);
+    setShowAllItems(false); // Reset show all when changing filter type
   };
 
   const handleOptionSelect = (id) => {
     setSelectedOption(id);
     onFilterChange({ type: filterType, value: id });
   };
+
+  const toggleShowAllItems = () => {
+    setShowAllItems(!showAllItems);
+  };
+
+  // Determine how many items to show initially (you can adjust this number)
+  const itemsToShowInitially = 6;
+  const displayedOptions = showAllItems ? options : options.slice(0, itemsToShowInitially);
+  const hasMoreItems = options.length > itemsToShowInitially;
 
   if (isLoading) {
     return <div className="p-4 text-center text-gray-500">Đang tải bộ lọc...</div>;
@@ -101,32 +112,46 @@ const FilterBar = ({ onFilterChange }) => {
       </div>
 
       {/* Danh sách các lựa chọn theo loại */}
-      <div className="flex gap-4 flex-wrap">
-        {/* Nút "Ngẫu nhiên" */}
-        <button
-          key="random"
-          className="h-12 px-6 rounded-lg font-semibold bg-transparent border border-gray-300"
-          onClick={() => handleOptionSelect("random")}
-        >
-          Ngẫu nhiên
-        </button>
-
-        {/* Danh sách các options */}
-        {options.length === 0 ? (
-          <div className="text-gray-500 italic">Không có dữ liệu</div>
-        ) : (
-          options.map((option) => (
+      <div className="flex-1">
+        <div className={`flex gap-4 ${showAllItems ? 'flex-col' : 'flex-wrap'}`}>
+          {/* Nút "Ngẫu nhiên" */}
+          <div className={`${showAllItems ? 'flex flex-wrap gap-4' : 'flex gap-4 flex-wrap'}`}>
             <button
-              key={option.id}
-              className={`h-12 px-6 rounded-lg font-semibold ${
-                selectedOption === option.id ? 'bg-[#A8E6CF] text-black' : 'bg-transparent border border-gray-300'
-              }`}
-              onClick={() => handleOptionSelect(option.id)}
+              key="random"
+              className="h-12 px-6 rounded-lg font-semibold bg-transparent border border-gray-300 whitespace-nowrap cursor-pointer hover:bg-[#A8E6CF] hover:text-black transition-colors"
+              onClick={() => handleOptionSelect("random")}
             >
-              {option.label}
+              Ngẫu nhiên
             </button>
-          ))
-        )}
+
+            {/* Danh sách các options */}
+            {displayedOptions.length === 0 ? (
+              <div className="text-gray-500 italic">Không có dữ liệu</div>
+            ) : (
+              displayedOptions.map((option) => (
+                <button
+                  key={option.id}
+                  className={`h-12 px-6 rounded-lg font-semibold whitespace-nowrap cursor-pointer ${
+                    selectedOption === option.id ? 'bg-[#A8E6CF] text-black' : 'bg-transparent border border-gray-300'
+                  }`}
+                  onClick={() => handleOptionSelect(option.id)}
+                >
+                  {option.label}
+                </button>
+              ))
+            )}
+
+            {/* Button hiển thị thêm/ẩn bớt */}
+            {hasMoreItems && (
+              <button
+                className="h-12 px-6 rounded-lg font-semibold bg-blue-500 text-white hover:bg-blue-600 transition-colors whitespace-nowrap"
+                onClick={toggleShowAllItems}
+              >
+                {showAllItems ? 'Ẩn bớt' : `Hiển thị thêm (${options.length - itemsToShowInitially})`}
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

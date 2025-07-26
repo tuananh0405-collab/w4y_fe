@@ -54,7 +54,8 @@ const Header = () => {
       {
         type: "divider",
       },
-      {
+      /*
+       * {
         key: "job-applied",
         label: (
           <a href="/job-applied">
@@ -67,6 +68,7 @@ const Header = () => {
       {
         type: "divider",
       },
+      */
     );
   }
   menuItems.push({
@@ -136,7 +138,7 @@ const Header = () => {
                 {user.name}
               </span>
               <span className="font-inter text-xs text-gray-500 tracking-wide truncate">
-                {user.accountType} ({points} điểm)
+                {user.accountType}
               </span>
             </div>
             <Chip

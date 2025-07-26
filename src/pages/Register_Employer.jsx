@@ -19,6 +19,8 @@ import {
 import { Modal, Input, Button } from "antd";
 import theme from "../utils/theme";
 import { BASE_URL } from "../redux/constants";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Register_Employer = () => {
   const [formData, setFormData] = useState({
@@ -33,7 +35,7 @@ const Register_Employer = () => {
     cityCode: "",  // city code
     district: "",  // district name
     districtCode: "", // (optional) district code if needed
-    agreeToTerms: false,
+    agreeToTerms: true,
   });
 
   const [provinces, setProvinces] = useState([]);
@@ -99,9 +101,11 @@ const Register_Employer = () => {
     try {
       const response = await signUp(updatedFormData).unwrap();
       console.log("Registration successful", response);
+      toast.success("Registration successful! Please check your email for verification.");
       setIsModalVisible(true);
     } catch (error) {
       console.error("Registration failed:", error);
+      toast.error("Registration failed: " + error.data?.message || "Unknown error");
     }
   };
 
@@ -119,8 +123,10 @@ const Register_Employer = () => {
       }).unwrap();
       console.log("Email verified successfully", response);
       navigate("/auth");
+      toast.success("Email verified successfully!");
     } catch (error) {
       console.error("Verification failed:", error);
+      toast.error("Verification failed: " + error.data?.message || "Unknown error");
     }
   };
 
@@ -486,6 +492,7 @@ const Register_Employer = () => {
           </form>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

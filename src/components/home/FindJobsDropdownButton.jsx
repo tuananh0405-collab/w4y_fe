@@ -1,14 +1,13 @@
-import { useMemo, useState } from "react";
-import { useGetUnreadMessageSendersQuery } from "../../redux/api/chatApiSlice";
-import { userIcon } from "../../assets";
-import { getMessageAge } from "../../utils/dateUtils";
-import { Avatar, Dropdown } from "antd";
+import { useState } from "react";
+import { Dropdown } from "antd";
 import {
+  AutoAwesome,
+  Bookmark,
+  ForwardToInbox,
   KeyboardArrowDown,
   KeyboardArrowUp,
-  NotificationsActive,
+  SavedSearch,
 } from "@mui/icons-material";
-import { Stack } from "@mui/material";
 
 const notificationItems = [
   {
@@ -17,11 +16,21 @@ const notificationItems = [
     children: [
       {
         key: "top-jobs",
-        label: <a href="/top-jobs">Tìm việc làm</a>,
+        label: (
+          <a href="/top-jobs">
+            <SavedSearch sx={{ color: "#00796b" }} className="me-2" />Tìm việc
+            làm
+          </a>
+        ),
       },
       {
         key: "recommended-jobs",
-        label: <a href="/recommended-jobs">Việc làm phù hợp</a>,
+        label: (
+          <a href="/recommended-jobs">
+            <AutoAwesome sx={{ color: "#00796b" }} className="me-2" />{" "}
+            Việc làm phù hợp
+          </a>
+        ),
       },
     ],
   },
@@ -31,11 +40,22 @@ const notificationItems = [
     children: [
       {
         key: "saved-jobs",
-        label: <a href="/saved-jobs">Việc đã lưu</a>,
+        type: "disabled",
+        label: (
+          <span className="text-gray-500 opacity-50">
+            <Bookmark sx={{ color: "#00796b" }} className="me-2" />
+            Việc đã lưu
+          </span>
+        ),
       },
       {
         key: "applied-jobs",
-        label: <a href="/applied-jobs">Việc làm đã ứng tuyển</a>,
+        label: (
+          <a href="/job-applied">
+            <ForwardToInbox sx={{ color: "#00796b" }} className="me-2" />
+            Việc làm đã ứng tuyển
+          </a>
+        ),
       },
     ],
   },

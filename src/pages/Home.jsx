@@ -38,9 +38,6 @@ useEffect(() => {
   };
 
   const handlePageChange = (page) => {
-    console.log('====================================');
-    console.log(page);
-    console.log('====================================');
     setFilter((prev) => ({
       ...prev,
       page,
