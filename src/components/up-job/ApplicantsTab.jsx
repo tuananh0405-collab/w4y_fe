@@ -105,14 +105,25 @@ const ApplicantsTab = () => {
   };
 
   const handleOpenCV = (app) => {
-    if (!app.resumeFile || !app.resumeFile.path) {
-      alert("Ứng viên chưa nộp CV.");
-      return;
-    }
-    const fileUrl = `${BASE_URL}/${app.resumeFile.path.replace(/\\/g, "/")}`;
-    setModalFileUrl(fileUrl);
-    setCvModalVisible(true);
-    setSelectedApplication(app);
+if (!app.resumeFile || !app.resumeFile.path) {
+    alert("Ứng viên chưa nộp CV.");
+    return;
+  }
+
+  let fileUrl = "";
+  const path = app.resumeFile.path.replace(/\\/g, "/");
+
+  if (path.startsWith("http")) {
+    // Nếu là Cloudinary URL
+    fileUrl = path;
+  } else {
+    // Nếu là local path
+    fileUrl = `${BASE_URL}/${path}`;
+  }
+
+  setModalFileUrl(fileUrl);
+  setCvModalVisible(true);
+  setSelectedApplication(app);
   };
 
   const handleOpenProfile = (app) => {
