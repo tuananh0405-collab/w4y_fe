@@ -538,7 +538,7 @@ const Profile = () => {
                 </div>
               ))
             ) : (
-              <p className="text-gray-500">No education information provided.</p>
+              <p className="text-gray-500">Chưa có thông tin học vấn.</p>
             )}
           </div>
 
@@ -597,25 +597,6 @@ const Profile = () => {
 
         {/* Right Section */}
         <div className="flex-1 space-y-6">
-          {/* Job Statistics Section */}
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">Quản lý dự án tiêu biểu</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[
-                { value: resumeFiles.length, label: "Danh sách CV của bạn" },
-                { value: applicationCount, label: "Dự án đã ứng tuyển" },
-                { value: 312, label: "Lượt xem hồ sơ" },
-              ].map(({ value, label }, idx) => (
-                <div
-                  key={idx}
-                  className="bg-gray-50 rounded-lg p-4 flex flex-col items-center text-center border border-gray-200 shadow-sm"
-                >
-                  <span className="text-2xl font-bold text-teal-600">{value}</span>
-                  <span className="text-sm text-gray-600">{label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
 
           {/* Contact Info */}
           <div className="bg-gray-50 rounded-xl p-6 shadow-sm">

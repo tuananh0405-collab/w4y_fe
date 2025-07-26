@@ -186,7 +186,7 @@ const ApplicationForm = ({ jobId, jobTitle, onClose }) => {
               Trong trường hợp bạn phát hiện tin tuyển dụng có dấu hiệu lừa đảo,
               hoặc nhận được liên hệ đáng ngờ từ phía nhà tuyển dụng,
               vui lòng báo cáo ngay cho đội ngũ hỗ trợ của chúng tôi qua email{" "}
-              <strong>hotro@W4Uwebsite.vn</strong> để được xử lý kịp thời.
+              <strong>vutuananh0405@gmail.com</strong> để được xử lý kịp thời.
             </li>
             <li>
               Để tránh rủi ro, bạn nên tránh cung cấp các thông tin nhạy cảm như CMND/CCCD,
