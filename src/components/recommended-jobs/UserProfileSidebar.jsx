@@ -4,6 +4,8 @@ import { Avatar, Skeleton, Tooltip, Typography } from "@mui/material";
 import { ReportProblem } from "@mui/icons-material";
 import { useGetJobSkillsByIdsQuery } from "../../redux/api/jobSkillApiSlice";
 import check from "check-types";
+import dayjs from "dayjs";
+import { Divider } from "antd";
 
 const UserProfileSidebar = () => {
   const {
@@ -14,6 +16,7 @@ const UserProfileSidebar = () => {
 
   const profile = profileData?.data;
 
+  /*
   const {
     data: skillsData,
     isLoading: isLoadingSkills,
@@ -24,6 +27,7 @@ const UserProfileSidebar = () => {
   );
 
   const skills = skillsData?.data || [];
+  */
 
   if (isLoadingProfile) {
     return (
@@ -89,9 +93,10 @@ const UserProfileSidebar = () => {
       </div>
 
       <div className="mt-8">
-        <h3 className="text-lg font-semibold mb-2">Kỹ năng</h3>
+        <h3 className="text-lg font-semibold mb-2">Thông tin ứng tuyển</h3>
         <div className="h-px bg-gray-300 my-4"></div>
-        {isLoadingSkills
+        {
+          /*isLoadingSkills
           ? (
             <div className="flex flex-wrap gap-2">
               <Skeleton
@@ -122,7 +127,119 @@ const UserProfileSidebar = () => {
                   ))}
                 </div>
               )
-              : <p className="text-gray-500 text-sm">Chưa có kỹ năng.</p>}
+              : <p className="text-gray-500 text-sm">Chưa có kỹ năng.</p>*/
+        }
+
+        {/* Bio Section */}
+        <div className="mt-6 bg-gray-50 p-6 rounded-xl shadow-sm">
+          <h3 className="text-lg font-semibold text-teal-700 mb-3">
+            Giới thiệu bản thân
+          </h3>
+          <p className="text-gray-700 leading-relaxed">
+            {profile?.userDetail || "Chưa có thông tin giới thiệu"}
+          </p>
+        </div>
+
+        {/* Open to Work, Level, Work Type */}
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-6 rounded-xl shadow-sm">
+          <label className="flex flex-col text-gray-700 font-semibold">
+            Open to Work?
+            <span className="mt-2 text-gray-900">
+              {profile?.openToWork ? "Đang tìm việc" : "Không tìm việc"}
+            </span>
+          </label>
+          <label className="flex flex-col text-gray-700 font-semibold">
+            Loại hình làm việc
+            <span className="mt-2 text-gray-900">
+              {profile?.timeWork === "full-time"
+                ? "Full-time"
+                : profile?.timeWork === "part-time"
+                  ? "Part-time"
+                  : profile?.timeWork === "freelance"
+                    ? "Freelance"
+                    : "Không rõ"}
+            </span>
+          </label>
+          <label className="flex flex-col text-gray-700 font-semibold">
+            Cấp độ
+            <span className="mt-2 text-gray-900 capitalize">
+              {profile?.level || "Không rõ cấp độ"}
+            </span>
+          </label>
+        </div>
+
+        {/* Education */}
+        <div className="mt-6 bg-gray-50 p-6 rounded-xl shadow-sm">
+          <Divider orientation="left" className="text-teal-700 font-semibold">
+            Học vấn
+          </Divider>
+          {profile?.education.length > 0
+            ? (
+              profile?.education.map((edu, index) => (
+                <div key={edu._id || index} className="mb-4">
+                  <p className="text-gray-900">
+                    <strong>Trường:</strong> {edu.school}
+                  </p>
+                  <p className="text-gray-900">
+                    <strong>Chuyên ngành:</strong> {edu.fieldOfStudy}
+                  </p>
+                  <p className="text-gray-900">
+                    <strong>Thời gian:</strong>{" "}
+                    {dayjs(edu.startDate).format("MMM YYYY")} – {edu.endDate
+                      ? dayjs(edu.endDate).format("MMM YYYY")
+                      : "Hiện tại"}
+                  </p>
+                </div>
+              ))
+            )
+            : (
+              <p className="text-gray-500">
+                No education information provided.
+              </p>
+            )}
+        </div>
+
+        {/* Experience */}
+        <div className="mt-6 bg-gray-50 p-6 rounded-xl shadow-sm">
+          <Divider orientation="left" className="text-teal-700 font-semibold">
+            Kinh nghiệm làm việc
+          </Divider>
+          {profile?.experience.length > 0
+            ? (
+              profile?.experience.map((exp, index) => (
+                <div key={exp._id || index} className="mb-4">
+                  <p className="text-base font-semibold">{exp.position}</p>
+                  <p className="text-sm italic text-gray-700">{exp.company}</p>
+                  <p className="text-sm text-gray-600">
+                    {dayjs(exp.startDate).format("MMM YYYY")} - {exp.endDate
+                      ? dayjs(exp.endDate).format("MMM YYYY")
+                      : "Hiện tại"}
+                  </p>
+                </div>
+              ))
+            )
+            : <p className="text-gray-500">Chưa có kinh nghiệm làm việc.</p>}
+        </div>
+
+        {/* Skills */}
+        <div className="mt-6 bg-gray-50 p-6 rounded-xl shadow-sm">
+          <h3 className="text-lg font-semibold text-teal-700 mb-3">Kỹ Năng</h3>
+          <div className="h-px bg-gray-300 my-4"></div>
+          <div className="flex flex-wrap gap-2">
+            {profile?.skills.length > 0
+              ? (
+                profile?.skills.map((skill, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center px-3 py-1 rounded-full bg-gray-200"
+                  >
+                    {skill}
+                  </div>
+                ))
+              )
+              : <p className="text-gray-500 mt-2">Chưa có kỹ năng</p>}
+          </div>
+        </div>
       </div>
     </div>
   );

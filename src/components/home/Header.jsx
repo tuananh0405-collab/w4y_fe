@@ -54,7 +54,8 @@ const Header = () => {
       {
         type: "divider",
       },
-      {
+      /*
+       * {
         key: "job-applied",
         label: (
           <a href="/job-applied">
@@ -67,6 +68,7 @@ const Header = () => {
       {
         type: "divider",
       },
+      */
     );
   }
   menuItems.push({

@@ -6,7 +6,7 @@ import ConversationDescriptionCard from "../components/chat-room/ConversationDes
 import MessageList from "../components/chat-room/MessageList";
 import MessageComposeBar from "../components/chat-room/MessageComposeBar";
 import { useGetChatTokenQuery } from "../redux/api/chatApiSlice";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { socket } from "../socket";
 import { useSelector } from "react-redux";
 import ApplicantSuggestionList from "../components/chat-room/SuggestionList_Applicant";
@@ -40,6 +40,8 @@ const ChatRoom = () => {
   const [conversationQuery_fetch, setConversationQuery_fetch] = useState("");
   // For the loading effect when fetch with new query
   const [isChangingQuery, setIsChangingQuery] = useState(false);
+
+  const listOnSendRef = useRef(null);
 
   // Wait for QUERY_DELAY_MS in milliseconds after user stops typing before fetching
   useEffect(() => {
@@ -155,8 +157,8 @@ const ChatRoom = () => {
           name={receiverProfile?.name}
           title={receiverProfile?.accountType}
         />
-        <MessageList senderId={senderId} receiverId={receiverId} />
-        {receiverId && <MessageComposeBar onSend={handleSend} />}
+        <MessageList senderId={senderId} receiverId={receiverId} listOnSendRef={listOnSendRef}/>
+        {receiverId && <MessageComposeBar onSend={handleSend} listOnSendRef={listOnSendRef}/>}
       </div>
 
       <div className="w-px bg-black opacity-20" />
