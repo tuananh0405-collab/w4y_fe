@@ -2,21 +2,47 @@ import React, { useState } from "react";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import { fileIcon, editNoteIcon } from "../../assets";
-import { useApplyJobMutation } from "../../redux/api/applicationApiSlice";
-import { Snackbar, Alert } from "@mui/material"; // Import Snackbar and Alert from MUI
+import { useApplyJobMutation, useApplyJobLibraryMutation } from "../../redux/api/applicationApiSlice";
+import { useGetUploadedCVsQuery } from "../../redux/api/applicantApiSlice";
+import { Snackbar, Alert, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 
 const ApplicationForm = ({ jobId, jobTitle, onClose }) => {
   const [uploadFromComputer, setUploadFromComputer] = useState(true);
   const [file, setFile] = useState(null);
-  const [applyJob, { isLoading }] = useApplyJobMutation();
+  const [selectedCV, setSelectedCV] = useState("");
+  const [coverLetter, setCoverLetter] = useState("");
+  const { data: queryResponse, isLoading: isLoadingCVs, error: cvError } = useGetUploadedCVsQuery();
+  const uploadedCVs = queryResponse?.data || [];
+  const [applyJob, { isLoading: isLoadingApplyJob }] = useApplyJobMutation();
+  const [applyJobLibrary, { isLoading: isLoadingApplyJobLibrary }] = useApplyJobLibraryMutation();
 
   // Snackbar state
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // "success", "error", "warning", "info"
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+
+  // Extract cleaner filename from path
+  const getFileNameFromPath = (path) => {
+    if (!path) return "CV không tên";
+    const parts = path.split("/");
+    const fullName = parts[parts.length - 1] || "CV không tên";
+    const nameParts = fullName.split("-");
+    if (nameParts.length > 1) {
+      const cleanName = nameParts.slice(1).join("-");
+      const nameWithoutTimestamp = cleanName.replace(/-\d+\.pdf$/, ".pdf");
+      return nameWithoutTimestamp;
+    }
+    return fullName;
+  };
 
   const handleUploadFromComputerChange = () => {
     setUploadFromComputer(true);
+    setSelectedCV("");
+  };
+
+  const handleUploadFromLibraryChange = () => {
+    setUploadFromComputer(false);
+    setFile(null);
   };
 
   const handleFileInput = (e) => {
@@ -27,28 +53,69 @@ const ApplicationForm = ({ jobId, jobTitle, onClose }) => {
     }
   };
 
+  const handleCVSelect = (event) => {
+    const newValue = event.target.value;
+    setSelectedCV(newValue);
+    console.log("Selected CV ID:", newValue); // Debug log
+  };
+
+  const handleCoverLetterChange = (e) => {
+    setCoverLetter(e.target.value);
+  };
+
   const handleSubmit = async () => {
+    console.log("Form state:", { uploadFromComputer, file, selectedCV, coverLetter, uploadedCVs }); // Enhanced debug log
     if (uploadFromComputer && !file) {
       setSnackbarMessage("Vui lòng chọn file CV trước khi nộp.");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
       return;
     }
+    if (!uploadFromComputer && !selectedCV) {
+      setSnackbarMessage("Vui lòng chọn CV từ thư viện trước khi nộp.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
+      return;
+    }
 
-    const formData = new FormData();
-    if (uploadFromComputer) {
-      formData.append("resumeFile", file);
+    // Enhanced validation with logging
+    if (!uploadFromComputer) {
+      const validCV = uploadedCVs.find((cv) => cv._id === selectedCV);
+      if (!validCV) {
+        console.log("Invalid CV selected, uploadedCVs:", uploadedCVs);
+        setSnackbarMessage("CV đã chọn không hợp lệ hoặc không tồn tại.");
+        setSnackbarSeverity("error");
+        setOpenSnackbar(true);
+        return;
+      }
+      console.log("Validated CV:", validCV);
     }
 
     try {
-      await applyJob({ jobId, formData }).unwrap();
+      console.log("Submitting with:", { jobId, resumeId: selectedCV, coverLetter }); // Debug log
+      if (uploadFromComputer) {
+        const formData = new FormData();
+        formData.append("resumeFile", file);
+        formData.append("coverLetter", coverLetter);
+        await applyJob({ jobId, formData }).unwrap();
+      } else {
+        const payload = { jobId, resumeId: selectedCV, coverLetter };
+        console.log("Mutation payload:", payload); // New debug log
+        const result = await applyJobLibrary(payload).unwrap();
+        console.log("Mutation result:", result); // New debug log
+      }
       setSnackbarMessage("Ứng tuyển thành công!");
       setSnackbarSeverity("success");
       setOpenSnackbar(true);
+      // Reset form
+      setFile(null);
+      setSelectedCV("");
+      setCoverLetter("");
+      setUploadFromComputer(true);
       onClose();
     } catch (err) {
-      console.error(err);
-      setSnackbarMessage("Có lỗi xảy ra khi nộp đơn");
+      console.error("Submission error:", err);
+      setSnackbarMessage(err?.data?.message || "Có lỗi xảy ra khi nộp đơn");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
     }
@@ -71,21 +138,46 @@ const ApplicationForm = ({ jobId, jobTitle, onClose }) => {
           </h2>
 
           <div className="flex flex-col gap-3 border border-[#A8BBB4] rounded-lg p-5 bg-[#f1f8f6]">
-            {/* Bỏ chọn thư viện (hiện tại chưa hỗ trợ) */}
-            <label className="flex items-center gap-3 cursor-not-allowed select-none opacity-50">
+            <label className="flex items-center gap-3 cursor-pointer select-none">
               <Checkbox
-                checked={false}
-                disabled
+                checked={!uploadFromComputer}
+                onChange={handleUploadFromLibraryChange}
                 sx={{
                   color: "#6A9183",
+                  "&.Mui-checked": { color: "#3A6656" },
                   padding: 0,
                   margin: 0,
                 }}
               />
               <span className="text-lg font-medium text-[#3A6656]">
-                Chọn CV từ thư viện của tôi (chức năng đang phát triển)
+                Chọn CV từ thư viện của tôi
               </span>
             </label>
+
+            {!uploadFromComputer && (
+              <FormControl fullWidth className="mt-4">
+                <InputLabel id="cv-select-label">Chọn CV</InputLabel>
+                <Select
+                  labelId="cv-select-label"
+                  value={selectedCV}
+                  label="Chọn CV"
+                  onChange={handleCVSelect}
+                  disabled={isLoadingCVs}
+                >
+                  {isLoadingCVs ? (
+                    <MenuItem disabled>Đang tải CV...</MenuItem>
+                  ) : uploadedCVs.length > 0 ? (
+                    uploadedCVs.map((cv) => (
+                      <MenuItem key={cv._id} value={cv._id}>
+                        {getFileNameFromPath(cv.path)}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>Không có CV nào trong thư viện</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            )}
 
             <label
               htmlFor="file-upload"
@@ -108,7 +200,6 @@ const ApplicationForm = ({ jobId, jobTitle, onClose }) => {
             </label>
           </div>
 
-          {/* Khu vực kéo thả và nút chọn file */}
           {uploadFromComputer && (
             <label
               htmlFor="file-upload"
@@ -166,6 +257,8 @@ const ApplicationForm = ({ jobId, jobTitle, onClose }) => {
           <textarea
             placeholder='Viết giới thiệu ngắn gọn về bản thân (điểm mạnh, điểm yếu) và nêu rõ mong muốn, lý do bạn muốn ứng tuyển cho vị trí này.'
             rows={5}
+            value={coverLetter}
+            onChange={handleCoverLetterChange}
             className="w-full border border-[#6A9183] rounded-xl p-4 text-base resize-y bg-[#E6F0EA] focus:outline-none focus:ring-4 focus:ring-[#A8E6CF]"
           />
         </section>
@@ -237,9 +330,9 @@ const ApplicationForm = ({ jobId, jobTitle, onClose }) => {
               },
             }}
             onClick={handleSubmit}
-            disabled={isLoading}
+            disabled={isLoadingApplyJob || isLoadingApplyJobLibrary}
           >
-            {isLoading ? "Đang nộp..." : "Nộp hồ sơ ứng tuyển"}
+            {isLoadingApplyJob || isLoadingApplyJobLibrary ? "Đang nộp..." : "Nộp hồ sơ ứng tuyển"}
           </Button>
         </footer>
       </section>
@@ -247,7 +340,7 @@ const ApplicationForm = ({ jobId, jobTitle, onClose }) => {
       {/* Snackbar for success or error messages */}
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={6000} // Hide after 6 seconds
+        autoHideDuration={6000}
         onClose={() => setOpenSnackbar(false)}
       >
         <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity}>
