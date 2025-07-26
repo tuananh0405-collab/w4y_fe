@@ -14,6 +14,7 @@ import {
 import check from "check-types";
 import { Tooltip } from "antd";
 import { InfoOutlined } from "@mui/icons-material";
+import { Typography } from "@mui/material";
 
 const technicalOptions = [
   "Công nghệ thông tin / Lập trình",
@@ -366,12 +367,12 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold text-teal-700">Thông tin cơ bản</h2>
-        <button
+        {/*<button
           className="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700 cursor-pointer"
           onClick={() => alert("Chưa hỗ trợ tính năng này")}
         >
           Xem bản nháp đã lưu
-        </button>
+        </button>*/}
       </div>
 
       <div
@@ -841,6 +842,8 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
             </div>
           )}
           {!useSalaryRange && (
+            <div className="flex flex-col">
+              <Typography sx={{color: "orange" }}>Bài đăng sẽ bị giảm độ ưu tiên khi ứng viên tìm lọc theo mức lương</Typography>
             <input
               type="text"
               name="salary"
@@ -849,6 +852,7 @@ const CreateJobTab = ({ onBack, onSubmit }) => {
               placeholder="Lương"
               className="border p-2 rounded"
             />
+            </div>
           )}
           {errors.salary && (
             <p className="text-red-600 mt-1">
